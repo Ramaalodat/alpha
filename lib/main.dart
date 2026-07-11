@@ -26,6 +26,7 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations', 
       fallbackLocale: const Locale('en'),
+       startLocale: const Locale('en'),
       child: MultiProvider( providers: [
             
         ChangeNotifierProvider(create: (context) => Themeprovider()..loadtheme(),),
@@ -72,7 +73,7 @@ void initState() {
   @override
   Widget build(BuildContext context) {
 
-     
+     print(context.locale.languageCode);
        
         return Consumer<Themeprovider>(builder: (context, themeprovider, _) {
          return MaterialApp(

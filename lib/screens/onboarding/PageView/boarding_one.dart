@@ -1,7 +1,7 @@
 import 'package:alpha_app/media/images.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
-import 'package:alpha_app/services/app_colors.dart';
-import 'package:alpha_app/services/device.dart';
+import 'package:alpha_app/core/utils/app_colors.dart';
+import 'package:alpha_app/core/utils/device.dart';
 
 import 'package:alpha_app/widgets/Custom_mesh_card.dart';
 import 'package:flutter/material.dart';

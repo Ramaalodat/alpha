@@ -5,8 +5,8 @@ import 'package:alpha_app/screens/onboarding/PageView/boarding_one.dart';
 import 'package:alpha_app/screens/onboarding/onboarding_screen.dart';
 
 
-import 'package:alpha_app/services/app_colors.dart';
-import 'package:alpha_app/services/device.dart';
+import 'package:alpha_app/core/utils/app_colors.dart';
+import 'package:alpha_app/core/utils/device.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Text(
             "SMART FINANCIAL ADVISOR",
             style: GoogleFonts.ibmPlexSansArabic(
-              fontSize: screenW*0.04,
+              fontSize: screenW*0.042,
              
               color: themeprovider.isDark
                   ? AppColors.darkSubText

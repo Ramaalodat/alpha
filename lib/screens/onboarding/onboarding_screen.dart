@@ -1,9 +1,10 @@
 import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/screens/auth/login.dart';
 import 'package:alpha_app/screens/onboarding/PageView/boarding_one.dart';
 import 'package:alpha_app/screens/onboarding/PageView/boarding_three.dart';
 import 'package:alpha_app/screens/onboarding/PageView/boarding_two.dart';
-import 'package:alpha_app/services/app_colors.dart';
-import 'package:alpha_app/services/device.dart';
+import 'package:alpha_app/core/utils/app_colors.dart';
+import 'package:alpha_app/core/utils/device.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -70,7 +71,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             currentPage == 2
     ? ElevatedButton(
         onPressed: () {
-         
+         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Login(),));
         },
         style: ButtonStyle(
           backgroundColor: WidgetStatePropertyAll(
@@ -102,7 +103,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             onPressed: () {
               // Skip
             },
-            child: Text("Skip"),
+            child: Text("Skip" , style: TextStyle(color:  themeprovider.isDark
+                  ? AppColors.darkSubText
+                  : AppColors.lightSubText,
+                  fontWeight: FontWeight.w500 ,
+                  fontSize: screenW*0.042),),
           ),
 
           Expanded(
