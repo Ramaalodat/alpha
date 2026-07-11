@@ -66,7 +66,7 @@ final  _passwordController = TextEditingController();
                                "Log in to continue your financial journey",
                                style: GoogleFonts.ibmPlexSansArabic(
                                  fontSize: screenW*0.04,
-                                
+                                fontWeight: FontWeight.w500,
                                  color: themeprovider.isDark
                     ? AppColors.darkSubText
                     : AppColors.lightSubText,
@@ -76,22 +76,32 @@ final  _passwordController = TextEditingController();
                         SizedBox(height: screenH*0.03,),
                 Padding(
                  padding: EdgeInsets.symmetric(horizontal: screenW*0.02),
-                   child: Text("Phone Number" , style: TextStyle(fontSize: screenW*0.04 , color: AppColors.darkError , fontWeight: FontWeight.bold),),
+                   child: Text("Phone number" , style: TextStyle(fontSize: screenW*0.04 ,  color: themeprovider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),),
                  ),
                  SizedBox(height: screenH*0.01,),
                  CustomTextfield( isPassword: false,
-                  controller: _emailController, hint: "You@example.com" , validator: (value) {
-                    if (value == null || value.isEmpty) return "validation.email_required".tr() ;
-                  if (!value.contains('@') || !value.contains('.')) return "validation.invalid_email".tr();
-                  return null;
+                  controller: _emailController, hint: "+962" , validator: (value) {
+                    if (value == null || value.isEmpty) {
+    return "Phone number is required";
+  }
+
+  if (value.length != 9) {
+    return "Enter a valid phone number";
+  }
+
+  if (!value.startsWith("7")) {
+    return "Invalid phone number";
+  }
+
+  return null;
                 
                  },
-                 icon: Icons.email_outlined,),
+                 icon: Icons.call,),
         
            SizedBox(height: screenH*0.02,),
           Padding(
                  padding: EdgeInsets.symmetric(horizontal: screenW*0.02),
-                   child: Text("Password ", style: TextStyle(fontSize: screenW*0.04 , color: AppColors.darkError ,  fontWeight: FontWeight.bold),),
+                   child: Text("Password ", style: TextStyle(fontSize: screenW*0.04 , color: themeprovider.isDark ? AppColors.darkSubText:AppColors.lightSubText,  fontWeight: FontWeight.bold),),
                  ),
                  SizedBox(height: screenH*0.01,),
         
@@ -123,50 +133,60 @@ final  _passwordController = TextEditingController();
               
                    
                       }, icon: _isremember ? Icon( size: screenW * 0.06,
-                        Icons.check_box , color: AppColors.darkSubText,) :Icon(Icons.square_outlined , color: AppColors.darkBorder,) 
+                        Icons.check_box , color: themeprovider.isDark ? AppColors.darkSecondary :AppColors.lightSecondary,) :Icon(Icons.square_outlined , color: themeprovider.isDark ? AppColors.darkSecondary :AppColors.lightSecondary,) 
                       ),
-                      Text("remember_me".tr(),  style: TextStyle( fontSize: screenW * 0.04 , fontWeight: FontWeight.w500 , color: AppColors.darkAccent),)
+                      Text("remember_me".tr(),  style: TextStyle( fontSize: screenW * 0.04 , fontWeight: FontWeight.w600 , color: themeprovider.isDark ? AppColors.darkSecondary :AppColors.lightSecondary ),)
                     ],
                   ),
               SizedBox(height: screenH*0.05,),
         
         Center(
           child: _isloading ? CircularProgressIndicator(color: AppColors.darkError,) :
-           ElevatedButton(onPressed: () async{
-            
-           
-        
-          },  style:  ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(
-                               AppColors.darkError,
-                              ),
-                              fixedSize:  WidgetStatePropertyAll(
-                              Size(screenW * 0.85, screenH * 0.065),
-                              ),
-                              shadowColor: WidgetStatePropertyAll(AppColors.darkPrimary),
-                              elevation: const WidgetStatePropertyAll(5)
-                              
-                            ),
-                            child: Text(
-                              "sign_in".tr(),
-                              style: TextStyle(fontSize: screenW * 0.055, color: Colors.white),
-                            ),
-                      ),
+             ElevatedButton(
+                     onPressed: () {
+                     
+                     },
+                     style: ButtonStyle(
+                       backgroundColor: WidgetStatePropertyAll(
+             themeprovider.isDark
+                 ? AppColors.darkPrimary
+                 : AppColors.lightPrimary,
+                       ),
+                       fixedSize: WidgetStatePropertyAll(
+             Size(screenW * 0.8, screenH * 0.065),
+                       ),
+                       shape: WidgetStatePropertyAll(
+             RoundedRectangleBorder(
+               borderRadius: BorderRadius.circular(10),
+             ),
+                       ),
+                     ),
+                     child: Text(
+                       "Login",
+                       style: TextStyle(
+             fontSize: screenW * 0.055,
+             color: AppColors.darkBorder,
+             fontWeight: FontWeight.w600,
+                       ),
+                     ),
+                   ),
         ),
         
-         SizedBox(height: screenW*0.01,),
-                        Center(
-                          child: TextButton(onPressed: () {
-                          
-                          }, child: Text("forgot_password_title".tr(), style:  TextStyle(color: AppColors.darkText,  fontSize: screenW * 0.04),)),
-                        ),
-                           SizedBox(height: screenH * 0.02),
+          SizedBox(height: screenW*0.01,),
+                          Center(
+                            child: TextButton(onPressed: () {
+                              
+                            }, child: Text("forgot_password_title".tr(), style:  TextStyle(color: themeprovider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary,  fontSize: screenW * 0.04 , fontWeight: FontWeight.w600),)),
+                          ),
+                             SizedBox(height: screenH * 0.06),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                     Text(
                      "no_account".tr(),
-                      style: TextStyle(color: Colors.grey, fontSize: screenW * 0.04),
+                      style: TextStyle(color: themeprovider.isDark
+                    ? AppColors.darkSubText
+                    : AppColors.lightSubText, fontSize: screenW * 0.04 , fontWeight: FontWeight.w500),
                     ),
                    SizedBox(width: screenW * 0.015),
                     InkWell(
@@ -178,9 +198,10 @@ final  _passwordController = TextEditingController();
                       child: Text(
             "sign_up".tr(),
               style:  TextStyle(
-                color: AppColors.darkBorder,
-                fontSize: screenW*0.04,
-                fontWeight: FontWeight.w500,
+               color: themeprovider.isDark ? AppColors.darkSecondary :AppColors.lightSecondary ,
+                fontSize: screenW*0.045,
+                fontWeight: FontWeight.w600,
+                
               ),
                       ),
                     ),

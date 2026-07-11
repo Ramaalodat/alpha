@@ -118,11 +118,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         style: ButtonStyle(
           backgroundColor: WidgetStatePropertyAll(
             themeprovider.isDark
-                ? AppColors.darkSecondary
-                : AppColors.lightSecondary,
+                ? AppColors.darkPrimary
+                : AppColors.lightPrimary,
           ),
           fixedSize: WidgetStatePropertyAll(
-            Size(screenW * 0.8, screenH * 0.06),
+            Size(screenW * 0.8, screenH * 0.065),
           ),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
