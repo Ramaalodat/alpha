@@ -67,47 +67,76 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
                 SizedBox(height: screenH*0.05,),
                 
-              Row( crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-                 children: [
-                  TextButton(onPressed: () {
-                    
-                  }, child: Text("Skip" , style: TextStyle( fontSize: screenW*0.04,
-                    color: themeprovider.isDark
-                      ? AppColors.darkSubText
-                      : AppColors.lightSubText,
-                      fontWeight: FontWeight.w500),
-                      )),
-             Expanded(
-               child: ElevatedButton(
-                            onPressed: (){
-              _controller.nextPage(
-                duration: Duration(milliseconds: 300),
-                curve: Curves.ease,
-              );
+            currentPage == 2
+    ? ElevatedButton(
+        onPressed: () {
+         
+        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStatePropertyAll(
+            themeprovider.isDark
+                ? AppColors.darkSecondary
+                : AppColors.lightSecondary,
+          ),
+          fixedSize: WidgetStatePropertyAll(
+            Size(screenW * 0.8, screenH * 0.06),
+          ),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        child: Text(
+          "Get Started",
+          style: TextStyle(
+            fontSize: screenW * 0.055,
+            color: AppColors.darkBorder,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      )
+    : Row(
+        children: [
+          TextButton(
+            onPressed: () {
+              // Skip
             },
-                          style:  ButtonStyle( 
-                            backgroundColor: themeprovider.isDark ? WidgetStatePropertyAll(
-                             AppColors.darkSecondary
-                            ) : 
-                            WidgetStatePropertyAll(AppColors.lightSecondary) ,
+            child: Text("Skip"),
+          ),
 
-                            fixedSize: WidgetStatePropertyAll(
-                                Size(screenW * 0.8, screenH * 0.06),
-                              ),
-                          
-                            shape: WidgetStatePropertyAll( RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(10)))
-                            
-                          ),
-                          child: Text(
-                           "Next",
-                            style: TextStyle(fontSize: screenW * 0.055, color: AppColors.darkBorder ,fontWeight: FontWeight.w500),
-                          ),
-                  
-                        ),
-             ),
-                 ],
-              ),
+          Expanded(
+            child:ElevatedButton(
+        onPressed: () {
+        _controller.nextPage( duration: Duration(milliseconds: 300), curve: Curves.ease, );
+        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStatePropertyAll(
+            themeprovider.isDark
+                ? AppColors.darkSecondary
+                : AppColors.lightSecondary,
+          ),
+          fixedSize: WidgetStatePropertyAll(
+            Size(screenW * 0.8, screenH * 0.06),
+          ),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        child: Text(
+          "Next",
+          style: TextStyle(
+            fontSize: screenW * 0.055,
+            color: AppColors.darkBorder,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      )
+          ),
+        ],
+      ),
                 
                 SizedBox(height: screenH*0.03,)
             ],
