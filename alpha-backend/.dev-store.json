@@ -1,0 +1,165 @@
+{
+  "users": [
+    {
+      "id": "dev-1783807153614",
+      "phoneNumber": "+962790000001",
+      "fullName": "Test User",
+      "birthDate": "1995-01-01T00:00:00.000Z",
+      "passwordHash": "$2a$12$.BzzZ5aSCDe/vx3.TZ0JI.3KXuAZ5ncofbmKy.oEb/qjKBtuWUEGu",
+      "status": "PENDING_VERIFICATION",
+      "isOnboarded": false,
+      "createdAt": "2026-07-11T21:59:13.615Z",
+      "updatedAt": "2026-07-11T21:59:13.615Z"
+    },
+    {
+      "id": "dev-1783807214937",
+      "phoneNumber": "+962790000002",
+      "fullName": "Test User 2",
+      "birthDate": "1995-01-02T00:00:00.000Z",
+      "passwordHash": "$2a$12$tKlZymqYKKpP1aaj7egj/u.SKkrSrC0qm.4CKLZscMY0MUVRfakr2",
+      "status": "PENDING_VERIFICATION",
+      "isOnboarded": false,
+      "createdAt": "2026-07-11T22:00:14.937Z",
+      "updatedAt": "2026-07-11T22:00:14.937Z"
+    },
+    {
+      "id": "dev-1783807543378",
+      "phoneNumber": "+962790000003",
+      "fullName": "Test User",
+      "birthDate": "1995-01-01T00:00:00.000Z",
+      "passwordHash": "$2a$12$x0WgS/az4sRL9KOgsmYLkuJpgggyI/wJzk1vGYGBWwbpTlF/o61iu",
+      "status": "VERIFIED",
+      "isOnboarded": false,
+      "createdAt": "2026-07-11T22:05:43.378Z",
+      "updatedAt": "2026-07-11T22:07:42.176Z"
+    },
+    {
+      "id": "dev-1783807784936",
+      "phoneNumber": "+962790000004",
+      "fullName": "Test User 4",
+      "birthDate": "1995-01-01T00:00:00.000Z",
+      "passwordHash": "$2a$12$SgQWPa3.LXkAOz2UhNf19uoTG7TumtqznOsLD1yjcqJ9MbzzA3v9y",
+      "status": "PENDING_VERIFICATION",
+      "isOnboarded": false,
+      "createdAt": "2026-07-11T22:09:44.936Z",
+      "updatedAt": "2026-07-11T22:09:44.936Z"
+    },
+    {
+      "id": "dev-1783808826953",
+      "phoneNumber": "+962790000005",
+      "fullName": "Live Tester",
+      "birthDate": "1995-01-01T00:00:00.000Z",
+      "passwordHash": "$2a$12$c1NFaVrxzZz.scCadddULO8kiLr4JQKUzVsBa55ECtNN7FMwGXc36",
+      "status": "VERIFIED",
+      "isOnboarded": false,
+      "createdAt": "2026-07-11T22:27:06.954Z",
+      "updatedAt": "2026-07-11T22:28:29.689Z",
+      "phoneVerifiedAt": "2026-07-11T22:28:12.678Z",
+      "lastLoginAt": "2026-07-11T22:28:29.689Z"
+    }
+  ],
+  "otps": [
+    {
+      "phoneNumber": "+962790000001",
+      "code": "820624",
+      "purpose": "REGISTRATION",
+      "isUsed": true,
+      "attempts": 0,
+      "expiresAt": "2026-07-11T22:04:17.693Z",
+      "id": "1783807157694-f5534d85c00d6",
+      "createdAt": "2026-07-11T21:59:17.694Z",
+      "usedAt": "2026-07-11T21:59:32.843Z"
+    },
+    {
+      "phoneNumber": "+962790000002",
+      "code": "874907",
+      "purpose": "REGISTRATION",
+      "isUsed": true,
+      "attempts": 0,
+      "expiresAt": "2026-07-11T22:05:19.015Z",
+      "id": "1783807219016-9594c0b7b52db",
+      "createdAt": "2026-07-11T22:00:19.016Z",
+      "usedAt": "2026-07-11T22:00:28.584Z"
+    },
+    {
+      "phoneNumber": "+962790000003",
+      "code": "585888",
+      "purpose": "REGISTRATION",
+      "isUsed": true,
+      "attempts": 1,
+      "expiresAt": "2026-07-11T22:10:47.464Z",
+      "id": "1783807547465-d38f2df1eeb15",
+      "createdAt": "2026-07-11T22:05:47.465Z",
+      "usedAt": "2026-07-11T22:06:18.631Z"
+    },
+    {
+      "phoneNumber": "+962790000004",
+      "code": "793416",
+      "purpose": "REGISTRATION",
+      "isUsed": true,
+      "attempts": 2,
+      "expiresAt": "2026-07-11T22:14:48.982Z",
+      "id": "1783807788983-f3218cc9c02de",
+      "createdAt": "2026-07-11T22:09:48.984Z",
+      "usedAt": "2026-07-11T22:10:54.912Z"
+    },
+    {
+      "phoneNumber": "+962790000005",
+      "code": "580803",
+      "purpose": "REGISTRATION",
+      "isUsed": true,
+      "attempts": 1,
+      "expiresAt": "2026-07-11T22:32:11.057Z",
+      "id": "1783808831059-81604fd93397b",
+      "createdAt": "2026-07-11T22:27:11.059Z",
+      "usedAt": "2026-07-11T22:28:08.591Z"
+    }
+  ],
+  "sessions": [
+    {
+      "userId": "u1",
+      "refreshTokenHash": "$2a$10$/5nyBGG5r3CnY8EP/G2FWuc2VDKSCNpejiIOkbypRvh6mIdTzWd/i",
+      "expiresAt": "2026-07-11T23:20:42.324Z",
+      "isActive": true,
+      "isRevoked": false,
+      "id": "1783808442325-7a9acec028f83",
+      "createdAt": "2026-07-11T22:20:42.325Z",
+      "updatedAt": "2026-07-11T22:20:42.325Z"
+    },
+    {
+      "userId": "dev-1783808826953",
+      "refreshTokenHash": "$2a$10$yoH1wmpSd3LI7sOLHDWZgOTgIFswqTNjNIafHHyQbYcn6jbuwcO2y",
+      "expiresAt": "2026-07-18T22:28:12.746Z",
+      "isActive": true,
+      "isRevoked": false,
+      "id": "1783808896825-f4320228ef452",
+      "createdAt": "2026-07-11T22:28:16.825Z",
+      "updatedAt": "2026-07-11T22:29:14.112Z",
+      "lastUsedAt": "2026-07-11T22:29:14.112Z"
+    },
+    {
+      "userId": "dev-1783808826953",
+      "refreshTokenHash": "$2a$10$jTmjzJDe0skRyGAWbHEsku.fFua363PdznYOOViHk.OZZ.n0H5kE6",
+      "expiresAt": "2026-07-18T22:28:29.756Z",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.5624",
+      "isActive": true,
+      "isRevoked": false,
+      "id": "1783808913824-fc66c7126960e",
+      "createdAt": "2026-07-11T22:28:33.824Z",
+      "updatedAt": "2026-07-11T22:28:33.824Z"
+    },
+    {
+      "userId": "dev-1783808826953",
+      "refreshTokenHash": "$2a$10$/yho1NjzUeEXCzpwmlIDGOMGh3cJQencRIWaDfYt.FM9WEokDoOfe",
+      "expiresAt": "2026-07-18T22:29:14.175Z",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-US) WindowsPowerShell/5.1.22621.5624",
+      "isActive": true,
+      "isRevoked": false,
+      "id": "1783808958245-607300d04f83f",
+      "createdAt": "2026-07-11T22:29:18.245Z",
+      "updatedAt": "2026-07-11T22:29:18.245Z"
+    }
+  ]
+}

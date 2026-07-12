@@ -1,0 +1,511 @@
+import { PrismaClient, Expense, ExpenseCategory } from '@prisma/client';
+import { ErrorCodes } from '../types/api.types';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, DEFAULT_EXPENSE_CATEGORIES } from '../utils/constants';
+import { CreateExpenseRequest, UpdateExpenseRequest, CreateExpenseCategoryRequest, ExpenseFilters } from '../types/user.types';
+import logger from '../utils/logger';
+
+const prisma = new PrismaClient();
+
+export class ExpenseService {
+  /**
+   * Create expense
+   */
+  async createExpense(userId: string, data: CreateExpenseRequest): Promise<Expense> {
+    const {
+      categoryId,
+      amount,
+      description,
+      expenseDate,
+      paymentMethod,
+      location,
+      receiptUrl,
+      isRecurring,
+      recurringFrequency,
+      tags,
+      notes,
+    } = data;
+
+    // Validate amount
+    if (amount <= 0) {
+      throw {
+        code: ErrorCodes.INVALID_AMOUNT,
+        message: ERROR_MESSAGES.INVALID_AMOUNT,
+      };
+    }
+
+    // Check if category exists
+    const category = await prisma.expenseCategory.findUnique({
+      where: { id: categoryId },
+    });
+
+    if (!category) {
+      throw {
+        code: ErrorCodes.NOT_FOUND,
+        message: 'فئة المصروف غير موجودة',
+      };
+    }
+
+    // Create expense
+    const expense = await prisma.expense.create({
+      data: {
+        userId,
+        categoryId,
+        amount,
+        description,
+        expenseDate: expenseDate ? new Date(expenseDate) : new Date(),
+        paymentMethod: paymentMethod as any,
+        location,
+        receiptUrl,
+        isRecurring: isRecurring || false,
+        recurringFrequency: recurringFrequency as any,
+        tags: tags || [],
+        notes,
+      },
+    });
+
+    // Create audit log
+    await this.createAuditLog({
+      userId,
+      action: 'CREATE',
+      entityType: 'Expense',
+      entityId: expense.id,
+      newValues: expense,
+    });
+
+    logger.info('Expense created', { userId, expenseId: expense.id, amount });
+
+    return expense;
+  }
+
+  /**
+   * Get expense by ID
+   */
+  async getExpenseById(userId: string, expenseId: string): Promise<Expense> {
+    const expense = await prisma.expense.findFirst({
+      where: {
+        id: expenseId,
+        userId,
+        deletedAt: null,
+      },
+      include: {
+        category: true,
+      },
+    });
+
+    if (!expense) {
+      throw {
+        code: ErrorCodes.NOT_FOUND,
+        message: ERROR_MESSAGES.EXPENSE_NOT_FOUND,
+      };
+    }
+
+    return expense;
+  }
+
+  /**
+   * Get user expenses with filters
+   */
+  async getUserExpenses(userId: string, filters?: ExpenseFilters): Promise<Expense[]> {
+    const where: any = {
+      userId,
+      deletedAt: null,
+    };
+
+    if (filters) {
+      if (filters.categoryId) {
+        where.categoryId = filters.categoryId;
+      }
+      if (filters.startDate) {
+        where.expenseDate = { gte: new Date(filters.startDate) };
+      }
+      if (filters.endDate) {
+        where.expenseDate = { ...where.expenseDate, lte: new Date(filters.endDate) };
+      }
+      if (filters.minAmount) {
+        where.amount = { gte: filters.minAmount };
+      }
+      if (filters.maxAmount) {
+        where.amount = { ...where.amount, lte: filters.maxAmount };
+      }
+      if (filters.paymentMethod) {
+        where.paymentMethod = filters.paymentMethod;
+      }
+      if (filters.tags && filters.tags.length > 0) {
+        where.tags = { hasSome: filters.tags };
+      }
+      if (filters.isRecurring !== undefined) {
+        where.isRecurring = filters.isRecurring;
+      }
+    }
+
+    const expenses = await prisma.expense.findMany({
+      where,
+      include: {
+        category: true,
+      },
+      orderBy: { expenseDate: 'desc' },
+    });
+
+    return expenses;
+  }
+
+  /**
+   * Update expense
+   */
+  async updateExpense(userId: string, expenseId: string, data: UpdateExpenseRequest): Promise<Expense> {
+    // Get existing expense
+    const existingExpense = await this.getExpenseById(userId, expenseId);
+
+    const updateData: any = {};
+
+    if (data.categoryId) {
+      // Check if category exists
+      const category = await prisma.expenseCategory.findUnique({
+        where: { id: data.categoryId },
+      });
+      if (!category) {
+        throw {
+          code: ErrorCodes.NOT_FOUND,
+          message: 'فئة المصروف غير موجودة',
+        };
+      }
+      updateData.categoryId = data.categoryId;
+    }
+    if (data.amount !== undefined) {
+      if (data.amount <= 0) {
+        throw {
+          code: ErrorCodes.INVALID_AMOUNT,
+          message: ERROR_MESSAGES.INVALID_AMOUNT,
+        };
+      }
+      updateData.amount = data.amount;
+    }
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.expenseDate) updateData.expenseDate = new Date(data.expenseDate);
+    if (data.paymentMethod) updateData.paymentMethod = data.paymentMethod;
+    if (data.location !== undefined) updateData.location = data.location;
+    if (data.receiptUrl !== undefined) updateData.receiptUrl = data.receiptUrl;
+    if (data.isRecurring !== undefined) updateData.isRecurring = data.isRecurring;
+    if (data.recurringFrequency) updateData.recurringFrequency = data.recurringFrequency;
+    if (data.tags) updateData.tags = data.tags;
+    if (data.notes !== undefined) updateData.notes = data.notes;
+
+    // Update expense
+    const updatedExpense = await prisma.expense.update({
+      where: { id: expenseId },
+      data: updateData,
+      include: {
+        category: true,
+      },
+    });
+
+    // Create audit log
+    await this.createAuditLog({
+      userId,
+      action: 'UPDATE',
+      entityType: 'Expense',
+      entityId: expenseId,
+      oldValues: existingExpense,
+      newValues: updatedExpense,
+    });
+
+    logger.info('Expense updated', { userId, expenseId });
+
+    return updatedExpense;
+  }
+
+  /**
+   * Delete expense (soft delete)
+   */
+  async deleteExpense(userId: string, expenseId: string): Promise<{ message: string }> {
+    // Check if expense exists
+    await this.getExpenseById(userId, expenseId);
+
+    // Soft delete
+    await prisma.expense.update({
+      where: { id: expenseId },
+      data: { deletedAt: new Date() },
+    });
+
+    // Create audit log
+    await this.createAuditLog({
+      userId,
+      action: 'DELETE',
+      entityType: 'Expense',
+      entityId: expenseId,
+    });
+
+    logger.info('Expense deleted', { userId, expenseId });
+
+    return {
+      message: SUCCESS_MESSAGES.EXPENSE_DELETED,
+    };
+  }
+
+  /**
+   * Get expense categories
+   */
+  async getCategories(userId?: string): Promise<ExpenseCategory[]> {
+    const where: any = {
+      isActive: true,
+    };
+
+    // Get default categories and user's custom categories
+    if (userId) {
+      where.OR = [
+        { isDefault: true },
+        { createdBy: userId },
+      ];
+    } else {
+      where.isDefault = true;
+    }
+
+    const categories = await prisma.expenseCategory.findMany({
+      where,
+      orderBy: [
+        { displayOrder: 'asc' },
+        { name: 'asc' },
+      ],
+    });
+
+    return categories;
+  }
+
+  /**
+   * Create custom expense category
+   */
+  async createCategory(userId: string, data: CreateExpenseCategoryRequest): Promise<ExpenseCategory> {
+    const { name, icon, color } = data;
+
+    const category = await prisma.expenseCategory.create({
+      data: {
+        name,
+        icon,
+        color: color || '#6B7280',
+        isDefault: false,
+        isEssential: false,
+        createdBy: userId,
+      },
+    });
+
+    logger.info('Custom expense category created', { userId, categoryId: category.id });
+
+    return category;
+  }
+
+  /**
+   * Get expense statistics
+   */
+  async getExpenseStats(userId: string, startDate?: Date, endDate?: Date): Promise<{
+    totalExpenses: number;
+    expenseCount: number;
+    averageExpense: number;
+    byCategory: Array<{
+      category: string;
+      categoryId: string;
+      amount: number;
+      count: number;
+      percentage: number;
+    }>;
+    byPaymentMethod: Array<{
+      method: string;
+      amount: number;
+      count: number;
+    }>;
+    dailyAverage: number;
+  }> {
+    const where: any = {
+      userId,
+      deletedAt: null,
+    };
+
+    if (startDate) {
+      where.expenseDate = { gte: startDate };
+    }
+    if (endDate) {
+      where.expenseDate = { ...where.expenseDate, lte: endDate };
+    }
+
+    // Get total expenses
+    const [totals, expenses, categories] = await Promise.all([
+      prisma.expense.aggregate({
+        where,
+        _sum: { amount: true },
+        _count: true,
+        _avg: { amount: true },
+      }),
+      prisma.expense.findMany({
+        where,
+        include: { category: true },
+      }),
+      this.getCategories(userId),
+    ]);
+
+    const totalAmount = Number(totals._sum.amount || 0);
+
+    // Group by category
+    const categoryMap = new Map<string, { amount: number; count: number; name: string }>();
+    expenses.forEach((expense) => {
+      const catId = expense.categoryId;
+      const existing = categoryMap.get(catId) || { amount: 0, count: 0, name: expense.category.name };
+      existing.amount += Number(expense.amount);
+      existing.count += 1;
+      categoryMap.set(catId, existing);
+    });
+
+    const byCategory = Array.from(categoryMap.entries()).map(([categoryId, data]) => ({
+      categoryId,
+      category: data.name,
+      amount: data.amount,
+      count: data.count,
+      percentage: totalAmount > 0 ? (data.amount / totalAmount) * 100 : 0,
+    }));
+
+    // Group by payment method
+    const paymentMap = new Map<string, { amount: number; count: number }>();
+    expenses.forEach((expense) => {
+      const method = expense.paymentMethod || 'UNKNOWN';
+      const existing = paymentMap.get(method) || { amount: 0, count: 0 };
+      existing.amount += Number(expense.amount);
+      existing.count += 1;
+      paymentMap.set(method, existing);
+    });
+
+    const byPaymentMethod = Array.from(paymentMap.entries()).map(([method, data]) => ({
+      method,
+      amount: data.amount,
+      count: data.count,
+    }));
+
+    // Calculate daily average
+    let dailyAverage = 0;
+    if (startDate && endDate) {
+      const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      dailyAverage = days > 0 ? totalAmount / days : 0;
+    }
+
+    return {
+      totalExpenses: totalAmount,
+      expenseCount: totals._count || 0,
+      averageExpense: Number(totals._avg.amount || 0),
+      byCategory: byCategory.sort((a, b) => b.amount - a.amount),
+      byPaymentMethod: byPaymentMethod.sort((a, b) => b.amount - a.amount),
+      dailyAverage,
+    };
+  }
+
+  /**
+   * Get monthly expenses comparison
+   */
+  async getMonthlyComparison(userId: string): Promise<{
+    currentMonth: number;
+    lastMonth: number;
+    changePercentage: number;
+    trend: 'increase' | 'decrease' | 'stable';
+  }> {
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+
+    const [currentMonth, lastMonth] = await Promise.all([
+      prisma.expense.aggregate({
+        where: {
+          userId,
+          deletedAt: null,
+          expenseDate: { gte: currentMonthStart },
+        },
+        _sum: { amount: true },
+      }),
+      prisma.expense.aggregate({
+        where: {
+          userId,
+          deletedAt: null,
+          expenseDate: {
+            gte: lastMonthStart,
+            lte: lastMonthEnd,
+          },
+        },
+        _sum: { amount: true },
+      }),
+    ]);
+
+    const currentTotal = Number(currentMonth._sum.amount || 0);
+    const lastTotal = Number(lastMonth._sum.amount || 0);
+
+    let changePercentage = 0;
+    let trend: 'increase' | 'decrease' | 'stable' = 'stable';
+
+    if (lastTotal > 0) {
+      changePercentage = ((currentTotal - lastTotal) / lastTotal) * 100;
+      if (changePercentage > 5) trend = 'increase';
+      else if (changePercentage < -5) trend = 'decrease';
+    }
+
+    return {
+      currentMonth: currentTotal,
+      lastMonth: lastTotal,
+      changePercentage: Math.round(changePercentage * 100) / 100,
+      trend,
+    };
+  }
+
+  /**
+   * Seed default categories (for initial setup)
+   */
+  async seedDefaultCategories(): Promise<void> {
+    const existingCategories = await prisma.expenseCategory.count({
+      where: { isDefault: true },
+    });
+
+    if (existingCategories > 0) {
+      logger.info('Default categories already exist, skipping seed');
+      return;
+    }
+
+    for (const [index, category] of DEFAULT_EXPENSE_CATEGORIES.entries()) {
+      await prisma.expenseCategory.create({
+        data: {
+          name: category.name,
+          nameAr: category.name, // Same for Arabic
+          icon: category.icon,
+          color: category.color,
+          isDefault: true,
+          isEssential: ['Food & Dining', 'Transportation', 'Bills & Utilities', 'Healthcare'].includes(category.name),
+          displayOrder: index + 1,
+        },
+      });
+    }
+
+    logger.info('Default expense categories seeded');
+  }
+
+  /**
+   * Create audit log entry
+   */
+  private async createAuditLog(data: {
+    userId?: string;
+    action: string;
+    entityType: string;
+    entityId?: string;
+    oldValues?: any;
+    newValues?: any;
+  }): Promise<void> {
+    try {
+      await prisma.auditLog.create({
+        data: {
+          userId: data.userId,
+          action: data.action as any,
+          entityType: data.entityType,
+          entityId: data.entityId,
+          oldValues: data.oldValues,
+          newValues: data.newValues,
+        },
+      });
+    } catch (error) {
+      logger.error('Failed to create audit log', { error });
+    }
+  }
+}
+
+export const expenseService = new ExpenseService();
