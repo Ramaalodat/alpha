@@ -4,6 +4,7 @@ import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/core/utils/app_colors.dart';
 import 'package:alpha_app/core/utils/device.dart';
+import 'package:alpha_app/screens/auth/otp_screen.dart';
 import 'package:alpha_app/screens/profile/birth_date_screen.dart';
 import 'package:alpha_app/widgets/custom_phonefield.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
@@ -131,7 +132,9 @@ class _CreateAccountState extends State<CreateAccount> {
    final date = await Navigator.push(
      context,
      MaterialPageRoute(
-       builder: (_) => BirthDateScreen(),
+       builder: (_) => BirthDateScreen(
+         initialDate: authprovider.birthDate,
+       ),
      ),
    );
 
@@ -185,6 +188,7 @@ class _CreateAccountState extends State<CreateAccount> {
              ElevatedButton(
                    onPressed: () async {
 
+Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OtpScreen(phoneNumber: authprovider.phoneController.text,),));
   // // تحقق من الـ Form
   // if (!_formkey.currentState!.validate()) return;
 
