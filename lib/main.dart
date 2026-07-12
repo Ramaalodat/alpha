@@ -1,3 +1,4 @@
+import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
@@ -31,7 +32,7 @@ void main() async {
             
         ChangeNotifierProvider(create: (context) => Themeprovider()..loadtheme(),),
          ChangeNotifierProvider(create: (context) => LanguageProvider()..loadSavedLanguage()),
-      
+       ChangeNotifierProvider(create: (context) =>AuthProvider()),
 
   
        
