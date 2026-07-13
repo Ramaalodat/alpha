@@ -5,6 +5,7 @@ import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/core/utils/app_colors.dart';
 import 'package:alpha_app/core/utils/device.dart';
 import 'package:alpha_app/screens/auth/create_account.dart';
+import 'package:alpha_app/screens/auth/terms_screen.dart';
 import 'package:alpha_app/widgets/custom_phonefield.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -143,130 +144,35 @@ class _LoginState extends State<Login> {
              ElevatedButton(
                    onPressed: () async {
 
-  // // تحقق من الـ Form
-  // if (!_formkey.currentState!.validate()) return;
+  
+  if (!_formkey.currentState!.validate()) return;
 
 
-  // setState(() {
-  //   _isloading = true;
-  // });
+ final success = await context.read<AuthProvider>().login(
+  phone: "+962${authprovider.phoneController.text.trim()}",
+  password: authprovider.passwordController.text.trim(),
+);
 
 
-  // try {
+if(success){
 
-  //   final phone = "+962${_phoneController.text.trim()}";
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (_) => TermsScreen(),
+    ),
+  );
 
+}else{
 
-  //   // استدعاء الباكيند
-  //   final response = await AuthService.login(
-  //     phone: phone,
-  //     password: _passwordController.text.trim(),
-  //   );
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Invalid phone or password"),
+      backgroundColor: Colors.red,
+    ),
+  );
 
-
-  //   if (response.success) {
-
-
-  //     final pref = await SharedPreferences.getInstance();
-
-
-  //     // حفظ التوكن فقط (لا نحفظ كلمة المرور)
-  //     await pref.setString(
-  //       "token",
-  //       response.token,
-  //     );
-
-
-  //     // حفظ اختيار Remember me
-  //     await pref.setBool(
-  //       "remember_me",
-  //       _isremember,
-  //     );
-
-
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-
-  //       SnackBar(
-  //         content: Text(
-  //           "logged_success".tr(),
-  //           style: TextStyle(
-  //             fontSize: screenW * 0.045,
-  //           ),
-  //         ),
-
-  //         backgroundColor: Colors.green,
-
-  //       ),
-
-  //     );
-
-
-
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => Interests(),
-  //       ),
-  //     );
-
-
-
-  //   } else {
-
-
-      
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-
-  //       SnackBar(
-  //         content: Text(
-  //           response.message ?? "Invalid phone or password",
-  //           style: TextStyle(
-  //             fontSize: screenW * 0.045,
-  //           ),
-  //         ),
-
-  //         backgroundColor: Colors.red,
-
-  //       ),
-
-  //     );
-
-
-  //   }
-
-
-
-  // } catch(e) {
-
-
-  //   ScaffoldMessenger.of(context).showSnackBar(
-
-  //     SnackBar(
-  //       content: Text(
-  //         "Something went wrong",
-  //         style: TextStyle(
-  //           fontSize: screenW * 0.045,
-  //         ),
-  //       ),
-
-  //       backgroundColor: Colors.red,
-
-  //     ),
-
-  //   );
-
-
-  // } finally {
-
-
-  //   setState(() {
-  //     _isloading = false;
-  //   });
-
-
-  // }
+}
 
 },
                      style: ButtonStyle(
