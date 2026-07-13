@@ -1,6 +1,8 @@
 import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/screens/auth/otp_screen.dart';
+import 'package:alpha_app/screens/auth/terms_screen.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -86,7 +88,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home: SplashScreen()
+            home: OtpScreen(phoneNumber: "789036211")
           );
         },
          

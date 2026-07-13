@@ -86,7 +86,16 @@ class _CreateAccountState extends State<CreateAccount> {
                    child: Text("Full name" , style: TextStyle(fontSize: screenW*0.04 ,  color: themeprovider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),),
                  ),
                  SizedBox(height: screenH*0.01,),
-                 CustomTextfield(controller: authprovider.nameController, hint: "Enter your full name", type:  TextFieldType.name , icon: Icons.person,),
+                 CustomTextfield(validator: (value){
+
+ if(value == null || value.isEmpty){
+   return "Name is required";
+ }
+
+ return null;
+
+},
+                  controller: authprovider.nameController, hint: "Enter your full name", type:  TextFieldType.name , icon: Icons.person,),
                         SizedBox(height: screenH*0.02,),
                 Padding(
                  padding: EdgeInsets.symmetric(horizontal: screenW*0.02),
@@ -186,133 +195,56 @@ class _CreateAccountState extends State<CreateAccount> {
         Center(
           child: authprovider.isLoading ? CircularProgressIndicator(color: AppColors.darkAccent,) :
              ElevatedButton(
-                   onPressed: () async {
-
-Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OtpScreen(phoneNumber: authprovider.phoneController.text,),));
-  // // تحقق من الـ Form
-  // if (!_formkey.currentState!.validate()) return;
+                  onPressed: () async {
 
 
-  // setState(() {
-  //   _isloading = true;
-  // });
-
-
-  // try {
-
-  //   final phone = "+962${_phoneController.text.trim()}";
-
-
-  //   // استدعاء الباكيند
-  //   final response = await AuthService.login(
-  //     phone: phone,
-  //     password: _passwordController.text.trim(),
-  //   );
-
-
-  //   if (response.success) {
-
-
-  //     final pref = await SharedPreferences.getInstance();
-
-
-  //     // حفظ التوكن فقط (لا نحفظ كلمة المرور)
-  //     await pref.setString(
-  //       "token",
-  //       response.token,
-  //     );
-
-
-  //     // حفظ اختيار Remember me
-  //     await pref.setBool(
-  //       "remember_me",
-  //       _isremember,
-  //     );
+if(!_formkey.currentState!.validate()) return;
 
 
 
-  //     ScaffoldMessenger.of(context).showSnackBar(
+final success =
+await context.read<AuthProvider>().register(
 
-  //       SnackBar(
-  //         content: Text(
-  //           "logged_success".tr(),
-  //           style: TextStyle(
-  //             fontSize: screenW * 0.045,
-  //           ),
-  //         ),
+  name: authprovider.nameController.text.trim(),
 
-  //         backgroundColor: Colors.green,
+  phone: "0${authprovider.phoneController.text.trim()}",
 
-  //       ),
+  birthDate: authprovider.birthDateController.text,
 
-  //     );
+  password: authprovider.passwordController.text.trim(),
+
+);
 
 
 
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => Interests(),
-  //       ),
-  //     );
+if(success){
 
 
-
-  //   } else {
-
-
-      
-
-  //     ScaffoldMessenger.of(context).showSnackBar(
-
-  //       SnackBar(
-  //         content: Text(
-  //           response.message ?? "Invalid phone or password",
-  //           style: TextStyle(
-  //             fontSize: screenW * 0.045,
-  //           ),
-  //         ),
-
-  //         backgroundColor: Colors.red,
-
-  //       ),
-
-  //     );
+Navigator.push(
+ context,
+ MaterialPageRoute(
+  builder: (_) => OtpScreen(
+    phoneNumber: "${authprovider.phoneController.text.trim()}",
+  ),
+ ),
+);
 
 
-  //   }
+}else{
 
 
+ScaffoldMessenger.of(context).showSnackBar(
 
-  // } catch(e) {
+const SnackBar(
+ content: Text("Registration failed"),
+ backgroundColor: Colors.red,
+),
 
-
-  //   ScaffoldMessenger.of(context).showSnackBar(
-
-  //     SnackBar(
-  //       content: Text(
-  //         "Something went wrong",
-  //         style: TextStyle(
-  //           fontSize: screenW * 0.045,
-  //         ),
-  //       ),
-
-  //       backgroundColor: Colors.red,
-
-  //     ),
-
-  //   );
+);
 
 
-  // } finally {
+}
 
-
-  //   setState(() {
-  //     _isloading = false;
-  //   });
-
-
-  // }
 
 },
                      style: ButtonStyle(

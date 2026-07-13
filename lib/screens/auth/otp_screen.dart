@@ -1,130 +1,468 @@
 import 'dart:async';
+
+import 'package:alpha_app/core/utils/app_colors.dart';
+import 'package:alpha_app/core/utils/device.dart';
+import 'package:alpha_app/providers/auth_provider.dart';
+import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/screens/auth/terms_screen.dart';
+
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
+
 
 class OtpScreen extends StatefulWidget {
+
   final String phoneNumber;
-  const OtpScreen({Key? key, required this.phoneNumber}) : super(key: key);
+
+  const OtpScreen({
+    super.key,
+    required this.phoneNumber,
+  });
+
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
+
 }
 
+
+
 class _OtpScreenState extends State<OtpScreen> {
-  final _pinController = TextEditingController();
-  int _secondsRemaining = 30;
+
+
+  final TextEditingController _pinController =
+  TextEditingController();
+
+
   Timer? _timer;
 
-  String maskPhoneNumber(String phone) {
-    if (phone.length <= 3) return phone;
-    return "${phone.substring(0, 3)}\u2022\u2022\u2022${phone.substring(phone.length - 4)}";
-  }
+
+  int _secondsRemaining = 300;
+
+
 
   @override
   void initState() {
+
     super.initState();
+
     _startTimer();
+
   }
 
-  void _startTimer() {
+
+
+  void _startTimer(){
+
     setState(() {
-      _secondsRemaining = 30;
+
+      _secondsRemaining = 10;
+
     });
+
+
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          if (_secondsRemaining > 0) {
-            _secondsRemaining--;
-          } else {
-            _timer?.cancel();
+
+
+    _timer = Timer.periodic(
+        const Duration(seconds: 1),
+            (timer){
+
+
+          if(!mounted) return;
+
+
+          if(_secondsRemaining > 0){
+
+            setState(() {
+
+              _secondsRemaining--;
+
+            });
+
+
+          }else{
+
+            timer.cancel();
+
           }
-        });
-      }
-    });
+
+
+        }
+    );
+
   }
+
+
+
+  String maskPhoneNumber(String phone){
+
+    if(phone.length <= 6){
+
+      return phone;
+
+    }
+
+
+    return "0${phone.substring(0,2)}•••••${phone.substring(phone.length-2)}";
+
+  }
+
+
 
   @override
-  void dispose() {
+  void dispose(){
+
     _timer?.cancel();
+
     _pinController.dispose();
+
     super.dispose();
+
   }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
+final screenW = Device.width(context);
+    final screenH = Device.height(context);
+    final themeprovider = Provider.of<Themeprovider>(context);
+
+    final authProvider =
+    Provider.of<AuthProvider>(context);
+
+
+
     final defaultPinTheme = PinTheme(
-      width: 60,
-      height: 70,
-      textStyle: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF00897B)),
+
+      width: screenW*0.4,
+
+      height: screenH*0.095,
+
+
+      textStyle:  TextStyle(
+
+        fontSize: screenW*0.07,
+
+        fontWeight: FontWeight.bold,
+
+        color: themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
+
+      ),
+
+
       decoration: BoxDecoration(
-        color: const Color(0xFFE0F2F1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF00897B)),
+
+        color: themeprovider.isDark ? AppColors.darkBorder : AppColors.lightBorder, 
+
+        borderRadius:
+        BorderRadius.circular(12),
+
+
+        border: Border.all(
+          color: themeprovider.isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+
+      ),
+
+    );
+
+
+
+
+    return SafeArea(
+      child: Scaffold(
+      
+      
+       
+      backgroundColor:  themeprovider.isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      
+      
+      
+        body: SafeArea(
+      
+      
+          child: Padding(
+      
+            
+            padding:  EdgeInsets.symmetric(horizontal: screenW* 0.05  ),
+      
+      
+            child: Column(
+      
+              children: [
+      
+      
+      
+                 SizedBox(height: screenH*0.09),
+      
+      
+      
+      
+                Container(
+      
+                  padding:
+                 EdgeInsets.all(screenW*0.055),
+      
+      
+                  decoration:
+                  BoxDecoration(
+      
+                  color: themeprovider.isDark ? AppColors.darkBorder : AppColors.lightBorder, 
+      
+                    borderRadius:
+                    BorderRadius.circular(20),
+      
+                  ),
+      
+      
+                  child:
+                   Icon(
+      
+                    Icons.sms_outlined,
+      
+                    size: screenW*0.15,
+      
+                  ),
+      
+                ),
+      
+      
+      
+      
+      
+                 SizedBox(height: screenH*0.045),
+      
+      
+      
+      
+                 Text(
+              "Verify your number",
+              style: GoogleFonts.ibmPlexSansArabic(
+                fontSize: screenW*0.08,
+                fontWeight: FontWeight.bold,
+                color: themeprovider.isDark
+                    ? AppColors.darkText
+                    : AppColors.lightText,
+              ),
+            ),
+      
+      
+      
+      
+      
+                const SizedBox(height: 10),
+      
+      
+      
+      
+      
+                Text( textAlign: TextAlign.center,
+                               "We sent a 4-digit code to ${maskPhoneNumber(widget.phoneNumber)}",
+                               style: GoogleFonts.ibmPlexSansArabic(
+                                 fontSize: screenW*0.04,
+                                fontWeight: FontWeight.w500,
+                                 color: themeprovider.isDark
+                    ? AppColors.darkSubText
+                    : AppColors.lightSubText,
+                               ),
+                             ),
+      
+      
+      
+      
+                 SizedBox(height: screenH*0.06),
+      
+      
+      
+      
+      
+                Pinput(
+      
+                  controller: _pinController,
+      
+      
+                  length: 4,
+      
+      
+                  defaultPinTheme:
+                  defaultPinTheme,
+      
+      
+                  focusedPinTheme:
+                  defaultPinTheme.copyWith(
+      
+      
+                    decoration:
+                    defaultPinTheme.decoration!.copyWith(
+      
+                      border: Border.all( width: 1.5,
+                        color: themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
+                      ),
+    color: (themeprovider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary).withOpacity(0.4),
+                    ),
+      
+                  ),
+      
+                ),
+      
+      
+      
+      
+                 SizedBox(height: screenH*0.03),
+      
+      
+      
+      
+                Row(
+      
+                  mainAxisAlignment:
+                  MainAxisAlignment.center,
+      
+      
+                  children: [
+      
+      Text(
+                      "Didn't get the code? ",
+                        style: TextStyle( color: (themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.5), fontSize: screenW * 0.04 , fontWeight: FontWeight.w500),
+                      ),
+      
+                    
+      
+                    
+      
+      
+      
+                    GestureDetector(
+      
+                      onTap:
+                      _secondsRemaining == 0
+                          ? _startTimer
+                          : null,
+      
+      
+                      child: Text(
+      
+      
+                        _secondsRemaining > 0
+      
+                            ? "Resend ${(_secondsRemaining ~/ 60)}:${(_secondsRemaining % 60).toString().padLeft(2,'0')}"
+      
+                            : "Resend",
+      
+      
+      
+                        style: 
+                                                TextStyle(
+                                                   color: _secondsRemaining == 0 ?    themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary :(themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.5), fontSize: screenW * 0.04 , fontWeight: FontWeight.bold),
+
+                      
+      
+                      ),
+      
+                    ),
+      
+      
+                  ],
+      
+                ),
+      
+      
+      
+      
+      
+                 Spacer(),
+      
+  
+      
+              Padding(
+
+                  padding: EdgeInsets.only(
+                    bottom: screenH * 0.02,
+                  ),
+
+
+                  child: ElevatedButton(
+
+                    onPressed: () {
+
+
+                    },
+
+
+                    style: ButtonStyle(
+
+                      backgroundColor: WidgetStatePropertyAll(
+
+                        themeprovider.isDark
+                            ? AppColors.darkPrimary
+                            : AppColors.lightPrimary,
+
+                      ),
+
+
+                      fixedSize: WidgetStatePropertyAll(
+
+                        Size(
+                          screenW,
+                          screenH * 0.065,
+                        ),
+
+                      ),
+
+
+                      shape: WidgetStatePropertyAll(
+
+                        RoundedRectangleBorder(
+
+                          borderRadius:
+                              BorderRadius.circular(10),
+
+                        ),
+
+                      ),
+
+                    ),
+
+
+                    child: Text(
+
+                      "Verify",
+
+                      style: TextStyle(
+
+                        fontSize: screenW * 0.055,
+
+                        color: AppColors.darkBorder,
+
+                        fontWeight: FontWeight.w600,
+
+                      ),
+
+                    ),
+
+                  ),
+
+                ),
+      
+      
+              ],
+      
+            ),
+      
+          ),
+      
+        ),
+      
+      
       ),
     );
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAF9),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 50),
-              Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)), child: const Icon(Icons.mail_outline, size: 50)),
-              const SizedBox(height: 30),
-              const Text('Verify your number', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Text('We sent a 4-digit code to ${maskPhoneNumber(widget.phoneNumber)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: Colors.grey)),
-              const SizedBox(height: 40),
-              
-              Pinput(
-                controller: _pinController,
-                length: 4,
-                defaultPinTheme: defaultPinTheme,
-                focusedPinTheme: defaultPinTheme.copyWith(decoration: defaultPinTheme.decoration!.copyWith(border: Border.all(color: Colors.black))),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // التعديل هنا: "Resend" فقط وبدون خط تحتها
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Didn't get the code? ", style: TextStyle(color: Colors.grey)),
-                  GestureDetector(
-                    onTap: _secondsRemaining == 0 ? _startTimer : null,
-                    child: Text(
-                      _secondsRemaining > 0 
-                          ? "Resend (0:${_secondsRemaining.toString().padLeft(2, '0')})"
-                          : "Resend",
-                      style: TextStyle(
-                        color: _secondsRemaining == 0 ? Colors.blueAccent : Colors.grey,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.none, // التأكد من عدم وجود خط
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              
-              const Spacer(),
-              
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF004D40), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-                  onPressed: () { print("تم إدخال الرمز: ${_pinController.text}"); },
-                  child: const Text('Verify', style: TextStyle(color: Colors.white, fontSize: 18)),
-                ),
-              ),
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
-      ),
-    );
   }
+
 }
