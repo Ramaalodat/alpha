@@ -541,9 +541,9 @@ class FinancialProvider extends ChangeNotifier {
 
 
 
-    return 0.5 +
+    return  (1 / 3) +
 
-        ((completed / totalQuestions) * 0.5);
+        ((completed / totalQuestions) *  (1 / 3));
 
 
   }

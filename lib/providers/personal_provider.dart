@@ -149,7 +149,7 @@ double get pageProgress {
   if (isHeadOfHousehold == false && contributesToExpenses != null) completedQuestions++;
 
   
-  double weight = 0.5; 
+  double weight =  (1 / 3); 
   return (completedQuestions / totalQuestions) * weight;
 }
 
