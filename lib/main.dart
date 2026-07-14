@@ -1,5 +1,6 @@
 import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
+import 'package:alpha_app/providers/goal_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
 
@@ -45,6 +46,7 @@ void main() async {
   
   ChangeNotifierProvider(create: (context) =>PersonalProvider()),
        ChangeNotifierProvider(create: (context) =>FinancialProvider()),
+         ChangeNotifierProvider(create: (context) =>GoalProvider()),
       ],
         child: MyApp())
     ),
@@ -95,7 +97,8 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home:  PersonalInfoScreen(), // Replace with your initial screen
+            home:  SplashScreen(), // Replace with your initial screen
+            //PersonalInfoScreen(), // Replace with your initial screen
           );
         },
          

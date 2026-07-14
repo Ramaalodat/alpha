@@ -1,4 +1,4 @@
 class ApiConstants {
   static const String baseUrl =
-      "https://api.basira-app.com/v1";
+      "http://0.0.0.0:3000/api/docs";
 }

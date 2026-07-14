@@ -3,6 +3,7 @@ import 'package:alpha_app/core/utils/device.dart';
 import 'package:alpha_app/models/expense_item.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
 import 'package:flutter/material.dart';
@@ -1467,7 +1468,7 @@ Padding(
        
               if(financialProvider.isValid){
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => FinancialSetupScreen(),));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SetGoalScreen(),));
 
   }else{
 

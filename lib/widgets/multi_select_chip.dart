@@ -1,4 +1,7 @@
+import 'package:alpha_app/core/utils/app_colors.dart';
+import 'package:alpha_app/providers/themeprovider.dart' show Themeprovider;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 class MultiSelectChip extends StatelessWidget {
@@ -29,6 +32,7 @@ class MultiSelectChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final themeprovider = Provider.of<Themeprovider>(context);
 
     return SizedBox(
 
@@ -99,16 +103,12 @@ class MultiSelectChip extends StatelessWidget {
 
                 color:
 
-                selected
+               
+   selected
 
-                    ?
-
-                Colors.teal.withOpacity(.15)
-
-                    :
-
-                const Color(0xff1C2222),
-
+                  ?
+(themeprovider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary).withOpacity(0.04) :
+             themeprovider.isDark ? AppColors.darkBorder : AppColors.lightBorder,
 
 
                 borderRadius:
@@ -127,11 +127,12 @@ class MultiSelectChip extends StatelessWidget {
 
                       ?
 
-                  Colors.teal
+               
 
-                      :
+               themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary
+                    :
 
-                  Colors.transparent,
+                Colors.transparent,
 
                   width:1.5,
 
@@ -154,16 +155,14 @@ class MultiSelectChip extends StatelessWidget {
 
                   color:
 
-                  selected
+                   selected
 
-                      ?
+                    ?
+      themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary
 
-                  Colors.teal
+                    :
 
-                      :
-
-                  Colors.grey.shade300,
-
+                (themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.4),
 
                   fontWeight:
 
