@@ -187,274 +187,276 @@ final screenW = Device.width(context);
         body: SafeArea(
       
       
-          child: Padding(
-      
-            
-            padding:  EdgeInsets.symmetric(horizontal: screenW* 0.05  ),
-      
-      
-            child: Column(
-      
-              children: [
-      
-      
-      
-                 SizedBox(height: screenH*0.09),
-      
-      
-      
-      
-                Container(
-      
-                  padding:
-                 EdgeInsets.all(screenW*0.055),
-      
-      
-                  decoration:
-                  BoxDecoration(
-      
-                  color: themeprovider.isDark ? AppColors.darkBorder : AppColors.lightBorder, 
-      
-                    borderRadius:
-                    BorderRadius.circular(20),
-      
-                  ),
-      
-      
-                  child:
-                   Icon(
-      
-                    Icons.sms_outlined,
-      
-                    size: screenW*0.15,
-      
-                  ),
-      
-                ),
-      
-      
-      
-      
-      
-                 SizedBox(height: screenH*0.045),
-      
-      
-      
-      
-                 Text(
-              "Verify your number",
-              style: GoogleFonts.ibmPlexSansArabic(
-                fontSize: screenW*0.08,
-                fontWeight: FontWeight.bold,
-                color: themeprovider.isDark
-                    ? AppColors.darkText
-                    : AppColors.lightText,
-              ),
-            ),
-      
-      
-      
-      
-      
-                const SizedBox(height: 10),
-      
-      
-      
-      
-      
-                Text( textAlign: TextAlign.center,
-                               "We sent a 4-digit code to ${maskPhoneNumber(widget.phoneNumber)}",
-                               style: GoogleFonts.ibmPlexSansArabic(
-                                 fontSize: screenW*0.04,
-                                fontWeight: FontWeight.w500,
-                                 color: themeprovider.isDark
-                    ? AppColors.darkSubText
-                    : AppColors.lightSubText,
-                               ),
-                             ),
-      
-      
-      
-      
-                 SizedBox(height: screenH*0.06),
-      
-      
-      
-      
-      
-                Pinput(
-      
-                  controller: _pinController,
-      
-      
-                  length: 4,
-      
-      
-                  defaultPinTheme:
-                  defaultPinTheme,
-      
-      
-                  focusedPinTheme:
-                  defaultPinTheme.copyWith(
-      
-      
+          child: SingleChildScrollView(
+            child: Padding(
+                  
+              
+              padding:  EdgeInsets.symmetric(horizontal: screenW* 0.05  ),
+                  
+                  
+              child: Column(
+                  
+                children: [
+                  
+                  
+                  
+                   SizedBox(height: screenH*0.09),
+                  
+                  
+                  
+                  
+                  Container(
+                  
+                    padding:
+                   EdgeInsets.all(screenW*0.055),
+                  
+                  
                     decoration:
-                    defaultPinTheme.decoration!.copyWith(
-      
-                      border: Border.all( width: 1.5,
-                        color: themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
-                      ),
-    color: (themeprovider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary).withOpacity(0.4),
+                    BoxDecoration(
+                  
+                    color: themeprovider.isDark ? AppColors.darkBorder : AppColors.lightBorder, 
+                  
+                      borderRadius:
+                      BorderRadius.circular(20),
+                  
                     ),
-      
+                  
+                  
+                    child:
+                     Icon(
+                  
+                      Icons.sms_outlined,
+                  
+                      size: screenW*0.15,
+                  
+                    ),
+                  
                   ),
-      
+                  
+                  
+                  
+                  
+                  
+                   SizedBox(height: screenH*0.045),
+                  
+                  
+                  
+                  
+                   Text(
+                "Verify your number",
+                style: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: screenW*0.08,
+                  fontWeight: FontWeight.bold,
+                  color: themeprovider.isDark
+                      ? AppColors.darkText
+                      : AppColors.lightText,
                 ),
-      
-      
-      
-      
-                 SizedBox(height: screenH*0.03),
-      
-      
-      
-      
-                Row(
-      
-                  mainAxisAlignment:
-                  MainAxisAlignment.center,
-      
-      
-                  children: [
-      
-      Text(
-                      "Didn't get the code? ",
-                        style: TextStyle( color: (themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.5), fontSize: screenW * 0.04 , fontWeight: FontWeight.w500),
+              ),
+                  
+                  
+                  
+                  
+                  
+               SizedBox(height: screenH*0.01),
+                  
+                  
+                  
+                  
+                  
+                  Text( textAlign: TextAlign.center,
+                                 "We sent a 4-digit code to ${maskPhoneNumber(widget.phoneNumber)}",
+                                 style: GoogleFonts.ibmPlexSansArabic(
+                                   fontSize: screenW*0.04,
+                                  fontWeight: FontWeight.w500,
+                                   color: themeprovider.isDark
+                      ? AppColors.darkSubText
+                      : AppColors.lightSubText,
+                                 ),
+                               ),
+                  
+                  
+                  
+                  
+                   SizedBox(height: screenH*0.06),
+                  
+                  
+                  
+                  
+                  
+                  Pinput(
+                  
+                    controller: _pinController,
+                  
+                  
+                    length: 4,
+                  
+                  
+                    defaultPinTheme:
+                    defaultPinTheme,
+                  
+                  
+                    focusedPinTheme:
+                    defaultPinTheme.copyWith(
+                  
+                  
+                      decoration:
+                      defaultPinTheme.decoration!.copyWith(
+                  
+                        border: Border.all( width: 1.5,
+                          color: themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
+                        ),
+                color: (themeprovider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary).withOpacity(0.4),
                       ),
-      
-                    
-      
-                    
-      
-      
-      
-                    GestureDetector(
-      
-                      onTap:
-                      _secondsRemaining == 0
-                          ? _startTimer
-                          : null,
-      
-      
-                      child: Text(
-      
-      
-                        _secondsRemaining > 0
-      
-                            ? "Resend ${(_secondsRemaining ~/ 60)}:${(_secondsRemaining % 60).toString().padLeft(2,'0')}"
-      
-                            : "Resend",
-      
-      
-      
-                        style: 
-                                                TextStyle(
-                                                   color: _secondsRemaining == 0 ?    themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary :(themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.5), fontSize: screenW * 0.04 , fontWeight: FontWeight.bold),
-
+                  
+                    ),
+                  
+                  ),
+                  
+                  
+                  
+                  
+                   SizedBox(height: screenH*0.03),
+                  
+                  
+                  
+                  
+                  Row(
+                  
+                    mainAxisAlignment:
+                    MainAxisAlignment.center,
+                  
+                  
+                    children: [
+                  
+                  Text(
+                        "Didn't get the code? ",
+                          style: TextStyle( color: (themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.5), fontSize: screenW * 0.04 , fontWeight: FontWeight.w500),
+                        ),
+                  
                       
-      
-                      ),
-      
-                    ),
-      
-      
-                  ],
-      
-                ),
-      
-      
-      
-      
-      
-                 Spacer(),
-      
-  
-      
-              Padding(
-
-                  padding: EdgeInsets.only(
-                    bottom: screenH * 0.02,
-                  ),
-
-
-                  child: ElevatedButton(
-
-                    onPressed: () {
-
-
-                    },
-
-
-                    style: ButtonStyle(
-
-                      backgroundColor: WidgetStatePropertyAll(
-
-                        themeprovider.isDark
-                            ? AppColors.darkPrimary
-                            : AppColors.lightPrimary,
-
-                      ),
-
-
-                      fixedSize: WidgetStatePropertyAll(
-
-                        Size(
-                          screenW,
-                          screenH * 0.065,
+                  
+                      
+                  
+                
+                  
+                      GestureDetector(
+                  
+                        onTap:
+                        _secondsRemaining == 0
+                            ? _startTimer
+                            : null,
+                  
+                  
+                        child: Text(
+                  
+                  
+                          _secondsRemaining > 0
+                  
+                              ? "Resend ${(_secondsRemaining ~/ 60)}:${(_secondsRemaining % 60).toString().padLeft(2,'0')}"
+                  
+                              : "Resend",
+                  
+                  
+                  
+                          style: 
+                                                  TextStyle(
+                                                     color: _secondsRemaining == 0 ?    themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary :(themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.5), fontSize: screenW * 0.04 , fontWeight: FontWeight.bold),
+            
+                        
+                  
                         ),
-
+                  
                       ),
-
-
-                      shape: WidgetStatePropertyAll(
-
-                        RoundedRectangleBorder(
-
-                          borderRadius:
-                              BorderRadius.circular(10),
-
-                        ),
-
-                      ),
-
-                    ),
-
-
-                    child: Text(
-
-                      "Verify",
-
-                      style: TextStyle(
-
-                        fontSize: screenW * 0.055,
-
-                        color: AppColors.darkBorder,
-
-                        fontWeight: FontWeight.w600,
-
-                      ),
-
-                    ),
-
+                  
+                  
+                    ],
+                  
                   ),
-
-                ),
-      
-      
-              ],
-      
+                  
+                  
+                  
+                  
+                  
+                  
+                  SizedBox(height:screenH*0.3,),
+              
+                  
+                Padding(
+            
+                    padding: EdgeInsets.only(
+                      bottom: screenH * 0.02,
+                    ),
+            
+            
+                    child: ElevatedButton(
+            
+                      onPressed: () {
+            
+            
+                      },
+            
+            
+                      style: ButtonStyle(
+            
+                        backgroundColor: WidgetStatePropertyAll(
+            
+                          themeprovider.isDark
+                              ? AppColors.darkPrimary
+                              : AppColors.lightPrimary,
+            
+                        ),
+            
+            
+                        fixedSize: WidgetStatePropertyAll(
+            
+                          Size(
+                            screenW,
+                            screenH * 0.065,
+                          ),
+            
+                        ),
+            
+            
+                        shape: WidgetStatePropertyAll(
+            
+                          RoundedRectangleBorder(
+            
+                            borderRadius:
+                                BorderRadius.circular(10),
+            
+                          ),
+            
+                        ),
+            
+                      ),
+            
+            
+                      child: Text(
+            
+                        "Verify",
+            
+                        style: TextStyle(
+            
+                          fontSize: screenW * 0.055,
+            
+                          color: AppColors.darkBorder,
+            
+                          fontWeight: FontWeight.w600,
+            
+                        ),
+            
+                      ),
+            
+                    ),
+            
+                  ),
+                  
+                  
+                ],
+                  
+              ),
+                  
             ),
-      
           ),
       
         ),
