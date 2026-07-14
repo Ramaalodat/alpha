@@ -45,6 +45,7 @@ dependencies:
   intl_phone_field: ^3.2.0
   table_calendar: ^3.2.0
   pinput: ^6.0.2
+  percent_indicator: ^4.2.5
 
 dev_dependencies:
   flutter_test:

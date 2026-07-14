@@ -11,6 +11,7 @@ enum TextFieldType {
   phone,
   password,
   date,
+  number
 }
 
 
@@ -237,6 +238,9 @@ readOnly: widget.readOnly,
 
       case TextFieldType.password:
         return TextInputType.visiblePassword;
+
+      case TextFieldType.number:
+        return TextInputType.number;
 
     }
 

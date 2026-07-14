@@ -1,9 +1,16 @@
 import 'package:alpha_app/providers/auth_provider.dart';
+import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
+import 'package:alpha_app/providers/personal_provider.dart';
+
 import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/screens/auth/otp_screen.dart';
 import 'package:alpha_app/screens/auth/terms_screen.dart';
+import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
+import 'package:alpha_app/screens/profile/financial_setup_screen.dart';
+
+import 'package:alpha_app/screens/profile/personal_info_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:flutter/material.dart';
@@ -35,9 +42,9 @@ void main() async {
         ChangeNotifierProvider(create: (context) => Themeprovider()..loadtheme(),),
          ChangeNotifierProvider(create: (context) => LanguageProvider()..loadSavedLanguage()),
        ChangeNotifierProvider(create: (context) =>AuthProvider()),
-
   
-       
+  ChangeNotifierProvider(create: (context) =>PersonalProvider()),
+       ChangeNotifierProvider(create: (context) =>FinancialProvider()),
       ],
         child: MyApp())
     ),
@@ -88,7 +95,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home: OtpScreen(phoneNumber: "789036211")
+            home:  PersonalInfoScreen(), // Replace with your initial screen
           );
         },
          
