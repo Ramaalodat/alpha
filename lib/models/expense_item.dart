@@ -1,13 +1,26 @@
+import 'package:flutter/material.dart';
+
+
+
 class ExpenseItem {
 
 
   String name;
 
+
   bool selected;
+
 
   double amount;
 
+
   String frequency;
+
+
+
+  final TextEditingController controller;
+
+
 
 
 
@@ -15,13 +28,45 @@ class ExpenseItem {
 
     required this.name,
 
-    this.selected=false,
+    this.selected = false,
 
-    this.amount=0,
+    this.amount = 0,
 
-    this.frequency="Monthly",
+    this.frequency = "Monthly",
 
-  });
+  }) : controller = TextEditingController();
+
+
+
+
+
+
+
+  String get displayAmount {
+
+
+    if(amount == 0){
+
+      return "";
+
+    }
+
+
+    if(amount % 1 == 0){
+
+      return amount.toInt().toString();
+
+    }
+
+
+    return amount.toString();
+
+
+  }
+
+
+
+
 
 
 
@@ -30,15 +75,22 @@ class ExpenseItem {
 
     return {
 
+
       "name":name,
+
 
       "amount":amount,
 
+
       "frequency":frequency,
+
 
     };
 
 
   }
+
+
+
 
 }

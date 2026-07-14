@@ -52,7 +52,7 @@ CrossAxisAlignment.start,
 children:[
 
 SizedBox(height:screenH*0.03,),
-Text("test",),
+
 
  Text( 
                                "Step 1 of 2",

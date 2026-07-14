@@ -4,84 +4,98 @@ import '../models/income_source.dart';
 import '../models/expense_item.dart';
 
 
+
 class FinancialProvider extends ChangeNotifier {
+
 
 
   String? moneyRelationship;
 
 
-  double savingTarget = 0;
+  double? savingTarget;
 
 
   String? mainGoal;
 
 
-  double householdIncome = 0;
+  double? householdIncome;
+
+
+
+
+
+  final savingTargetController =
+  TextEditingController();
+
+
+
+  final householdIncomeController =
+  TextEditingController();
+
+
+
+
 
 
 
   List<IncomeSource> incomeSources = [
 
-    IncomeSource(
-      name: "Regular Salary",
-    ),
 
-    IncomeSource(
-      name: "Temporary Job",
-    ),
+    IncomeSource(name: "Regular Salary"),
 
-    IncomeSource(
-      name: "Family Support",
-    ),
 
-    IncomeSource(
-      name: "External Support",
-    ),
+    IncomeSource(name: "Temporary Job"),
 
-    IncomeSource(
-      name: "Rent Income",
-    ),
 
-    IncomeSource(
-      name: "Other",
-    ),
+    IncomeSource(name: "Family Support"),
+
+
+    IncomeSource(name: "External Support"),
+
+
+    IncomeSource(name: "Rent Income"),
+
+
+    IncomeSource(name: "Other"),
+
 
   ];
+
+
+
+
 
 
 
 
   List<ExpenseItem> fixedExpenses = [
 
-    ExpenseItem(
-      name: "Education",
-    ),
 
-    ExpenseItem(
-      name: "House Rent",
-    ),
+    ExpenseItem(name: "Education"),
 
-    ExpenseItem(
-      name: "Loan",
-    ),
 
-    ExpenseItem(
-      name: "Bills",
-    ),
+    ExpenseItem(name: "House Rent"),
 
-    ExpenseItem(
-      name: "Treatment",
-    ),
 
-    ExpenseItem(
-      name: "Saving",
-    ),
+    ExpenseItem(name: "Loan"),
 
-    ExpenseItem(
-      name: "Other",
-    ),
+
+    ExpenseItem(name: "Bills"),
+
+
+    ExpenseItem(name: "Treatment"),
+
+
+    ExpenseItem(name: "Saving"),
+
+
+    ExpenseItem(name: "Other"),
+
 
   ];
+
+
+
 
 
 
@@ -89,29 +103,24 @@ class FinancialProvider extends ChangeNotifier {
 
   List<ExpenseItem> flexibleExpenses = [
 
-    ExpenseItem(
-      name: "Food",
-    ),
 
-    ExpenseItem(
-      name: "Transport",
-    ),
+    ExpenseItem(name: "Food"),
 
-    ExpenseItem(
-      name: "Clothes",
-    ),
 
-    ExpenseItem(
-      name: "Entertainment",
-    ),
+    ExpenseItem(name: "Transport"),
 
-    ExpenseItem(
-      name: "Personal Care",
-    ),
 
-    ExpenseItem(
-      name: "Other",
-    ),
+    ExpenseItem(name: "Clothes"),
+
+
+    ExpenseItem(name: "Entertainment"),
+
+
+    ExpenseItem(name: "Personal Care"),
+
+
+    ExpenseItem(name: "Other"),
+
 
   ];
 
@@ -119,50 +128,85 @@ class FinancialProvider extends ChangeNotifier {
 
 
 
+
+
+
+
   void setMoneyRelationship(String value){
 
-    moneyRelationship = value;
+
+    moneyRelationship=value;
+
 
     notifyListeners();
 
+
   }
+
+
+
+
 
 
 
 
   void setSavingTarget(String value){
 
+
     savingTarget =
-        double.tryParse(value) ?? 0;
+        double.tryParse(
+            value.replaceAll(",", ".")
+        );
+
 
 
     notifyListeners();
 
+
   }
+
+
+
+
 
 
 
 
   void setMainGoal(String value){
 
-    mainGoal = value;
+
+    mainGoal=value;
+
 
     notifyListeners();
 
+
   }
+
+
+
+
 
 
 
 
   void setHouseholdIncome(String value){
 
+
     householdIncome =
-        double.tryParse(value) ?? 0;
+        double.tryParse(
+            value.replaceAll(",", ".")
+        );
+
 
 
     notifyListeners();
 
+
   }
+
+
+
 
 
 
@@ -171,13 +215,18 @@ class FinancialProvider extends ChangeNotifier {
 
   void toggleIncome(IncomeSource item){
 
+
     item.selected =
     !item.selected;
 
 
     notifyListeners();
 
+
   }
+
+
+
 
 
 
@@ -189,13 +238,22 @@ class FinancialProvider extends ChangeNotifier {
       String value
       ){
 
+
+
     item.amount =
-        double.tryParse(value) ?? 0;
+        double.tryParse(
+            value.replaceAll(",", ".")
+        ) ?? 0;
+
 
 
     notifyListeners();
 
+
   }
+
+
+
 
 
 
@@ -204,13 +262,17 @@ class FinancialProvider extends ChangeNotifier {
 
   void toggleExpense(ExpenseItem item){
 
+
     item.selected =
     !item.selected;
 
 
     notifyListeners();
 
+
   }
+
+
 
 
 
@@ -223,13 +285,19 @@ class FinancialProvider extends ChangeNotifier {
       String value
       ){
 
+
     item.amount =
-        double.tryParse(value) ?? 0;
+        double.tryParse(
+            value.replaceAll(",", ".")
+        ) ?? 0;
+
 
 
     notifyListeners();
 
+
   }
+
 
 
 
@@ -253,6 +321,7 @@ class FinancialProvider extends ChangeNotifier {
 
 
   }
+
 
 
 
@@ -304,12 +373,17 @@ class FinancialProvider extends ChangeNotifier {
   double get balance{
 
 
-    return totalIncome -
+    return (householdIncome ?? 0)
 
-        (totalExpenses + savingTarget);
+        -
+
+        (totalExpenses +
+
+            (savingTarget ?? 0));
 
 
   }
+
 
 
 
@@ -333,67 +407,296 @@ class FinancialProvider extends ChangeNotifier {
 
 
 
-  Map<String,dynamic> get data{
+
+  double get pageProgress{
 
 
-    return {
+    const int totalQuestions = 7;
 
 
-      "money_relationship":
-      moneyRelationship,
-
-
-      "saving_target":
-      savingTarget,
-
-
-      "main_goal":
-      mainGoal,
-
-
-      "household_income":
-      householdIncome,
-
-
-
-      "income_sources":
-
-      incomeSources
-
-          .where((e)=>e.selected)
-
-          .map((e)=>e.toJson())
-
-          .toList(),
+    int completed = 0;
 
 
 
 
-      "fixed_expenses":
 
-      fixedExpenses
+    if(moneyRelationship != null){
 
-          .where((e)=>e.selected)
+      completed++;
 
-          .map((e)=>e.toJson())
-
-          .toList(),
+    }
 
 
 
 
-      "flexible_expenses":
+    if(savingTarget != null){
 
-      flexibleExpenses
+      completed++;
 
-          .where((e)=>e.selected)
-
-          .map((e)=>e.toJson())
-
-          .toList(),
+    }
 
 
-    };
+
+
+
+    if(mainGoal != null){
+
+      completed++;
+
+    }
+
+
+
+
+
+    if(householdIncome != null){
+
+      completed++;
+
+    }
+
+
+
+
+
+
+    final selectedIncome =
+
+    incomeSources
+        .where((e)=>e.selected)
+        .toList();
+
+
+
+
+    if(selectedIncome.isNotEmpty &&
+
+        selectedIncome.every(
+                (e)=>e.amount > 0
+        )){
+
+
+      completed++;
+
+
+    }
+
+
+
+
+
+
+
+    final selectedFixed =
+
+    fixedExpenses
+        .where((e)=>e.selected)
+        .toList();
+
+
+
+
+    if(selectedFixed.isNotEmpty &&
+
+        selectedFixed.every(
+                (e)=>e.amount > 0
+        )){
+
+
+      completed++;
+
+
+    }
+
+
+
+
+
+
+
+    final selectedFlexible =
+
+    flexibleExpenses
+        .where((e)=>e.selected)
+        .toList();
+
+
+
+
+    if(selectedFlexible.isNotEmpty &&
+
+        selectedFlexible.every(
+                (e)=>e.amount > 0
+        )){
+
+
+      completed++;
+
+
+    }
+
+
+
+
+
+
+
+    return 0.5 +
+
+        ((completed / totalQuestions) * 0.5);
+
+
+  }
+
+
+
+
+
+
+
+
+
+  bool get isValid {
+
+  final hasIncomeSource =
+      incomeSources.any((e) => e.selected && e.amount > 0);
+
+
+  return
+      moneyRelationship != null &&
+      savingTarget != null &&
+      mainGoal != null &&
+      householdIncome != null &&
+      hasIncomeSource;
+
+}
+
+
+
+
+
+
+
+
+  bool get canSave => isValid;
+
+
+
+
+
+
+
+
+
+  Map<String,dynamic> get data=>{
+
+
+    "money_relationship":
+
+    moneyRelationship,
+
+
+
+    "saving_target":
+
+    savingTarget,
+
+
+
+    "main_goal":
+
+    mainGoal,
+
+
+
+    "household_income":
+
+    householdIncome,
+
+
+
+    "income_sources":
+
+    incomeSources
+
+        .where((e)=>e.selected)
+
+        .map((e)=>e.toJson())
+
+        .toList(),
+
+
+
+    "fixed_expenses":
+
+    fixedExpenses
+
+        .where((e)=>e.selected)
+
+        .map((e)=>e.toJson())
+
+        .toList(),
+
+
+
+    "flexible_expenses":
+
+    flexibleExpenses
+
+        .where((e)=>e.selected)
+
+        .map((e)=>e.toJson())
+
+        .toList(),
+
+
+  };
+
+
+
+
+
+
+
+
+
+  @override
+  void dispose(){
+
+
+    savingTargetController.dispose();
+
+
+    householdIncomeController.dispose();
+
+
+
+    for(var item in incomeSources){
+
+      item.controller.dispose();
+
+    }
+
+
+
+    for(var item in fixedExpenses){
+
+      item.controller.dispose();
+
+    }
+
+
+
+    for(var item in flexibleExpenses){
+
+      item.controller.dispose();
+
+    }
+
+
+
+
+    super.dispose();
 
 
   }

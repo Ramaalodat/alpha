@@ -1,15 +1,22 @@
-
+import 'package:alpha_app/core/utils/app_colors.dart';
+import 'package:alpha_app/core/utils/device.dart';
+import 'package:alpha_app/models/expense_item.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
+import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
-
 
 
 class FinancialSetupScreen extends StatelessWidget {
 
 
-  const FinancialSetupScreen({super.key});
+  const FinancialSetupScreen({
+    super.key,
+  });
 
 
 
@@ -17,29 +24,67 @@ class FinancialSetupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
 
-    final provider =
+    final screenW = Device.width(context);
+
+    final screenH = Device.height(context);
+
+
+
+    final themeProvider =
+    Provider.of<Themeprovider>(context);
+
+
+
+    final financialProvider =
     context.watch<FinancialProvider>();
+
+
 
 
 
     return Scaffold(
 
 
-      body: SafeArea(
+      backgroundColor:
+
+      themeProvider.isDark
+
+          ? AppColors.darkBackground
+
+          : AppColors.lightBackground,
 
 
-        child: SingleChildScrollView(
+
+      body:
+
+      SafeArea(
+
+
+        child:
+
+        SingleChildScrollView(
 
 
           padding:
-          const EdgeInsets.all(20),
+
+          EdgeInsets.symmetric(
+
+            horizontal:
+
+            screenW * 0.05,
+
+          ),
 
 
 
-          child: Column(
+
+          child:
+
+          Column(
 
 
             crossAxisAlignment:
+
             CrossAxisAlignment.start,
 
 
@@ -49,17 +94,47 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
-              const Text(
+              SizedBox(
 
-                "STEP 2 OF 2",
+                height:
+
+                screenH * 0.03,
+
+              ),
+
+
+
+
+
+              Text(
+
+                "Step 2 of 2",
 
                 style:
 
-                TextStyle(
+                GoogleFonts.ibmPlexSansArabic(
 
-                  color: Colors.teal,
+                  fontSize:
 
-                  fontWeight: FontWeight.bold,
+                  screenW * 0.04,
+
+
+                  fontWeight:
+
+                  FontWeight.w500,
+
+
+                  color:
+
+                  themeProvider.isDark
+
+                      ?
+
+                  AppColors.darkAccent
+
+                      :
+
+                  AppColors.lightAccent,
 
                 ),
 
@@ -68,22 +143,48 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
-              const SizedBox(height:10),
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.02,
+
+              ),
 
 
 
 
-              const Text(
 
-                "Financial Setup",
+              Text(
+
+                "Financial Information",
 
                 style:
 
-                TextStyle(
+                GoogleFonts.ibmPlexSansArabic(
 
-                  fontSize:26,
+                  fontSize:
 
-                  fontWeight:FontWeight.bold,
+                  screenW * 0.075,
+
+
+                  fontWeight:
+
+                  FontWeight.bold,
+
+
+                  color:
+
+                  themeProvider.isDark
+
+                      ?
+
+                  AppColors.darkText
+
+                      :
+
+                  AppColors.lightText,
 
                 ),
 
@@ -93,7 +194,130 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
-              const SizedBox(height:30),
+              SizedBox(
+
+                height:
+
+                screenH * 0.02,
+
+              ),
+
+
+
+
+
+              Text(
+
+                "Accurate data means sharper advice from Alpha",
+
+                style:
+
+                GoogleFonts.ibmPlexSansArabic(
+
+                  fontSize:
+
+                  screenW * 0.035,
+
+
+                  fontWeight:
+
+                  FontWeight.w500,
+
+
+                  color:
+
+                  themeProvider.isDark
+
+                      ?
+
+                  AppColors.darkSubText
+
+                      :
+
+                  AppColors.lightSubText,
+
+                ),
+
+              ),
+
+
+
+
+
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.02,
+
+              ),
+
+
+
+
+
+
+              LinearPercentIndicator(
+
+
+                lineHeight:
+
+                screenH * 0.02,
+
+
+
+                percent:
+
+                financialProvider.pageProgress,
+
+
+
+                backgroundColor:
+
+                themeProvider.isDark
+
+                    ?
+
+                AppColors.darkBorder
+
+                    :
+
+                AppColors.lightBorder,
+
+
+
+                progressColor:
+
+                themeProvider.isDark
+
+                    ?
+
+                AppColors.darkSecondary
+
+                    :
+
+                AppColors.lightSecondary,
+
+
+
+                barRadius:
+
+                const Radius.circular(10),
+
+              ),
+
+
+
+
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.03,
+
+              ),
 
 
 
@@ -105,15 +329,37 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
-              const Text(
+
+              Text(
 
                 "How do you describe your relationship with money?",
+
 
                 style:
 
                 TextStyle(
 
-                  fontWeight:FontWeight.w600,
+                  fontSize:
+
+                  screenW * 0.04,
+
+
+                  fontWeight:
+
+                  FontWeight.bold,
+
+
+                  color:
+
+                  themeProvider.isDark
+
+                      ?
+
+                  AppColors.darkSubText
+
+                      :
+
+                  AppColors.lightSubText,
 
                 ),
 
@@ -121,14 +367,28 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
-              const SizedBox(height:12),
+
+
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.01,
+
+              ),
+
 
 
 
 
               MultiSelectChip(
 
-                items:const [
+
+                items:
+
+                const [
+
 
                   "Careful spending",
 
@@ -136,12 +396,16 @@ class FinancialSetupScreen extends StatelessWidget {
 
                   "Emotional spending",
 
+
                 ],
+
+
+
 
 
                 selectedItems:
 
-                provider.moneyRelationship == null
+                financialProvider.moneyRelationship == null
 
                     ?
 
@@ -151,15 +415,20 @@ class FinancialSetupScreen extends StatelessWidget {
 
                 [
 
-                  provider.moneyRelationship!
+                  financialProvider.moneyRelationship!
 
                 ],
 
 
 
+
                 onTap:(value){
 
-                  provider.setMoneyRelationship(value);
+
+                  financialProvider
+
+                      .setMoneyRelationship(value);
+
 
                 },
 
@@ -170,23 +439,49 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
+              SizedBox(
 
-              const SizedBox(height:25),
+                height:
+
+                screenH * 0.02,
+
+              ),
 
 
 
 
 
 
-              const Text(
+              Text(
 
                 "Extra monthly saving target",
+
 
                 style:
 
                 TextStyle(
 
-                  fontWeight:FontWeight.w600,
+                  fontSize:
+
+                  screenW * 0.04,
+
+
+                  fontWeight:
+
+                  FontWeight.bold,
+
+
+                  color:
+
+                  themeProvider.isDark
+
+                      ?
+
+                  AppColors.darkSubText
+
+                      :
+
+                  AppColors.lightSubText,
 
                 ),
 
@@ -195,59 +490,63 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
-              const SizedBox(height:10),
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.01,
+
+              ),
 
 
 
 
-              TextField(
 
 
-                keyboardType:
+              CustomTextfield(
 
-                TextInputType.number,
+
+
+                controller:
+
+                financialProvider.savingTargetController,
+
+
+
+                hint:
+
+                "Enter amount",
+
+
+
+                type:
+
+                TextFieldType.number,
+
+
+
+                suffix:
+
+                const Padding(
+
+                  padding:
+
+                  EdgeInsets.all(12),
+
+
+                  child:
+
+                  Text("JOD"),
+
+                ),
+
 
 
 
                 onChanged:
 
-                provider.setSavingTarget,
-
-
-
-                decoration:
-
-                InputDecoration(
-
-
-                  hintText:
-                  "Enter amount",
-
-
-
-                  suffixText:
-                  "JOD",
-
-
-
-                  filled:true,
-
-
-                  border:
-
-                  OutlineInputBorder(
-
-
-                    borderRadius:
-
-                    BorderRadius.circular(12),
-
-
-                  ),
-
-
-                ),
-
+                financialProvider.setSavingTarget,
 
 
               ),
@@ -256,39 +555,54 @@ class FinancialSetupScreen extends StatelessWidget {
 
 
 
+              SizedBox(
 
-              const SizedBox(height:25),
+                height:
 
-
-
-
-
-
-              const Text(
-
-                "Main goal",
-
-                style:
-
-                TextStyle(
-
-                  fontWeight:FontWeight.w600,
-
-                ),
+                screenH * 0.02,
 
               ),
 
 
 
 
-              const SizedBox(height:12),
+
+             Text(
+
+                "Main financial goal", 
+                style: TextStyle(
+                  fontSize: screenW * 0.04,
+                  fontWeight: FontWeight.bold,
+                  color: themeProvider.isDark ? AppColors.darkSubText : AppColors.lightSubText,
+                ),
+              ),
+
+
+
+
+
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.01,
+
+              ),
+
+
 
 
 
 
               MultiSelectChip(
 
-                items:const [
+
+
+                items:
+
+                const [
+
 
                   "Saving",
 
@@ -301,9 +615,11 @@ class FinancialSetupScreen extends StatelessWidget {
                 ],
 
 
+
+
                 selectedItems:
 
-                provider.mainGoal == null
+                financialProvider.mainGoal == null
 
                     ?
 
@@ -313,706 +629,25 @@ class FinancialSetupScreen extends StatelessWidget {
 
                 [
 
-                  provider.mainGoal!
+                  financialProvider.mainGoal!
 
                 ],
 
 
 
-                onTap:(value){
-
-                  provider.setMainGoal(value);
-
-                },
-
-
-              ),
-
-
-
-
-
-
-
-              const SizedBox(height:30),
-
-
-
-
-
-
-              const Text(
-
-                "Average household income",
-
-                style:
-
-                TextStyle(
-
-                  fontWeight:FontWeight.w600,
-
-                ),
-
-              ),
-
-
-
-
-
-              const SizedBox(height:10),
-
-
-
-
-
-              TextField(
-
-
-
-                keyboardType:
-
-                TextInputType.number,
-
-
-
-                onChanged:
-
-                provider.setHouseholdIncome,
-
-
-
-                decoration:
-
-                InputDecoration(
-
-
-                  hintText:
-
-                  "Enter income",
-
-
-
-                  suffixText:
-
-                  "JOD",
-
-
-
-                  border:
-
-                  OutlineInputBorder(
-
-                    borderRadius:
-
-                    BorderRadius.circular(12),
-
-                  ),
-
-                ),
-
-
-              ),
-
-
-
-
-
-
-              const SizedBox(height:35),
-
-
-
-
-
-
-
-              // ================= INCOME =================
-
-
-
-
-
-
-              const Text(
-
-                "Income Sources",
-
-                style:
-
-                TextStyle(
-
-                  fontSize:18,
-
-                  fontWeight:FontWeight.bold,
-
-                ),
-
-              ),
-
-
-
-
-
-              const SizedBox(height:12),
-
-
-
-
-
-              MultiSelectChip(
-
-
-
-                items:
-
-                provider.incomeSources
-
-                    .map((e)=>e.name)
-
-                    .toList(),
-
-
-
-
-                selectedItems:
-
-                provider.incomeSources
-
-                    .where((e)=>e.selected)
-
-                    .map((e)=>e.name)
-
-                    .toList(),
-
-
 
 
                 onTap:(value){
 
 
-                  final item =
+                  financialProvider
 
-                  provider.incomeSources
-
-                      .firstWhere(
-
-                          (e)=>e.name==value
-
-                  );
-
-
-                  provider.toggleIncome(item);
-
+                      .setMainGoal(value);
 
 
                 },
 
-
               ),
-
-
-
-
-
-
-
-              const SizedBox(height:15),
-
-
-
-
-
-              ...provider.incomeSources
-
-                  .where((e)=>e.selected)
-
-                  .map((income){
-
-
-                return Padding(
-
-                  padding:
-
-                  const EdgeInsets.only(
-
-                    bottom:12,
-
-                  ),
-
-
-                  child:TextField(
-
-
-
-                    keyboardType:
-
-                    TextInputType.number,
-
-
-
-                    onChanged:(value){
-
-
-                      provider.updateIncomeAmount(
-
-                        income,
-
-                        value,
-
-                      );
-
-
-                    },
-
-
-
-                    decoration:
-
-                    InputDecoration(
-
-
-                      labelText:
-
-                      income.name,
-
-
-
-                      suffixText:
-
-                      "JOD",
-
-
-
-                      border:
-
-                      OutlineInputBorder(
-
-
-                        borderRadius:
-
-                        BorderRadius.circular(12),
-
-                      ),
-
-                    ),
-
-
-                  ),
-
-
-                );
-
-
-              }),
-
-
-
-
-
-              Text(
-
-                "Total Income: ${provider.totalIncome.toStringAsFixed(2)} JOD",
-
-                style:
-
-                const TextStyle(
-
-                  fontWeight:FontWeight.bold,
-
-                ),
-
-              ),
-
-
-
-
-
-
-
-              const SizedBox(height:35),
-
-
-
-
-
-
-
-
-              // ================= FIXED =================
-
-
-
-
-
-
-              const Text(
-
-                "Fixed Expenses",
-
-                style:
-
-                TextStyle(
-
-                  fontSize:18,
-
-                  fontWeight:FontWeight.bold,
-
-                ),
-
-              ),
-
-
-
-
-              const SizedBox(height:12),
-
-
-
-
-              MultiSelectChip(
-
-
-                items:
-
-                provider.fixedExpenses
-
-                    .map((e)=>e.name)
-
-                    .toList(),
-
-
-
-                selectedItems:
-
-                provider.fixedExpenses
-
-                    .where((e)=>e.selected)
-
-                    .map((e)=>e.name)
-
-                    .toList(),
-
-
-
-
-                onTap:(value){
-
-
-                  final item =
-
-                  provider.fixedExpenses
-
-                      .firstWhere(
-
-                          (e)=>e.name==value
-
-                  );
-
-
-
-                  provider.toggleExpense(item);
-
-
-                },
-
-
-              ),
-
-
-
-
-
-              const SizedBox(height:15),
-
-
-
-
-              ...provider.fixedExpenses
-
-                  .where((e)=>e.selected)
-
-                  .map((expense){
-
-
-                return _amountField(
-
-                    expense.name,
-
-                    (value){
-
-                      provider.updateExpenseAmount(
-
-                          expense,
-
-                          value
-
-                      );
-
-
-                    }
-
-                );
-
-
-              }),
-
-
-
-
-
-
-
-              const SizedBox(height:35),
-
-
-
-
-
-
-
-              // ================= FLEXIBLE =================
-
-
-
-
-
-              const Text(
-
-                "Flexible Expenses",
-
-                style:
-
-                TextStyle(
-
-                  fontSize:18,
-
-                  fontWeight:FontWeight.bold,
-
-                ),
-
-              ),
-
-
-
-
-
-
-              const SizedBox(height:12),
-
-
-
-
-
-              MultiSelectChip(
-
-
-                items:
-
-                provider.flexibleExpenses
-
-                    .map((e)=>e.name)
-
-                    .toList(),
-
-
-
-
-                selectedItems:
-
-                provider.flexibleExpenses
-
-                    .where((e)=>e.selected)
-
-                    .map((e)=>e.name)
-
-                    .toList(),
-
-
-
-                onTap:(value){
-
-
-                  final item =
-
-                  provider.flexibleExpenses
-
-                      .firstWhere(
-
-                          (e)=>e.name==value
-
-                  );
-
-
-
-                  provider.toggleExpense(item);
-
-
-                },
-
-
-              ),
-
-
-
-
-
-
-              const SizedBox(height:15),
-
-
-
-
-
-              ...provider.flexibleExpenses
-
-                  .where((e)=>e.selected)
-
-                  .map((expense){
-
-
-                return _amountField(
-
-                    expense.name,
-
-                    (value){
-
-
-                      provider.updateExpenseAmount(
-
-                          expense,
-
-                          value
-
-                      );
-
-
-                    }
-
-                );
-
-
-              }),
-
-
-
-
-
-
-
-
-              const SizedBox(height:30),
-
-
-
-
-
-
-              // ================= BALANCE =================
-
-
-
-
-
-
-              Container(
-
-
-
-                padding:
-
-                const EdgeInsets.all(15),
-
-
-
-                decoration:
-
-                BoxDecoration(
-
-
-                  color:
-
-                  provider.balance >=0
-
-                      ?
-
-                  Colors.green.withOpacity(.15)
-
-                      :
-
-                  Colors.red.withOpacity(.15),
-
-
-
-
-                  borderRadius:
-
-                  BorderRadius.circular(12),
-
-
-                ),
-
-
-
-
-                child:
-
-                Text(
-
-
-
-                  provider.balance >=0
-
-                      ?
-
-                  "Surplus: ${provider.balance.toStringAsFixed(2)} JOD"
-
-                      :
-
-                  "Deficit: ${provider.balance.abs().toStringAsFixed(2)} JOD",
-
-
-
-
-                  style:
-
-                  TextStyle(
-
-
-                    color:
-
-                    provider.balance>=0
-
-                        ?
-
-                    Colors.green
-
-                        :
-
-                    Colors.red,
-
-
-                    fontWeight:
-
-                    FontWeight.bold,
-
-                  ),
-
-
-
-                ),
-
-
-              ),
-
-
-
-
-
-
-
-              const SizedBox(height:30),
-
-
 
 
 
@@ -1020,167 +655,1043 @@ class FinancialSetupScreen extends StatelessWidget {
 
               SizedBox(
 
-                width:
+                height:
 
-                double.infinity,
+                screenH * 0.02,
+
+              ),
+
+
+
+
+
+
+              Text(
+
+                "Average household income",
+
+
+                style : TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold) 
+
+              ),
+
+
+
+
+
+              SizedBox(
 
                 height:
 
-                55,
+                screenH * 0.01,
+
+              ),
 
 
 
-                child:
-
-                ElevatedButton(
 
 
-
-                  onPressed:
-
-                  provider.isBalanced
-
-                      ?
-
-                      (){
+              CustomTextfield(
 
 
-                    debugPrint(
 
-                        provider.data.toString()
+                controller:
 
-                    );
-
-
-                  }
-
-                      :
-
-                  null,
+                financialProvider.householdIncomeController,
 
 
+
+                hint:
+
+                "Enter income",
+
+
+
+                type:
+
+                TextFieldType.number,
+
+
+
+                suffix:
+
+                const Padding(
+
+                  padding:
+
+                  EdgeInsets.all(12),
 
 
                   child:
 
-                  const Text(
+                  Text("JOD"),
 
-                    "Save and Continue",
+                ),
 
+
+
+                onChanged:
+
+                financialProvider.setHouseholdIncome,
+
+
+              ),
+
+
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.02,
+
+              ),
+
+
+
+
+
+              // ================= INCOME SOURCES =================
+
+
+
+
+              Text(
+
+                "Income Sources", style: TextStyle(
+
+                  fontSize: screenW * 0.04,
+                  fontWeight: FontWeight.bold,
+                  color: themeProvider.isDark ? AppColors.darkSubText : AppColors.lightSubText,
+
+                ),
+
+              ),
+
+
+
+
+              SizedBox(
+
+                height:
+
+                screenH * 0.01,
+
+              ),
+
+
+
+
+
+              MultiSelectChip(
+
+
+                items:
+
+                financialProvider.incomeSources
+
+                    .map((e)=>e.name)
+
+                    .toList(),
+
+
+
+
+                selectedItems:
+
+                financialProvider.incomeSources
+
+                    .where((e)=>e.selected)
+
+                    .map((e)=>e.name)
+
+                    .toList(),
+
+
+
+
+                onTap:(value){
+
+
+
+                  final item =
+
+                  financialProvider.incomeSources
+
+                      .firstWhere(
+
+                          (e)=>e.name == value
+
+                  );
+
+
+
+                  financialProvider.toggleIncome(item);
+
+
+
+                },
+
+              ),
+
+
+// ================= INCOME INPUTS =================
+
+
+
+SizedBox(
+
+  height: screenH * 0.02,
+
+),
+
+
+
+
+
+...financialProvider.incomeSources
+
+    .where((e)=>e.selected)
+
+    .map((income){
+
+
+  return Padding(
+
+
+    padding:
+
+    EdgeInsets.only(
+
+      bottom:
+
+      screenH * 0.015,
+
+    ),
+
+
+
+    child:
+
+
+    CustomTextfield(
+
+
+      controller:
+
+      income.controller,
+
+
+
+      hint:
+
+      income.name,
+
+
+
+      type:
+
+      TextFieldType.number,
+
+
+
+      suffix:
+
+      const Padding(
+
+        padding:
+
+        EdgeInsets.all(12),
+
+
+        child:
+
+        Text("JOD"),
+
+
+      ),
+
+
+
+      onChanged:(value){
+
+
+        financialProvider
+
+            .updateIncomeAmount(
+
+          income,
+
+          value,
+
+        );
+
+
+      },
+
+
+
+    ),
+
+
+
+  );
+
+
+
+}),
+
+
+
+
+SizedBox(
+
+  height:
+
+  screenH * 0.02,
+
+),
+
+RichText(
+  text: TextSpan(
+    text: "Total Income: ",
+    style: TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: screenW * 0.045,
+      color: themeProvider.isDark ? AppColors.darkText : AppColors.lightText, 
+    ),
+    children: [
+      TextSpan(
+        text: "${financialProvider.totalIncome.toStringAsFixed(2)} JOD",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: screenW * 0.045,
+          color: themeProvider.isDark ? AppColors.darkAccent : AppColors.lightAccent, 
+        ),
+      ),
+    ],
+  ),
+),
+
+
+
+
+
+
+SizedBox(
+
+height:
+
+screenH * 0.02,
+
+),
+
+
+
+
+
+
+
+// ================= FIXED EXPENSES =================
+
+
+
+
+Text(
+
+
+"Fixed Expenses",
+
+
+style:
+
+TextStyle(
+fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold
+
+),
+
+
+
+),
+
+
+
+
+
+
+SizedBox(
+
+height:
+
+screenH * 0.01,
+
+),
+
+
+
+
+
+
+
+MultiSelectChip(
+
+
+items:
+
+financialProvider.fixedExpenses
+
+.map((e)=>e.name)
+
+.toList(),
+
+
+
+
+selectedItems:
+
+financialProvider.fixedExpenses
+
+.where((e)=>e.selected)
+
+.map((e)=>e.name)
+
+.toList(),
+
+
+
+
+onTap:(value){
+
+
+final item =
+
+financialProvider.fixedExpenses
+
+.firstWhere(
+
+(e)=>e.name == value
+
+);
+
+
+
+financialProvider.toggleExpense(item);
+
+
+
+},
+
+
+),
+
+
+
+
+
+
+
+
+SizedBox(
+
+height:
+
+screenH * 0.02,
+
+),
+
+
+
+
+
+
+
+...financialProvider.fixedExpenses
+
+.where((e)=>e.selected)
+
+.map((expense){
+
+
+
+return _amountField(
+
+
+
+expense,
+
+
+
+(value){
+
+
+
+financialProvider
+
+.updateExpenseAmount(
+
+expense,
+
+value,
+
+);
+
+
+
+},
+
+
+
+);
+
+
+
+}),
+
+
+
+
+
+
+
+SizedBox(
+
+height:
+
+screenH * 0.02,
+
+),
+
+
+
+
+
+
+
+// ================= FLEXIBLE EXPENSES =================
+
+
+
+
+
+Text(
+
+
+"Flexible Expenses",
+
+
+style: TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),
+
+
+),
+
+
+
+
+
+
+
+SizedBox(
+
+height:
+
+screenH * 0.015,
+
+),
+
+
+
+
+
+
+
+MultiSelectChip(
+
+
+items:
+
+financialProvider.flexibleExpenses
+
+.map((e)=>e.name)
+
+.toList(),
+
+
+
+
+selectedItems:
+
+financialProvider.flexibleExpenses
+
+.where((e)=>e.selected)
+
+.map((e)=>e.name)
+
+.toList(),
+
+
+
+
+onTap:(value){
+
+
+
+final item =
+
+financialProvider.flexibleExpenses
+
+.firstWhere(
+
+(e)=>e.name == value
+
+);
+
+
+
+financialProvider.toggleExpense(item);
+
+
+
+},
+
+
+
+),
+
+
+
+
+
+
+
+SizedBox(
+
+height:
+
+screenH * 0.02,
+
+),
+
+
+
+
+
+
+
+...financialProvider.flexibleExpenses
+
+.where((e)=>e.selected)
+
+.map((expense){
+
+
+
+return _amountField(
+
+
+
+expense,
+
+
+
+(value){
+
+
+
+financialProvider
+
+.updateExpenseAmount(
+
+expense,
+
+value,
+
+);
+
+
+
+},
+
+
+
+);
+
+
+
+}),
+
+
+
+
+
+SizedBox(
+
+height:
+
+screenH * 0.02,
+
+),
+// ================= BALANCE =================
+
+
+
+Container(
+
+
+  width:
+
+  double.infinity,
+
+
+
+  padding:
+
+  const EdgeInsets.all(15),
+
+
+
+
+  decoration:
+
+  BoxDecoration(
+
+
+    color:
+
+    financialProvider.balance >= 0
+
+        ?
+
+    themeProvider.isDark ? AppColors.darkPrimary.withOpacity(.15) : AppColors.lightPrimary.withOpacity(.15)
+
+        :
+
+    themeProvider.isDark ? AppColors.darkError.withOpacity(.15) : AppColors.lightError.withOpacity(.15),
+
+
+
+    borderRadius:
+
+    BorderRadius.circular(12),
+
+
+  ),
+
+
+
+
+  child:
+
+  Text(
+
+
+
+    financialProvider.balance >= 0
+
+        ?
+
+
+    "Surplus: ${financialProvider.balance.toStringAsFixed(2)} JOD"
+
+
+
+        :
+
+
+
+    "Deficit: ${financialProvider.balance.abs().toStringAsFixed(2)} JOD",
+
+
+
+
+
+    style:
+
+    TextStyle(
+
+
+      fontWeight:
+
+      FontWeight.bold,
+
+
+
+      color:
+
+      financialProvider.balance >= 0
+
+          ?
+
+      themeProvider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary
+
+          :
+
+      themeProvider.isDark ? AppColors.darkError : AppColors.lightError,
+
+
+
+    ),
+
+
+
+  ),
+
+
+
+),
+
+
+
+
+
+
+SizedBox(
+
+  height:
+
+  screenH * 0.03,
+
+),
+
+
+
+Padding(
+            
+                    padding: EdgeInsets.only(
+                      bottom: screenH * 0.02,
+                    ),
+            
+            
+                    child: ElevatedButton(
+            
+                      onPressed: () {
+       
+              if(financialProvider.isValid){
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => FinancialSetupScreen(),));
+
+  }else{
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+
+       SnackBar( backgroundColor: themeProvider.isDark ? AppColors.darkError : AppColors.lightError,
+
+        content: Text(
+          "Please complete all required fields" ,
+          style: TextStyle(
+          fontSize: screenW * 0.04,
+          fontWeight: FontWeight.w500,
+          ),
+        ),
+
+        duration:
+        Duration(seconds: 2),
+
+      ),
+
+    );
+
+  }
+                      },
+            
+            
+                      style: ButtonStyle(
+            
+                        backgroundColor: WidgetStatePropertyAll(
+            
+                          themeProvider.isDark
+                              ? AppColors.darkPrimary
+                              : AppColors.lightPrimary,
+            
+                        ),
+            
+            
+                        fixedSize: WidgetStatePropertyAll(
+            
+                          Size(
+                            screenW,
+                            screenH * 0.065,
+                          ),
+            
+                        ),
+            
+            
+                        shape: WidgetStatePropertyAll(
+            
+                          RoundedRectangleBorder(
+            
+                            borderRadius:
+                                BorderRadius.circular(10),
+            
+                          ),
+            
+                        ),
+            
+                      ),
+            
+            
+                      child: Text(
+            
+                        "Next",
+            
+                        style: TextStyle(
+            
+                          fontSize: screenW * 0.055,
+            
+                          color: AppColors.darkBorder,
+            
+                          fontWeight: FontWeight.w600,
+            
+                        ),
+            
+                      ),
+            
+                    ),
+            
                   ),
 
 
 
-                ),
 
-              )
 
+    
 
 
 
 
-            ],
 
 
-          ),
 
 
-        ),
 
 
-      ),
 
 
-    );
 
 
-  }
 
+],
 
 
+),
 
 
+),
 
-  Widget _amountField(
 
-      String label,
+),
 
-      Function(String) onChanged,
 
-      ){
+);
 
 
 
-    return Padding(
+}
 
-      padding:
 
-      const EdgeInsets.only(
 
-          bottom:12
 
-      ),
 
 
 
-      child:TextField(
 
+Widget _amountField(
 
 
-        keyboardType:
 
-        TextInputType.number,
+    ExpenseItem expense,
 
 
 
-        onChanged:onChanged,
+    Function(String) onChanged,
 
 
 
-        decoration:
+    ){
 
-        InputDecoration(
 
 
+return Padding(
 
-          labelText:
 
-          label,
 
+padding:
 
+ EdgeInsets.only(
 
-          suffixText:
+bottom:12
 
-          "JOD",
+),
 
 
 
-          border:
 
-          OutlineInputBorder(
 
+child:
 
+CustomTextfield(
 
-            borderRadius:
 
-            BorderRadius.circular(12),
 
+controller:
 
+expense.controller,
 
-          ),
 
 
-        ),
+hint:
 
+expense.name,
 
 
-      ),
 
+type:
 
-    );
+TextFieldType.number,
 
 
-  }
+
+
+
+suffix:
+
+const Padding(
+
+
+
+padding:
+
+EdgeInsets.all(12),
+
+
+
+child:
+
+Text("JOD"),
+
+
+
+),
+
+
+
+
+
+onChanged:
+
+onChanged,
+
+
+
+),
+
+
+
+);
+
+
+
+}
 
 
 
