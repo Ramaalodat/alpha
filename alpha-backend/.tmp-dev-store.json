@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "phoneNumber": "+962790000000",
+      "fullName": "Test User",
+      "birthDate": "1995-01-01T00:00:00.000Z",
+      "passwordHash": "hash",
+      "status": "PENDING_VERIFICATION",
+      "isOnboarded": false,
+      "createdAt": "2026-07-15T19:00:52.910Z",
+      "updatedAt": "2026-07-15T19:00:52.910Z"
+    }
+  ],
+  "otps": [
+    {
+      "phoneNumber": "+962790000000",
+      "code": "123456",
+      "purpose": "REGISTRATION",
+      "expiresAt": "2026-07-15T19:01:52.916Z",
+      "id": "1784142052946-5b973a43e5b63",
+      "createdAt": "2026-07-15T19:00:52.946Z"
+    }
+  ],
+  "sessions": [],
+  "profiles": [],
+  "settings": []
+}
