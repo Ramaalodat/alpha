@@ -11,1689 +11,544 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-
 class FinancialSetupScreen extends StatelessWidget {
-
-
   const FinancialSetupScreen({
     super.key,
   });
 
-
-
   @override
   Widget build(BuildContext context) {
-
-
     final screenW = Device.width(context);
 
     final screenH = Device.height(context);
 
+    final themeProvider = Provider.of<Themeprovider>(context);
 
-
-    final themeProvider =
-    Provider.of<Themeprovider>(context);
-
-
-
-    final financialProvider =
-    context.watch<FinancialProvider>();
-
-
-
-
+    final financialProvider = context.watch<FinancialProvider>();
 
     return Scaffold(
-
-
-      backgroundColor:
-
-      themeProvider.isDark
-
+      backgroundColor: themeProvider.isDark
           ? AppColors.darkBackground
-
           : AppColors.lightBackground,
-
-
-
-      body:
-
-      SafeArea(
-
-
-        child:
-
-        SingleChildScrollView(
-
-
-          padding:
-
-          EdgeInsets.symmetric(
-
-            horizontal:
-
-            screenW * 0.05,
-
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenW * 0.05,
           ),
-
-
-
-
-          child:
-
-          Column(
-
-
-            crossAxisAlignment:
-
-            CrossAxisAlignment.start,
-
-
-
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-
-
-
               SizedBox(
-
-                height:
-
-                screenH * 0.03,
-
+                height: screenH * 0.03,
               ),
 
-
-
-
-
               Text(
-
-                "Step 2 of 2",
-
-                style:
-
-                GoogleFonts.ibmPlexSansArabic(
-
-                  fontSize:
-
-                  screenW * 0.04,
-
-
-                  fontWeight:
-
-                  FontWeight.w500,
-
-
-                  color:
-
-                  themeProvider.isDark
-
-                      ?
-
-                  AppColors.darkAccent
-
-                      :
-
-                  AppColors.lightAccent,
-
+                "Step 2 of 3",
+                style: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: screenW * 0.04,
+                  fontWeight: FontWeight.w500,
+                  color: themeProvider.isDark
+                      ? AppColors.darkAccent
+                      : AppColors.lightAccent,
                 ),
-
               ),
-
-
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.02,
-
+                height: screenH * 0.02,
               ),
 
-
-
-
-
               Text(
-
                 "Financial Information",
-
-                style:
-
-                GoogleFonts.ibmPlexSansArabic(
-
-                  fontSize:
-
-                  screenW * 0.075,
-
-
-                  fontWeight:
-
-                  FontWeight.bold,
-
-
-                  color:
-
-                  themeProvider.isDark
-
-                      ?
-
-                  AppColors.darkText
-
-                      :
-
-                  AppColors.lightText,
-
+                style: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: screenW * 0.075,
+                  fontWeight: FontWeight.bold,
+                  color: themeProvider.isDark
+                      ? AppColors.darkText
+                      : AppColors.lightText,
                 ),
-
               ),
-
-
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.02,
-
+                height: screenH * 0.01,
               ),
-
-
-
-
 
               Text(
-
                 "Accurate data means sharper advice from Alpha",
-
-                style:
-
-                GoogleFonts.ibmPlexSansArabic(
-
-                  fontSize:
-
-                  screenW * 0.035,
-
-
-                  fontWeight:
-
-                  FontWeight.w500,
-
-
-                  color:
-
-                  themeProvider.isDark
-
-                      ?
-
-                  AppColors.darkSubText
-
-                      :
-
-                  AppColors.lightSubText,
-
+                style: GoogleFonts.ibmPlexSansArabic(
+                  fontSize: screenW * 0.035,
+                  fontWeight: FontWeight.w500,
+                  color: themeProvider.isDark
+                      ? AppColors.darkSubText
+                      : AppColors.lightSubText,
                 ),
-
               ),
-
-
-
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.02,
-
+                height: screenH * 0.02,
               ),
-
-
-
-
-
 
               LinearPercentIndicator(
-
-
-                lineHeight:
-
-                screenH * 0.02,
-
-
-
-                percent:
-
-                financialProvider.pageProgress,
-
-
-
-                backgroundColor:
-
-                themeProvider.isDark
-
-                    ?
-
-                AppColors.darkBorder
-
-                    :
-
-                AppColors.lightBorder,
-
-
-
-                progressColor:
-
-                themeProvider.isDark
-
-                    ?
-
-                AppColors.darkSecondary
-
-                    :
-
-                AppColors.lightSecondary,
-
-
-
-                barRadius:
-
-                const Radius.circular(10),
-
+                lineHeight: screenH * 0.02,
+                percent: financialProvider.pageProgress,
+                backgroundColor: themeProvider.isDark
+                    ? AppColors.darkBorder
+                    : AppColors.lightBorder,
+                progressColor: themeProvider.isDark
+                    ? AppColors.darkSecondary
+                    : AppColors.lightSecondary,
+                barRadius: const Radius.circular(10),
               ),
-
-
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.03,
-
+                height: screenH * 0.03,
               ),
-
-
-
-
-
 
               // ================= GENERAL =================
 
-
-
-
-
               Text(
-
                 "How do you describe your relationship with money?",
-
-
-                style:
-
-                TextStyle(
-
-                  fontSize:
-
-                  screenW * 0.04,
-
-
-                  fontWeight:
-
-                  FontWeight.bold,
-
-
-                  color:
-
-                  themeProvider.isDark
-
-                      ?
-
-                  AppColors.darkSubText
-
-                      :
-
-                  AppColors.lightSubText,
-
-                ),
-
-              ),
-
-
-
-
-
-
-              SizedBox(
-
-                height:
-
-                screenH * 0.01,
-
-              ),
-
-
-
-
-
-              MultiSelectChip(
-
-
-                items:
-
-                const [
-
-
-                  "Careful spending",
-
-                  "Balanced spending",
-
-                  "Emotional spending",
-
-
-                ],
-
-
-
-
-
-                selectedItems:
-
-                financialProvider.moneyRelationship == null
-
-                    ?
-
-                []
-
-                    :
-
-                [
-
-                  financialProvider.moneyRelationship!
-
-                ],
-
-
-
-
-                onTap:(value){
-
-
-                  financialProvider
-
-                      .setMoneyRelationship(value);
-
-
-                },
-
-
-              ),
-
-
-
-
-
-              SizedBox(
-
-                height:
-
-                screenH * 0.02,
-
-              ),
-
-
-
-
-
-
-              Text(
-
-                "Extra monthly saving target",
-
-
-                style:
-
-                TextStyle(
-
-                  fontSize:
-
-                  screenW * 0.04,
-
-
-                  fontWeight:
-
-                  FontWeight.bold,
-
-
-                  color:
-
-                  themeProvider.isDark
-
-                      ?
-
-                  AppColors.darkSubText
-
-                      :
-
-                  AppColors.lightSubText,
-
-                ),
-
-              ),
-
-
-
-
-
-              SizedBox(
-
-                height:
-
-                screenH * 0.01,
-
-              ),
-
-
-
-
-
-
-              CustomTextfield(
-
-
-
-                controller:
-
-                financialProvider.savingTargetController,
-
-
-
-                hint:
-
-                "Enter amount",
-
-
-
-                type:
-
-                TextFieldType.number,
-
-
-
-                suffix:
-
-                const Padding(
-
-                  padding:
-
-                  EdgeInsets.all(12),
-
-
-                  child:
-
-                  Text("JOD"),
-
-                ),
-
-
-
-
-                onChanged:
-
-                financialProvider.setSavingTarget,
-
-
-              ),
-
-
-
-
-
-              SizedBox(
-
-                height:
-
-                screenH * 0.02,
-
-              ),
-
-
-
-
-
-             Text(
-
-                "Main financial goal", 
                 style: TextStyle(
                   fontSize: screenW * 0.04,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDark ? AppColors.darkSubText : AppColors.lightSubText,
+                  color: themeProvider.isDark
+                      ? AppColors.darkSubText
+                      : AppColors.lightSubText,
                 ),
               ),
 
-
-
-
-
-
               SizedBox(
-
-                height:
-
-                screenH * 0.01,
-
+                height: screenH * 0.01,
               ),
-
-
-
-
-
 
               MultiSelectChip(
-
-
-
-                items:
-
-                const [
-
-
-                  "Saving",
-
-                  "Debt payment",
-
-                  "Daily budget",
-
-                  "Other",
-
+                items: const [
+                  "Careful spending",
+                  "Balanced spending",
+                  "Emotional spending",
                 ],
-
-
-
-
-                selectedItems:
-
-                financialProvider.mainGoal == null
-
-                    ?
-
-                []
-
-                    :
-
-                [
-
-                  financialProvider.mainGoal!
-
-                ],
-
-
-
-
-
-                onTap:(value){
-
-
-                  financialProvider
-
-                      .setMainGoal(value);
-
-
+                selectedItems: financialProvider.moneyRelationship == null
+                    ? []
+                    : [financialProvider.moneyRelationship!],
+                onTap: (value) {
+                  financialProvider.setMoneyRelationship(value);
                 },
-
               ),
-
-
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.02,
-
+                height: screenH * 0.02,
               ),
-
-
-
-
-
 
               Text(
-
-                "Average household income",
-
-
-                style : TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold) 
-
+                "Extra monthly saving target",
+                style: TextStyle(
+                  fontSize: screenW * 0.04,
+                  fontWeight: FontWeight.bold,
+                  color: themeProvider.isDark
+                      ? AppColors.darkSubText
+                      : AppColors.lightSubText,
+                ),
               ),
-
-
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.01,
-
+                height: screenH * 0.01,
               ),
-
-
-
-
 
               CustomTextfield(
-
-
-
-                controller:
-
-                financialProvider.householdIncomeController,
-
-
-
-                hint:
-
-                "Enter income",
-
-
-
-                type:
-
-                TextFieldType.number,
-
-
-
-                suffix:
-
-                const Padding(
-
-                  padding:
-
-                  EdgeInsets.all(12),
-
-
-                  child:
-
-                  Text("JOD"),
-
+                controller: financialProvider.savingTargetController,
+                hint: "Enter amount",
+                type: TextFieldType.number,
+                suffix: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text("JOD"),
                 ),
-
-
-
-                onChanged:
-
-                financialProvider.setHouseholdIncome,
-
-
+                onChanged: financialProvider.setSavingTarget,
               ),
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.02,
-
+                height: screenH * 0.02,
               ),
 
+              Text(
+                "Main financial goal",
+                style: TextStyle(
+                  fontSize: screenW * 0.04,
+                  fontWeight: FontWeight.bold,
+                  color: themeProvider.isDark
+                      ? AppColors.darkSubText
+                      : AppColors.lightSubText,
+                ),
+              ),
 
+              SizedBox(
+                height: screenH * 0.01,
+              ),
 
+              MultiSelectChip(
+                items: const [
+                  "Saving",
+                  "Debt payment",
+                  "Daily budget",
+                  "Other",
+                ],
+                selectedItems: financialProvider.mainGoal == null
+                    ? []
+                    : [financialProvider.mainGoal!],
+                onTap: (value) {
+                  financialProvider.setMainGoal(value);
+                },
+              ),
 
+              SizedBox(
+                height: screenH * 0.02,
+              ),
+
+              Text("Average household income",
+                  style: TextStyle(
+                      fontSize: screenW * 0.04,
+                      color: themeProvider.isDark
+                          ? AppColors.darkSubText
+                          : AppColors.lightSubText,
+                      fontWeight: FontWeight.bold)),
+
+              SizedBox(
+                height: screenH * 0.01,
+              ),
+
+              CustomTextfield(
+                controller: financialProvider.householdIncomeController,
+                hint: "Enter income",
+                type: TextFieldType.number,
+                suffix: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text("JOD"),
+                ),
+                onChanged: financialProvider.setHouseholdIncome,
+              ),
+
+              SizedBox(
+                height: screenH * 0.02,
+              ),
 
               // ================= INCOME SOURCES =================
 
-
-
-
               Text(
-
-                "Income Sources", style: TextStyle(
-
+                "Income Sources",
+                style: TextStyle(
                   fontSize: screenW * 0.04,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDark ? AppColors.darkSubText : AppColors.lightSubText,
-
+                  color: themeProvider.isDark
+                      ? AppColors.darkSubText
+                      : AppColors.lightSubText,
                 ),
-
               ),
-
-
-
 
               SizedBox(
-
-                height:
-
-                screenH * 0.01,
-
+                height: screenH * 0.01,
               ),
-
-
-
-
 
               MultiSelectChip(
-
-
                 items:
-
-                financialProvider.incomeSources
-
-                    .map((e)=>e.name)
-
+                    financialProvider.incomeSources.map((e) => e.name).toList(),
+                selectedItems: financialProvider.incomeSources
+                    .where((e) => e.selected)
+                    .map((e) => e.name)
                     .toList(),
-
-
-
-
-                selectedItems:
-
-                financialProvider.incomeSources
-
-                    .where((e)=>e.selected)
-
-                    .map((e)=>e.name)
-
-                    .toList(),
-
-
-
-
-                onTap:(value){
-
-
-
-                  final item =
-
-                  financialProvider.incomeSources
-
-                      .firstWhere(
-
-                          (e)=>e.name == value
-
-                  );
-
-
+                onTap: (value) {
+                  final item = financialProvider.incomeSources
+                      .firstWhere((e) => e.name == value);
 
                   financialProvider.toggleIncome(item);
-
-
-
                 },
-
               ),
-
 
 // ================= INCOME INPUTS =================
 
-
-
-SizedBox(
-
-  height: screenH * 0.02,
-
-),
-
-
-
-
-
-...financialProvider.incomeSources
-
-    .where((e)=>e.selected)
-
-    .map((income){
-
-
-  return Padding(
-
-
-    padding:
-
-    EdgeInsets.only(
-
-      bottom:
-
-      screenH * 0.015,
-
-    ),
-
-
-
-    child:
-
-
-    CustomTextfield(
-
-
-      controller:
-
-      income.controller,
-
-
-
-      hint:
-
-      income.name,
-
-
-
-      type:
-
-      TextFieldType.number,
-
-
-
-      suffix:
-
-      const Padding(
-
-        padding:
-
-        EdgeInsets.all(12),
-
-
-        child:
-
-        Text("JOD"),
-
-
-      ),
-
-
-
-      onChanged:(value){
-
-
-        financialProvider
-
-            .updateIncomeAmount(
-
-          income,
-
-          value,
-
-        );
-
-
-      },
-
-
-
-    ),
-
-
-
-  );
-
-
-
-}),
-
-
-
-
-SizedBox(
-
-  height:
-
-  screenH * 0.02,
-
-),
-
-RichText(
-  text: TextSpan(
-    text: "Total Income: ",
-    style: TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: screenW * 0.045,
-      color: themeProvider.isDark ? AppColors.darkText : AppColors.lightText, 
-    ),
-    children: [
-      TextSpan(
-        text: "${financialProvider.totalIncome.toStringAsFixed(2)} JOD",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: screenW * 0.045,
-          color: themeProvider.isDark ? AppColors.darkAccent : AppColors.lightAccent, 
-        ),
-      ),
-    ],
-  ),
-),
-
-
-
-
-
-
-SizedBox(
-
-height:
-
-screenH * 0.02,
-
-),
-
-
-
-
-
-
+              SizedBox(
+                height: screenH * 0.02,
+              ),
+
+              ...financialProvider.incomeSources
+                  .where((e) => e.selected)
+                  .map((income) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: screenH * 0.015,
+                  ),
+                  child: CustomTextfield(
+                    controller: income.controller,
+                    hint: income.name,
+                    type: TextFieldType.number,
+                    suffix: const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Text("JOD"),
+                    ),
+                    onChanged: (value) {
+                      financialProvider.updateIncomeAmount(
+                        income,
+                        value,
+                      );
+                    },
+                  ),
+                );
+              }),
+
+              SizedBox(
+                height: screenH * 0.02,
+              ),
+
+              RichText(
+                text: TextSpan(
+                  text: "Total Income: ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: screenW * 0.045,
+                    color: themeProvider.isDark
+                        ? AppColors.darkText
+                        : AppColors.lightText,
+                  ),
+                  children: [
+                    TextSpan(
+                      text:
+                          "${financialProvider.totalIncome.toStringAsFixed(2)} JOD",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: screenW * 0.045,
+                        color: themeProvider.isDark
+                            ? AppColors.darkAccent
+                            : AppColors.lightAccent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(
+                height: screenH * 0.02,
+              ),
 
 // ================= FIXED EXPENSES =================
 
-
-
-
-Text(
-
-
-"Fixed Expenses",
-
-
-style:
-
-TextStyle(
-fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold
-
-),
-
-
-
-),
-
-
-
-
-
-
-SizedBox(
-
-height:
-
-screenH * 0.01,
-
-),
-
-
-
-
-
-
-
-MultiSelectChip(
-
-
-items:
-
-financialProvider.fixedExpenses
-
-.map((e)=>e.name)
-
-.toList(),
-
-
-
-
-selectedItems:
-
-financialProvider.fixedExpenses
-
-.where((e)=>e.selected)
-
-.map((e)=>e.name)
-
-.toList(),
-
-
-
-
-onTap:(value){
-
-
-final item =
-
-financialProvider.fixedExpenses
-
-.firstWhere(
-
-(e)=>e.name == value
-
-);
-
-
-
-financialProvider.toggleExpense(item);
-
-
-
-},
-
-
-),
-
-
-
-
-
-
-
-
-SizedBox(
-
-height:
-
-screenH * 0.02,
-
-),
-
-
-
-
-
-
-
-...financialProvider.fixedExpenses
-
-.where((e)=>e.selected)
-
-.map((expense){
-
-
-
-return _amountField(
-
-
-
-expense,
-
-
-
-(value){
-
-
-
-financialProvider
-
-.updateExpenseAmount(
-
-expense,
-
-value,
-
-);
-
-
-
-},
-
-
-
-);
-
-
-
-}),
-
-
-
-
-
-
-
-SizedBox(
-
-height:
-
-screenH * 0.02,
-
-),
-
-
-
-
-
-
+              Text(
+                "Fixed Expenses",
+                style: TextStyle(
+                    fontSize: screenW * 0.04,
+                    color: themeProvider.isDark
+                        ? AppColors.darkSubText
+                        : AppColors.lightSubText,
+                    fontWeight: FontWeight.bold),
+              ),
+
+              SizedBox(
+                height: screenH * 0.01,
+              ),
+
+              MultiSelectChip(
+                items:
+                    financialProvider.fixedExpenses.map((e) => e.name).toList(),
+                selectedItems: financialProvider.fixedExpenses
+                    .where((e) => e.selected)
+                    .map((e) => e.name)
+                    .toList(),
+                onTap: (value) {
+                  final item = financialProvider.fixedExpenses
+                      .firstWhere((e) => e.name == value);
+
+                  financialProvider.toggleExpense(item);
+                },
+              ),
+
+              SizedBox(
+                height: screenH * 0.02,
+              ),
+
+              ...financialProvider.fixedExpenses
+                  .where((e) => e.selected)
+                  .map((expense) {
+                return _amountField(
+                  expense,
+                  (value) {
+                    financialProvider.updateExpenseAmount(
+                      expense,
+                      value,
+                    );
+                  },
+                );
+              }),
+
+              SizedBox(
+                height: screenH * 0.02,
+              ),
 
 // ================= FLEXIBLE EXPENSES =================
 
-
-
-
-
-Text(
-
-
-"Flexible Expenses",
-
-
-style: TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),
-
-
-),
-
-
-
-
-
-
-
-SizedBox(
-
-height:
-
-screenH * 0.015,
-
-),
-
-
-
-
-
-
-
-MultiSelectChip(
-
-
-items:
-
-financialProvider.flexibleExpenses
-
-.map((e)=>e.name)
-
-.toList(),
-
-
-
-
-selectedItems:
-
-financialProvider.flexibleExpenses
-
-.where((e)=>e.selected)
-
-.map((e)=>e.name)
-
-.toList(),
-
-
-
-
-onTap:(value){
-
-
-
-final item =
-
-financialProvider.flexibleExpenses
-
-.firstWhere(
-
-(e)=>e.name == value
-
-);
-
-
-
-financialProvider.toggleExpense(item);
-
-
-
-},
-
-
-
-),
-
-
-
-
-
-
-
-SizedBox(
-
-height:
-
-screenH * 0.02,
-
-),
-
-
-
-
-
-
-
-...financialProvider.flexibleExpenses
-
-.where((e)=>e.selected)
-
-.map((expense){
-
-
-
-return _amountField(
-
-
-
-expense,
-
-
-
-(value){
-
-
-
-financialProvider
-
-.updateExpenseAmount(
-
-expense,
-
-value,
-
-);
-
-
-
-},
-
-
-
-);
-
-
-
-}),
-
-
-
-
-
-SizedBox(
-
-height:
-
-screenH * 0.02,
-
-),
+              Text(
+                "Flexible Expenses",
+                style: TextStyle(
+                    fontSize: screenW * 0.04,
+                    color: themeProvider.isDark
+                        ? AppColors.darkSubText
+                        : AppColors.lightSubText,
+                    fontWeight: FontWeight.bold),
+              ),
+
+              SizedBox(
+                height: screenH * 0.015,
+              ),
+
+              MultiSelectChip(
+                items: financialProvider.flexibleExpenses
+                    .map((e) => e.name)
+                    .toList(),
+                selectedItems: financialProvider.flexibleExpenses
+                    .where((e) => e.selected)
+                    .map((e) => e.name)
+                    .toList(),
+                onTap: (value) {
+                  final item = financialProvider.flexibleExpenses
+                      .firstWhere((e) => e.name == value);
+
+                  financialProvider.toggleExpense(item);
+                },
+              ),
+
+              SizedBox(
+                height: screenH * 0.02,
+              ),
+
+              ...financialProvider.flexibleExpenses
+                  .where((e) => e.selected)
+                  .map((expense) {
+                return _amountField(
+                  expense,
+                  (value) {
+                    financialProvider.updateExpenseAmount(
+                      expense,
+                      value,
+                    );
+                  },
+                );
+              }),
+
+              SizedBox(
+                height: screenH * 0.02,
+              ),
 // ================= BALANCE =================
 
-
-
-Container(
-
-
-  width:
-
-  double.infinity,
-
-
-
-  padding:
-
-  const EdgeInsets.all(15),
-
-
-
-
-  decoration:
-
-  BoxDecoration(
-
-
-    color:
-
-    financialProvider.balance >= 0
-
-        ?
-
-    themeProvider.isDark ? AppColors.darkPrimary.withOpacity(.15) : AppColors.lightPrimary.withOpacity(.15)
-
-        :
-
-    themeProvider.isDark ? AppColors.darkError.withOpacity(.15) : AppColors.lightError.withOpacity(.15),
-
-
-
-    borderRadius:
-
-    BorderRadius.circular(12),
-
-
-  ),
-
-
-
-
-  child:
-
-  Text(
-
-
-
-    financialProvider.balance >= 0
-
-        ?
-
-
-    "Surplus: ${financialProvider.balance.toStringAsFixed(2)} JOD"
-
-
-
-        :
-
-
-
-    "Deficit: ${financialProvider.balance.abs().toStringAsFixed(2)} JOD",
-
-
-
-
-
-    style:
-
-    TextStyle(
-
-
-      fontWeight:
-
-      FontWeight.bold,
-
-
-
-      color:
-
-      financialProvider.balance >= 0
-
-          ?
-
-      themeProvider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary
-
-          :
-
-      themeProvider.isDark ? AppColors.darkError : AppColors.lightError,
-
-
-
-    ),
-
-
-
-  ),
-
-
-
-),
-
-
-
-
-
-
-SizedBox(
-
-  height:
-
-  screenH * 0.03,
-
-),
-
-
-
-Padding(
-            
-                    padding: EdgeInsets.only(
-                      bottom: screenH * 0.02,
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: financialProvider.balance >= 0
+                      ? themeProvider.isDark
+                          ? AppColors.darkPrimary.withOpacity(.15)
+                          : AppColors.lightPrimary.withOpacity(.15)
+                      : themeProvider.isDark
+                          ? AppColors.darkError.withOpacity(.15)
+                          : AppColors.lightError.withOpacity(.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  financialProvider.balance >= 0
+                      ? "Surplus: ${financialProvider.balance.toStringAsFixed(2)} JOD"
+                      : "Deficit: ${financialProvider.balance.abs().toStringAsFixed(2)} JOD",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: financialProvider.balance >= 0
+                        ? themeProvider.isDark
+                            ? AppColors.darkPrimary
+                            : AppColors.lightPrimary
+                        : themeProvider.isDark
+                            ? AppColors.darkError
+                            : AppColors.lightError,
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                height: screenH * 0.03,
+              ),
+
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: screenH * 0.02,
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (financialProvider.isValid) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SetGoalScreen(),
+                          ));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: themeProvider.isDark
+                              ? AppColors.darkError
+                              : AppColors.lightError,
+                          content: Text(
+                            "Please complete all required fields",
+                            style: TextStyle(
+                              fontSize: screenW * 0.04,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(
+                      themeProvider.isDark
+                          ? AppColors.darkPrimary
+                          : AppColors.lightPrimary,
                     ),
-            
-            
-                    child: ElevatedButton(
-            
-                      onPressed: () {
-       
-              if(financialProvider.isValid){
-
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SetGoalScreen(),));
-
-  }else{
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-
-       SnackBar( backgroundColor: themeProvider.isDark ? AppColors.darkError : AppColors.lightError,
-
-        content: Text(
-          "Please complete all required fields" ,
-          style: TextStyle(
-          fontSize: screenW * 0.04,
-          fontWeight: FontWeight.w500,
+                    fixedSize: WidgetStatePropertyAll(
+                      Size(
+                        screenW,
+                        screenH * 0.065,
+                      ),
+                    ),
+                    shape: WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    "Next",
+                    style: TextStyle(
+                      fontSize: screenW * 0.055,
+                      color: AppColors.darkBorder,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-
-        duration:
-        Duration(seconds: 2),
-
       ),
-
     );
-
   }
-                      },
-            
-            
-                      style: ButtonStyle(
-            
-                        backgroundColor: WidgetStatePropertyAll(
-            
-                          themeProvider.isDark
-                              ? AppColors.darkPrimary
-                              : AppColors.lightPrimary,
-            
-                        ),
-            
-            
-                        fixedSize: WidgetStatePropertyAll(
-            
-                          Size(
-                            screenW,
-                            screenH * 0.065,
-                          ),
-            
-                        ),
-            
-            
-                        shape: WidgetStatePropertyAll(
-            
-                          RoundedRectangleBorder(
-            
-                            borderRadius:
-                                BorderRadius.circular(10),
-            
-                          ),
-            
-                        ),
-            
-                      ),
-            
-            
-                      child: Text(
-            
-                        "Next",
-            
-                        style: TextStyle(
-            
-                          fontSize: screenW * 0.055,
-            
-                          color: AppColors.darkBorder,
-            
-                          fontWeight: FontWeight.w600,
-            
-                        ),
-            
-                      ),
-            
-                    ),
-            
-                  ),
 
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-],
-
-
-),
-
-
-),
-
-
-),
-
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-Widget _amountField(
-
-
-
+  Widget _amountField(
     ExpenseItem expense,
-
-
-
     Function(String) onChanged,
-
-
-
-    ){
-
-
-
-return Padding(
-
-
-
-padding:
-
- EdgeInsets.only(
-
-bottom:12
-
-),
-
-
-
-
-
-child:
-
-CustomTextfield(
-
-
-
-controller:
-
-expense.controller,
-
-
-
-hint:
-
-expense.name,
-
-
-
-type:
-
-TextFieldType.number,
-
-
-
-
-
-suffix:
-
-const Padding(
-
-
-
-padding:
-
-EdgeInsets.all(12),
-
-
-
-child:
-
-Text("JOD"),
-
-
-
-),
-
-
-
-
-
-onChanged:
-
-onChanged,
-
-
-
-),
-
-
-
-);
-
-
-
-}
-
-
-
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12),
+      child: CustomTextfield(
+        controller: expense.controller,
+        hint: expense.name,
+        type: TextFieldType.number,
+        suffix: const Padding(
+          padding: EdgeInsets.all(12),
+          child: Text("JOD"),
+        ),
+        onChanged: onChanged,
+      ),
+    );
+  }
 }

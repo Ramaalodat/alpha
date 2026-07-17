@@ -9,7 +9,7 @@ class AuthProvider extends ChangeNotifier {
   final passwordController = TextEditingController();
   final birthDateController = TextEditingController();
 
-
+final emailController = TextEditingController();
   DateTime? birthDate;
 
 
@@ -150,6 +150,7 @@ Future<bool> register({
   required String phone,
   required String birthDate,
   required String password,
+  required String email
 
 }) async {
 
@@ -170,6 +171,7 @@ Future<bool> register({
       birthDate: birthDate,
 
       password: password,
+      email : email
 
     );
 

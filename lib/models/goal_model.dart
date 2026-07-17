@@ -1,61 +1,45 @@
 class Goal {
 
+  final String category;
 
-  String icon;
+  final String? customName;
 
-  String name;
+  final double monthlySaving;
 
-  double amount;
+  final int priority;
 
-  DateTime? targetDate;
-
-
+  final DateTime? targetDate;
 
   Goal({
 
-    required this.icon,
+    required this.category,
 
-    required this.name,
+    this.customName,
 
-    required this.amount,
+    required this.monthlySaving,
+
+    required this.priority,
 
     this.targetDate,
 
   });
 
-
-
-
-
-  Map<String,dynamic> toJson(){
-
+  Map<String, dynamic> toJson() {
 
     return {
 
+      "category": category,
 
-      "icon":
-      icon,
+      "custom_name": customName,
 
+      "monthly_saving": monthlySaving,
 
-      "name":
-      name,
+      "priority": priority,
 
-
-      "amount":
-      amount,
-
-
-      "target_date":
-      targetDate?.toIso8601String(),
-
+      "target_date": targetDate?.toIso8601String(),
 
     };
 
-
   }
-
-
-
-
 
 }

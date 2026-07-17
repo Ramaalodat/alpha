@@ -55,7 +55,7 @@ SizedBox(height:screenH*0.03,),
 
 
  Text( 
-                               "Step 1 of 2",
+                               "Step 1 of 3",
                                style: GoogleFonts.ibmPlexSansArabic(
                                  fontSize: screenW*0.04,
                                 fontWeight: FontWeight.w500,
@@ -75,7 +75,7 @@ SizedBox(height:screenH*0.03,),
                   : AppColors.lightText,
             ),
           ),
-        SizedBox(height: screenH*0.02,),
+        SizedBox(height: screenH*0.01,),
                  Text( 
                              "Accurate data means sharper advice from Alpha",
                              style: GoogleFonts.ibmPlexSansArabic(

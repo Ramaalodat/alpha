@@ -1,12 +1,15 @@
 import 'package:alpha_app/providers/auth_provider.dart';
+import 'package:alpha_app/providers/chatbot_provider.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/goal_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
 
 import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/screens/ai_assistant/chat_screen.dart';
 import 'package:alpha_app/screens/auth/otp_screen.dart';
 import 'package:alpha_app/screens/auth/terms_screen.dart';
+import 'package:alpha_app/screens/goals/goal_history.dart';
 import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
 import 'package:alpha_app/screens/profile/financial_setup_screen.dart';
@@ -47,6 +50,11 @@ void main() async {
   ChangeNotifierProvider(create: (context) =>PersonalProvider()),
        ChangeNotifierProvider(create: (context) =>FinancialProvider()),
          ChangeNotifierProvider(create: (context) =>GoalProvider()),
+         ChangeNotifierProvider(
+
+create: (_) => ChatbotProvider(),
+
+),
       ],
         child: MyApp())
     ),
@@ -97,8 +105,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home:  SplashScreen(), // Replace with your initial screen
-            //PersonalInfoScreen(), // Replace with your initial screen
+            home: MyGoalsApp()
           );
         },
          

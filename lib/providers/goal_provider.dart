@@ -8,23 +8,34 @@ class GoalProvider extends ChangeNotifier {
 
 
 
-  final TextEditingController targetDateController =
-  TextEditingController();
+  // ================= CONTROLLERS =================
 
 
 
-  String? selectedIcon;
-
-
-
-  final TextEditingController nameController =
-  TextEditingController();
+  final TextEditingController customNameController =
+      TextEditingController();
 
 
 
   final TextEditingController amountController =
-  TextEditingController();
+      TextEditingController();
 
+
+
+  final TextEditingController targetDateController =
+      TextEditingController();
+
+
+
+
+
+
+  // ================= GOAL DATA =================
+
+
+
+
+  String? selectedCategory;
 
 
 
@@ -32,16 +43,36 @@ class GoalProvider extends ChangeNotifier {
 
 
 
+  int priority = 5;
 
 
-  final List<String> icons = [
+
+  double emergencyPercentage = 10;
 
 
-    "Device",
+
+
+
+  final List<String> goalCategories = [
+
+
+    "Emergency Fund",
+
+    "Laptop",
 
     "Travel",
 
     "Car",
+
+    "Education",
+
+    "House",
+
+    "Business",
+
+    "Furniture",
+
+    "Other",
 
 
   ];
@@ -52,10 +83,16 @@ class GoalProvider extends ChangeNotifier {
 
 
 
-  void setIcon(String value){
+  // ================= CATEGORY =================
 
 
-    selectedIcon = value;
+
+
+  void setCategory(String value){
+
+
+    selectedCategory = value;
+
 
 
     notifyListeners();
@@ -70,8 +107,65 @@ class GoalProvider extends ChangeNotifier {
 
 
 
+  // ================= PRIORITY =================
 
-  void setTargetDate(DateTime date){
+
+
+
+
+  void setPriority(int value){
+
+
+    priority = value;
+
+
+
+    notifyListeners();
+
+
+  }
+
+
+
+
+
+
+
+
+  // ================= EMERGENCY =================
+
+
+
+
+
+  void setEmergencyPercentage(double value){
+
+
+    emergencyPercentage = value;
+
+
+
+    notifyListeners();
+
+
+  }
+
+
+
+
+
+
+
+
+  // ================= DATE =================
+
+
+
+
+
+
+  void setDate(DateTime date){
+
 
 
     targetDate = date;
@@ -97,118 +191,42 @@ class GoalProvider extends ChangeNotifier {
 
 
 
-  void setName(String value){
-
-
-    nameController.text = value;
-
-
-    notifyListeners();
-
-
-  }
+  // ================= AMOUNT =================
 
 
 
 
 
 
+  double get monthlySaving{
 
-
-
-  void setAmount(String value){
-
-
-    amountController.text = value;
-
-
-    notifyListeners();
-
-
-  }
-
-
-
-
-
-
-
-
-
-  double get targetAmount{
 
 
     return double.tryParse(
 
-        amountController.text.replaceAll(",", "")
+
+
+      amountController.text
+
+          .replaceAll(",", "")
+
+
 
     ) ?? 0;
 
 
-  }
-
-
-
-
-
-
-
-
-
-  double get monthlySuggestion{
-
-
-
-    if(targetDate == null ||
-
-        targetAmount <= 0){
-
-
-      return 0;
-
-
-    }
-
-
-
-
-
-
-    final now = DateTime.now();
-
-
-
-
-    final months =
-
-        (targetDate!.year - now.year) * 12 +
-
-            (targetDate!.month - now.month);
-
-
-
-
-
-    if(months <= 0){
-
-
-      return targetAmount;
-
-
-    }
-
-
-
-
-
-    return targetAmount / months;
-
 
   }
 
 
 
 
+
+
+
+
+
+  // ================= VALIDATION =================
 
 
 
@@ -217,17 +235,27 @@ class GoalProvider extends ChangeNotifier {
   bool get isValid{
 
 
+    final nameValid =
+
+
+    selectedCategory == "Other"
+
+        ? customNameController.text.trim().isNotEmpty
+
+        : selectedCategory != null;
+
+
+
     return
 
-        selectedIcon != null &&
+        nameValid &&
 
-        nameController.text.trim().isNotEmpty &&
-
-        targetAmount > 0 &&
+        monthlySaving > 0 &&
 
         targetDate != null;
 
 
+
   }
 
 
@@ -238,28 +266,50 @@ class GoalProvider extends ChangeNotifier {
 
 
 
-  double get pageProgress {
-
-
-
-    const double startProgress = 2 / 3;
-
-
-    const int totalFields = 4;
-
-
-
-    int completedFields = 0;
+  // ================= PROGRESS =================
 
 
 
 
 
-    // 1 - Icon
+  double get pageProgress{
 
-    if(selectedIcon != null){
 
-      completedFields++;
+    const totalSteps = 4;
+
+
+
+    int completed = 0;
+
+
+
+    // اختيار الهدف
+
+    if(selectedCategory != null){
+
+      completed++;
+
+    }
+
+
+
+    // الاسم
+
+    if(selectedCategory == "Other"){
+
+
+      if(customNameController.text.trim().isNotEmpty){
+
+        completed++;
+
+      }
+
+
+    }
+
+    else if(selectedCategory != null){
+
+      completed++;
 
     }
 
@@ -268,24 +318,13 @@ class GoalProvider extends ChangeNotifier {
 
 
 
-    // 2 - Name
 
-    if(nameController.text.trim().isNotEmpty){
-
-      completedFields++;
-
-    }
+    // المبلغ
 
 
+    if(monthlySaving > 0){
 
-
-
-
-    // 3 - Amount
-
-    if(targetAmount > 0){
-
-      completedFields++;
+      completed++;
 
     }
 
@@ -294,12 +333,12 @@ class GoalProvider extends ChangeNotifier {
 
 
 
+    // التاريخ
 
-    // 4 - Date
 
     if(targetDate != null){
 
-      completedFields++;
+      completed++;
 
     }
 
@@ -308,13 +347,9 @@ class GoalProvider extends ChangeNotifier {
 
 
 
+    return  (2 / 3) +
 
-    return startProgress +
-
-        (completedFields / totalFields) *
-
-            (1 / 3);
-
+        ((completed / totalSteps) *  (1 / 3));
 
 
   }
@@ -322,6 +357,12 @@ class GoalProvider extends ChangeNotifier {
 
 
 
+
+
+
+
+
+  // ================= MODEL =================
 
 
 
@@ -330,25 +371,40 @@ class GoalProvider extends ChangeNotifier {
   Goal get goal{
 
 
+
     return Goal(
 
 
 
-      icon:
+      category:
 
-      selectedIcon ?? "",
-
-
-
-      name:
-
-      nameController.text.trim(),
+      selectedCategory ?? "",
 
 
 
-      amount:
+      customName:
 
-      targetAmount,
+      selectedCategory == "Other"
+
+          ?
+
+      customNameController.text.trim()
+
+          :
+
+      null,
+
+
+
+      monthlySaving:
+
+      monthlySaving,
+
+
+
+      priority:
+
+      priority,
 
 
 
@@ -361,12 +417,17 @@ class GoalProvider extends ChangeNotifier {
     );
 
 
+
   }
 
 
 
 
+void refresh(){
 
+    notifyListeners();
+
+  }
 
 
 
@@ -387,17 +448,21 @@ class GoalProvider extends ChangeNotifier {
   void dispose(){
 
 
-    targetDateController.dispose();
 
+    customNameController.dispose();
 
-    nameController.dispose();
 
 
     amountController.dispose();
 
 
 
+    targetDateController.dispose();
+
+
+
     super.dispose();
+
 
 
   }

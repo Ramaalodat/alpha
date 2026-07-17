@@ -108,7 +108,7 @@ class MultiSelectChip extends StatelessWidget {
 
                   ?
 (themeprovider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary).withOpacity(0.04) :
-             themeprovider.isDark ? AppColors.darkBorder : AppColors.lightBorder,
+           (themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(.4),
 
 
                 borderRadius:
@@ -162,7 +162,7 @@ class MultiSelectChip extends StatelessWidget {
 
                     :
 
-                (themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText).withOpacity(0.4),
+                (themeprovider.isDark ? AppColors.darkSubText : AppColors.lightSubText),
 
                   fontWeight:
 

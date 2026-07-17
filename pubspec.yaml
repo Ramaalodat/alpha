@@ -46,6 +46,10 @@ dependencies:
   table_calendar: ^3.2.0
   pinput: ^6.0.2
   percent_indicator: ^4.2.5
+  flutter_animate: ^4.5.2
+  speech_to_text: ^7.4.0
+  avatar_glow: ^3.0.1
+  lottie: ^3.5.1
 
 dev_dependencies:
   flutter_test:
