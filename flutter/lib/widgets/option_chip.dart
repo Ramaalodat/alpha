@@ -25,34 +25,38 @@ class OptionChip extends StatelessWidget {
         final isSelected = item == selected;
         return InkWell(
           onTap: () => onTap(item),
+          borderRadius: BorderRadius.circular(12),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             decoration: BoxDecoration(
               color: isSelected
                   ? (themeprovider.isDark
-                      ? AppColors.darkPrimary
-                      : AppColors.lightPrimary)
+                      ? AppColors.darkPrimary.withOpacity(0.05)
+                      : AppColors.lightPrimary.withOpacity(0.05))
                   : (themeprovider.isDark
-                      ? AppColors.darkCard
-                      : AppColors.lightCard),
-              borderRadius: BorderRadius.circular(20),
+                      ? AppColors.darkBorder
+                      : AppColors.lightSubText.withOpacity(0.2)),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected
-                    ? Colors.transparent
-                    : (themeprovider.isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder),
+                    ? (themeprovider.isDark
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary)
+                    : Colors.transparent,
+                width: 1.5,
               ),
             ),
             child: Text(
               item,
               style: TextStyle(
                 color: isSelected
-                    ? Colors.white
+                    ? (themeprovider.isDark
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary)
                     : (themeprovider.isDark
-                        ? AppColors.darkText
-                        : AppColors.lightText),
-                fontWeight: FontWeight.w500,
+                        ? AppColors.darkSubText
+                        : AppColors.lightSubText),
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

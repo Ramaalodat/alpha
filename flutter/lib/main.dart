@@ -1,11 +1,14 @@
 import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/providers/financial_setup_provider.dart';
+import 'package:alpha_app/providers/personal_provider.dart';
+import 'package:alpha_app/providers/goal_provider.dart';
 import 'package:alpha_app/screens/auth/login.dart';
 import 'package:alpha_app/screens/main/dashboard_screen.dart';
-import 'package:alpha_app/screens/onboarding/demographics_screen.dart';
-import 'package:alpha_app/screens/onboarding/financial_info_screen.dart';
-import 'package:alpha_app/screens/onboarding/first_goal_screen.dart';
+import 'package:alpha_app/screens/onboarding/personal_info_screen.dart';
+import 'package:alpha_app/screens/onboarding/financial_setup_screen.dart';
+import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
 import 'package:alpha_app/screens/profile/profile_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -33,6 +36,9 @@ void main() async {
           ChangeNotifierProvider(
               create: (context) => LanguageProvider()..loadSavedLanguage()),
           ChangeNotifierProvider(create: (context) => AuthProvider()),
+          ChangeNotifierProvider(create: (context) => FinancialProvider()),
+          ChangeNotifierProvider(create: (context) => PersonalProvider()),
+          ChangeNotifierProvider(create: (context) => GoalProvider()),
         ], child: MyApp())),
   );
 }
@@ -74,10 +80,10 @@ class _MyAppState extends State<MyApp> {
             '/login': (context) => const Login(),
             '/dashboard': (context) => const DashboardScreen(),
             '/profile': (context) => const ProfileScreen(),
-            '/onboarding/demographics': (context) => const DemographicsScreen(),
+            '/onboarding/demographics': (context) => const PersonalInfoScreen(),
             '/onboarding/financial-info': (context) =>
-                const FinancialInfoScreen(),
-            '/onboarding/first-goal': (context) => const FirstGoalScreen(),
+                const FinancialSetupScreen(),
+            '/onboarding/first-goal': (context) => const SetGoalScreen(),
           },
         );
       },

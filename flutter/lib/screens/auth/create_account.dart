@@ -55,9 +55,15 @@ class _CreateAccountState extends State<CreateAccount> {
     }
 
     final phoneText = context.read<AuthProvider>().phoneController.text.trim();
-    if (phoneText.isEmpty || phoneText.length != 9) {
+    if (phoneText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter your phone number first'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    if (phoneText.length != 9) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid 9-digit phone number'), backgroundColor: Colors.red),
       );
       return;
     }
