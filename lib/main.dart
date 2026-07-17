@@ -1,16 +1,20 @@
 import 'package:alpha_app/providers/auth_provider.dart';
+import 'package:alpha_app/providers/challenge_provider.dart';
 import 'package:alpha_app/providers/chatbot_provider.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/goal_provider.dart';
 import 'package:alpha_app/providers/home_provider.dart';
 
 import 'package:alpha_app/providers/language_provider.dart';
+import 'package:alpha_app/providers/leaderbord_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
+import 'package:alpha_app/providers/reward_provider.dart' show RewardProvider;
 
 import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/screens/ai_assistant/chat_screen.dart';
 import 'package:alpha_app/screens/auth/otp_screen.dart';
 import 'package:alpha_app/screens/auth/terms_screen.dart';
+import 'package:alpha_app/screens/challenges/chanllenges_screen.dart';
 import 'package:alpha_app/screens/goals/goal_history.dart';
 import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/screens/main_screen.dart';
@@ -53,6 +57,15 @@ void main() async {
   ChangeNotifierProvider(create: (context) =>PersonalProvider()),
        ChangeNotifierProvider(create: (context) =>FinancialProvider()),
          ChangeNotifierProvider(create: (context) =>GoalProvider()),
+          ChangeNotifierProvider(
+      create: (_) => ChallengeProvider(),
+    ),
+    ChangeNotifierProvider(
+      create: (_) => RewardProvider(),
+    ),
+    ChangeNotifierProvider(
+      create: (_) => LeaderboardProvider(),
+    ),
          ChangeNotifierProvider(
 
 create: (_) => ChatbotProvider(),
@@ -113,7 +126,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home: MainNavigationScreen(),
+            home: ChallengesScreen()
           );
         },
          
