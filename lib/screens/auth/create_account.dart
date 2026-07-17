@@ -97,6 +97,23 @@ class _CreateAccountState extends State<CreateAccount> {
 },
                   controller: authprovider.nameController, hint: "Enter your full name", type:  TextFieldType.name , icon: Icons.person,),
                         SizedBox(height: screenH*0.02,),
+                                    
+                Padding(
+                 padding: EdgeInsets.symmetric(horizontal: screenW*0.02),
+                   child: Text("Email" , style: TextStyle(fontSize: screenW*0.04 ,  color: themeprovider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),),
+                 ),
+                 SizedBox(height: screenH*0.01,),
+                 CustomTextfield(validator: (value){
+
+ if(value == null || value.isEmpty){
+   return "Email is required";
+ }
+
+ return null;
+
+},
+                  controller: authprovider.emailController, hint: "Enter your email", type:  TextFieldType.email, icon: Icons.email,),
+                        SizedBox(height: screenH*0.02,),
                 Padding(
                  padding: EdgeInsets.symmetric(horizontal: screenW*0.02),
                    child: Text("Phone number" , style: TextStyle(fontSize: screenW*0.04 ,  color: themeprovider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),),
@@ -212,6 +229,7 @@ await context.read<AuthProvider>().register(
   birthDate: authprovider.birthDateController.text,
 
   password: authprovider.passwordController.text.trim(),
+   email: authprovider.emailController.text.trim(),
 
 );
 
@@ -281,7 +299,7 @@ const SnackBar(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                       Text(
-                       "no_account".tr(),
+                       "Do you have account already ?",
                         style: TextStyle(color: themeprovider.isDark
                       ? AppColors.darkSubText
                       : AppColors.lightSubText, fontSize: screenW * 0.04 , fontWeight: FontWeight.w500),
@@ -294,7 +312,7 @@ const SnackBar(
                                     
                         },
                         child: Text(
-                                  "sign_up".tr(),
+                                  "Sign in",
                                     style:  TextStyle(
                                      color: themeprovider.isDark ? AppColors.darkSecondary :AppColors.lightSecondary ,
                                       fontSize: screenW*0.045,

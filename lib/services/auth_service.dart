@@ -40,6 +40,7 @@ static Future register({
   required String phone,
   required String birthDate,
   required String password,
+  required String email
 }) async {
 
 
@@ -57,6 +58,7 @@ static Future register({
       "birth_date": birthDate,
 
       "password": password,
+      "email" : email
 
 
     },

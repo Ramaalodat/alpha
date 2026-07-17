@@ -264,7 +264,7 @@ final screenW = Device.width(context);
                   
                   
                   Text( textAlign: TextAlign.center,
-                                 "We sent a 4-digit code to ${maskPhoneNumber(widget.phoneNumber)}",
+                                 "We sent a 6-digit code to ${maskPhoneNumber(widget.phoneNumber)}",
                                  style: GoogleFonts.ibmPlexSansArabic(
                                    fontSize: screenW*0.04,
                                   fontWeight: FontWeight.w500,
@@ -288,9 +288,17 @@ final screenW = Device.width(context);
                     controller: _pinController,
                   
                   
-                    length: 4,
+                    length: 6,
                   
-                  
+                  submittedPinTheme: defaultPinTheme.copyWith(
+    decoration: defaultPinTheme.decoration!.copyWith(
+      border: Border.all(
+        width: 1.5,
+        color: themeprovider.isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
+      ),
+      color: (themeprovider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary).withOpacity(0.4),
+    ),
+  ),
                     defaultPinTheme:
                     defaultPinTheme,
                   
