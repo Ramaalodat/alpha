@@ -6,7 +6,6 @@ import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/screens/auth/login.dart';
 import 'package:alpha_app/screens/goals/goal_date.dart';
 import 'package:alpha_app/screens/goals/goal_history.dart';
-import 'package:alpha_app/screens/main_screen.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +13,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-class SetGoalScreen extends StatelessWidget {
-  const SetGoalScreen({super.key});
+class NewGoalScreen extends StatelessWidget {
+  const NewGoalScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,19 +38,9 @@ class SetGoalScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: screenW * 0.03),
-Text( 
-                               "Step 3 of 3",
-                               style: GoogleFonts.ibmPlexSansArabic(
-                                 fontSize: screenW*0.04,
-                                fontWeight: FontWeight.w500,
-                                 color: themeProvider.isDark
-                    ? AppColors.darkAccent
-                    : AppColors.lightAccent,
-                               ),
-                             ),
-                             SizedBox(height: screenH*0.02,),
+
               Text(
-                "Set your first goal",
+                "New goal",
                 style: GoogleFonts.ibmPlexSansArabic(
                   color: themeProvider.isDark
                       ? AppColors.darkText
@@ -280,17 +269,10 @@ Text(
                 child: ElevatedButton(
                   onPressed: () {
                   if (provider.isValid) {
-    // يحفظ الهدف في قائمة السجل داخل نفس البروفايدر
-  final saved = provider.saveCurrentGoal();
+    final saved = provider.saveCurrentGoal();
 
 if (saved) {
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const MainNavigationScreen(),
-    ),
-    (route) => false,
-  );
+  Navigator.pop(context);
 }
   } else {
                       ScaffoldMessenger.of(context).showSnackBar(
