@@ -8,24 +8,31 @@ import 'package:provider/provider.dart';
 
 class GoalCard extends StatelessWidget {
   final Goal goal;
+  final VoidCallback onDelete;
 
   const GoalCard({
     super.key,
     required this.goal,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = context.watch<Themeprovider>();
+    final themeProvider =
+        context.watch<Themeprovider>();
+
     final isDark = themeProvider.isDark;
 
-    final Color urgencyColor = goal.showCircularProgress
-        ? const Color(0xFFF4C95D)
-        : const Color(0xFF34D399);
+    final Color urgencyColor =
+        goal.showCircularProgress
+            ? const Color(0xFFF4C95D)
+            : const Color(0xFF34D399);
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(
+        bottom: 16,
+      ),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: isDark
@@ -41,19 +48,22 @@ class GoalCard extends StatelessWidget {
             ? null
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color:
+                      Colors.black.withOpacity(0.04),
                   blurRadius: 14,
                   offset: const Offset(0, 6),
                 ),
               ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           _GoalHeader(
             goal: goal,
             isDark: isDark,
             urgencyColor: urgencyColor,
+            onDelete: onDelete,
           ),
 
           const SizedBox(height: 18),
@@ -82,11 +92,13 @@ class _GoalHeader extends StatelessWidget {
   final Goal goal;
   final bool isDark;
   final Color urgencyColor;
+  final VoidCallback onDelete;
 
   const _GoalHeader({
     required this.goal,
     required this.isDark,
     required this.urgencyColor,
+    required this.onDelete,
   });
 
   @override
@@ -99,8 +111,10 @@ class _GoalHeader extends StatelessWidget {
           decoration: BoxDecoration(
             color: isDark
                 ? const Color(0xFF203330)
-                : AppColors.lightSecondary.withOpacity(0.10),
-            borderRadius: BorderRadius.circular(12),
+                : AppColors.lightSecondary
+                    .withOpacity(0.10),
+            borderRadius:
+                BorderRadius.circular(12),
           ),
           alignment: Alignment.center,
           child: Icon(
@@ -119,7 +133,8 @@ class _GoalHeader extends StatelessWidget {
             goal.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.ibmPlexSansArabic(
+            style:
+                GoogleFonts.ibmPlexSansArabic(
               color: isDark
                   ? AppColors.darkText
                   : AppColors.lightText,
@@ -129,7 +144,7 @@ class _GoalHeader extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(width: 8),
+        const SizedBox(width: 5),
 
         Container(
           padding: const EdgeInsets.symmetric(
@@ -138,15 +153,76 @@ class _GoalHeader extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: urgencyColor.withOpacity(0.15),
+            borderRadius:
+                BorderRadius.circular(6),
           ),
           child: Text(
             "${goal.daysLeft} days left",
-            style: GoogleFonts.ibmPlexSansArabic(
+            style:
+                GoogleFonts.ibmPlexSansArabic(
               color: urgencyColor,
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
           ),
+        ),
+
+        const SizedBox(width: 2),
+
+        PopupMenuButton<String>(
+          tooltip: "Goal options",
+          padding: EdgeInsets.zero,
+          color: isDark
+              ? const Color(0xFF203330)
+              : Colors.white,
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(14),
+          ),
+          icon: Icon(
+            Icons.more_vert,
+            color: isDark
+                ? AppColors.darkSubText
+                : AppColors.lightSubText,
+            size: 22,
+          ),
+          onSelected: (value) {
+            if (value == "delete") {
+              onDelete();
+            }
+          },
+          itemBuilder: (context) {
+            return [
+              PopupMenuItem<String>(
+                value: "delete",
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.delete_outline,
+                      color: Color(0xFFFF6B6B),
+                      size: 21,
+                    ),
+
+                    const SizedBox(width: 9),
+
+                    Text(
+                      "Delete Goal",
+                      style: GoogleFonts
+                          .ibmPlexSansArabic(
+                        color: const Color(
+                          0xFFFF6B6B,
+                        ),
+                        fontSize: 13,
+                        fontWeight:
+                            FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ];
+          },
         ),
       ],
     );
@@ -188,7 +264,8 @@ class _GoalHeader extends StatelessWidget {
 // CIRCULAR CARD CONTENT
 // =====================================================
 
-class _CircularGoalContent extends StatelessWidget {
+class _CircularGoalContent
+    extends StatelessWidget {
   final Goal goal;
   final bool isDark;
 
@@ -214,10 +291,12 @@ class _CircularGoalContent extends StatelessWidget {
               backgroundColor: isDark
                   ? const Color(0xFF233532)
                   : Colors.grey.shade200,
-              progressColor: const Color(0xFF34D399),
+              progressColor:
+                  const Color(0xFFF4C95D),
               center: Text(
                 "${goal.progressPercentage}%",
-                style: GoogleFonts.ibmPlexSansArabic(
+                style: GoogleFonts
+                    .ibmPlexSansArabic(
                   color: isDark
                       ? Colors.white
                       : AppColors.lightText,
@@ -225,7 +304,6 @@ class _CircularGoalContent extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              footer: null,
             ),
 
             const SizedBox(width: 18),
@@ -237,10 +315,12 @@ class _CircularGoalContent extends StatelessWidget {
                 children: [
                   Text(
                     "Saved so far",
-                    style: GoogleFonts.ibmPlexSansArabic(
+                    style: GoogleFonts
+                        .ibmPlexSansArabic(
                       color: isDark
                           ? AppColors.darkSubText
-                          : AppColors.lightSubText,
+                          : AppColors
+                              .lightSubText,
                       fontSize: 11,
                     ),
                   ),
@@ -253,14 +333,17 @@ class _CircularGoalContent extends StatelessWidget {
                           CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "${goal.savedAmount!.toStringAsFixed(0)}",
-                          style:
-                              GoogleFonts.ibmPlexSansArabic(
+                          goal.savedAmount!
+                              .toStringAsFixed(0),
+                          style: GoogleFonts
+                              .ibmPlexSansArabic(
                             color: isDark
                                 ? Colors.white
-                                : AppColors.lightText,
+                                : AppColors
+                                    .lightText,
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight:
+                                FontWeight.bold,
                           ),
                         ),
 
@@ -279,8 +362,10 @@ class _CircularGoalContent extends StatelessWidget {
                               style: GoogleFonts
                                   .ibmPlexSansArabic(
                                 color: isDark
-                                    ? AppColors.darkSubText
-                                    : AppColors.lightSubText,
+                                    ? AppColors
+                                        .darkSubText
+                                    : AppColors
+                                        .lightSubText,
                                 fontSize: 10,
                               ),
                             ),
@@ -291,10 +376,12 @@ class _CircularGoalContent extends StatelessWidget {
                   else
                     Text(
                       "Progress will appear here",
-                      style: GoogleFonts.ibmPlexSansArabic(
+                      style: GoogleFonts
+                          .ibmPlexSansArabic(
                         color: isDark
                             ? AppColors.darkSubText
-                            : AppColors.lightSubText,
+                            : AppColors
+                                .lightSubText,
                         fontSize: 11,
                       ),
                     ),
@@ -319,7 +406,8 @@ class _CircularGoalContent extends StatelessWidget {
 // LINEAR CARD CONTENT
 // =====================================================
 
-class _LinearGoalContent extends StatelessWidget {
+class _LinearGoalContent
+    extends StatelessWidget {
   final Goal goal;
   final bool isDark;
 
@@ -333,7 +421,8 @@ class _LinearGoalContent extends StatelessWidget {
     return Column(
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius:
+              BorderRadius.circular(30),
           child: LinearProgressIndicator(
             value: goal.progress,
             minHeight: 7,
@@ -341,7 +430,8 @@ class _LinearGoalContent extends StatelessWidget {
                 ? const Color(0xFF233532)
                 : Colors.grey.shade200,
             valueColor:
-                const AlwaysStoppedAnimation<Color>(
+                const AlwaysStoppedAnimation<
+                    Color>(
               Color(0xFF34D399),
             ),
           ),
@@ -357,7 +447,8 @@ class _LinearGoalContent extends StatelessWidget {
               goal.savedAmount != null
                   ? "${goal.savedAmount!.toStringAsFixed(0)} JD"
                   : "0 JD",
-              style: GoogleFonts.ibmPlexSansArabic(
+              style: GoogleFonts
+                  .ibmPlexSansArabic(
                 color: isDark
                     ? AppColors.darkSubText
                     : AppColors.lightSubText,
@@ -367,9 +458,10 @@ class _LinearGoalContent extends StatelessWidget {
 
             Text(
               goal.targetAmount != null
-                  ? "Goal ${goal.targetAmount!.toStringAsFixed(0)}"
+                  ? "Goal ${goal.targetAmount!.toStringAsFixed(0)} JD"
                   : "Goal",
-              style: GoogleFonts.ibmPlexSansArabic(
+              style: GoogleFonts
+                  .ibmPlexSansArabic(
                 color: isDark
                     ? AppColors.darkSubText
                     : AppColors.lightSubText,
@@ -377,6 +469,13 @@ class _LinearGoalContent extends StatelessWidget {
               ),
             ),
           ],
+        ),
+
+        const SizedBox(height: 16),
+
+        _RecommendationBox(
+          goal: goal,
+          isDark: isDark,
         ),
       ],
     );
@@ -387,7 +486,8 @@ class _LinearGoalContent extends StatelessWidget {
 // RECOMMENDATION
 // =====================================================
 
-class _RecommendationBox extends StatelessWidget {
+class _RecommendationBox
+    extends StatelessWidget {
   final Goal goal;
   final bool isDark;
 
@@ -408,7 +508,8 @@ class _RecommendationBox extends StatelessWidget {
         color: isDark
             ? const Color(0xFF142320)
             : AppColors.lightBackground,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius:
+            BorderRadius.circular(20),
         border: Border.all(
           color: isDark
               ? Colors.white.withOpacity(0.04)
@@ -416,7 +517,8 @@ class _RecommendationBox extends StatelessWidget {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -430,8 +532,10 @@ class _RecommendationBox extends StatelessWidget {
               Expanded(
                 child: Text(
                   "Recommended Monthly Saving",
-                  style: GoogleFonts.ibmPlexSansArabic(
-                    color: const Color(0xFF34D399),
+                  style: GoogleFonts
+                      .ibmPlexSansArabic(
+                    color:
+                        const Color(0xFF34D399),
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -443,11 +547,13 @@ class _RecommendationBox extends StatelessWidget {
           const SizedBox(height: 5),
 
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment:
+                CrossAxisAlignment.end,
             children: [
               Text(
                 "${goal.displayedMonthlyRecommendation.toStringAsFixed(0)} JD",
-                style: GoogleFonts.ibmPlexSansArabic(
+                style: GoogleFonts
+                    .ibmPlexSansArabic(
                   color: isDark
                       ? Colors.white
                       : AppColors.lightText,
@@ -459,13 +565,18 @@ class _RecommendationBox extends StatelessWidget {
               const SizedBox(width: 5),
 
               Padding(
-                padding: const EdgeInsets.only(bottom: 2),
+                padding:
+                    const EdgeInsets.only(
+                  bottom: 2,
+                ),
                 child: Text(
                   "/ month",
-                  style: GoogleFonts.ibmPlexSansArabic(
+                  style: GoogleFonts
+                      .ibmPlexSansArabic(
                     color: isDark
                         ? AppColors.darkSubText
-                        : AppColors.lightSubText,
+                        : AppColors
+                            .lightSubText,
                     fontSize: 11,
                   ),
                 ),

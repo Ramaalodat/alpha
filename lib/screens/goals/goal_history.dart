@@ -129,11 +129,18 @@ class MyGoalsScreen extends StatelessWidget {
                         screenW: screenW,
                       ),
 
-                    ...goals.map(
-                      (goal) => GoalCard(
-                        goal: goal,
-                      ),
-                    ),
+                   ...goals.map(
+  (goal) => GoalCard(
+    goal: goal,
+    onDelete: () {
+      _showDeleteGoalDialog(
+        context,
+        goal.id ?? "",
+        goal.title,
+      );
+    },
+  ),
+),
 
                     _AddGoalButton(
                       isDark: themeProvider.isDark,
@@ -326,4 +333,100 @@ class _DashedBorderPainter extends CustomPainter {
   ) {
     return oldDelegate.color != color;
   }
+}
+
+void _showDeleteGoalDialog(
+  BuildContext context,
+  String goalId,
+  String goalTitle,
+) {
+  final themeProvider =
+      context.read<Themeprovider>();
+
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        backgroundColor:
+            themeProvider.isDark
+                ? const Color(0xFF172624)
+                : Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(22),
+        ),
+        title: Text(
+          "Delete Goal",
+          style:
+              GoogleFonts.ibmPlexSansArabic(
+            color: themeProvider.isDark
+                ? AppColors.darkText
+                : AppColors.lightText,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          "Are you sure you want to delete \"$goalTitle\"?",
+          style:
+              GoogleFonts.ibmPlexSansArabic(
+            color: themeProvider.isDark
+                ? AppColors.darkSubText
+                : AppColors.lightSubText,
+            fontSize: 14,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+            },
+            child: Text(
+              "Cancel",
+              style: GoogleFonts
+                  .ibmPlexSansArabic(
+                color: themeProvider.isDark
+                    ? AppColors.darkSubText
+                    : AppColors
+                        .lightSubText,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          TextButton(
+            onPressed: () {
+              context
+                  .read<GoalProvider>()
+                  .removeGoal(goalId);
+
+              Navigator.pop(dialogContext);
+
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Goal deleted successfully",
+                    style: GoogleFonts
+                        .ibmPlexSansArabic(),
+                  ),
+                  behavior:
+                      SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: Text(
+              "Delete",
+              style: GoogleFonts
+                  .ibmPlexSansArabic(
+                color:
+                    const Color(0xFFFF6B6B),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
