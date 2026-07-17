@@ -1,421 +1,329 @@
-
+import 'package:alpha_app/core/utils/app_colors.dart';
+import 'package:alpha_app/core/utils/device.dart';
+import 'package:alpha_app/providers/goal_provider.dart';
+import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/screens/goals/new_goal_screen.dart';
+import 'package:alpha_app/widgets/goals/goal_card.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
-class MyGoalsApp extends StatelessWidget {
-  const MyGoalsApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My Goals',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0D1111),
-        primaryColor: const Color(0xFF00D296), // Primary Green
-      ),
-      home: const MyGoalsScreen(),
-    );
-  }
-}
-
-class MyGoalsScreen extends StatefulWidget {
-  const MyGoalsScreen({Key? key}) : super(key: key);
-
-  @override
-  State<MyGoalsScreen> createState() => _MyGoalsScreenState();
-}
-
-class _MyGoalsScreenState extends State<MyGoalsScreen> {
-  int _selectedIndex = 2; // Index for 'Goals'
-
-  // Helper function to get icons
-  IconData _getGoalIcon(String title) {
-    if (title.contains('Laptop')) return Icons.laptop_mac;
-    if (title.contains('Aqaba')) return Icons.flight;
-    return Icons.flag;
-  }
+class MyGoalsScreen extends StatelessWidget {
+  const MyGoalsScreen({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final goalProvider = context.watch<GoalProvider>();
+    final themeProvider =
+        context.watch<Themeprovider>();
+
+    final screenW = Device.width(context);
+    final screenH = Device.height(context);
+
+    final goals = goalProvider.activeGoals;
+
     return Scaffold(
-      // Custom AppBar for status bar and top actions
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'My Goals',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        actions: [
-          // Add Goal Icon Button (Clickable)
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A2223),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  // Handle add goal
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Add New Goal Tapped')),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: themeProvider.isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
+
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: screenW * 0.06,
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
-              const Text(
-                '2 active goals',
-                style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 16),
-              ),
-              const SizedBox(height: 24),
+              SizedBox(height: screenH * 0.025),
 
-              // 1. Large Goal Card (Clickable)
-              _buildClickableCard(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Clicked: New Laptop Goal')),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // ================= HEADER =================
+
+              Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.laptop_mac, color: Color(0xFF9CA3AF), size: 28),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'New Laptop',
-                              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                        // "45 days left" tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF3CD).withOpacity(0.15), // Yellow-ish
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            '45 days left',
-                            style: TextStyle(color: Color(0xFFFBC02D), fontWeight: FontWeight.bold, fontSize: 14),
+                        Text(
+                          "My Goals",
+                          style: GoogleFonts
+                              .ibmPlexSansArabic(
+                            color: themeProvider.isDark
+                                ? AppColors.darkText
+                                : AppColors.lightText,
+                            fontSize: screenW * 0.07,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        // Custom Circular Progress Indicator
+
                         SizedBox(
-                          width: 80,
-                          height: 80,
-                          child: Stack(
-                            children: [
-                              Center(
-                                child: SizedBox(
-                                  width: 70,
-                                  height: 70,
-                                  child: CircularProgressIndicator(
-                                    value: 0.70, // 70%
-                                    strokeWidth: 8,
-                                    backgroundColor: const Color(0xFF263238),
-                                    valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFF00D296)),
-                                  ),
-                                ),
-                              ),
-                              Center(
-                                child: const Text(
-                                  '70%',
-                                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
+                          height: screenH * 0.004,
                         ),
-                        const SizedBox(width: 24),
-                        // Savings Info
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Saved so far', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14)),
-                            const SizedBox(height: 4),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-                              textBaseline: TextBaseline.alphabetic,
-                              children: [
-                                const Text(
-                                  '700',
-                                  style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                                ),
-                                const Text(
-                                  ' of 1,000 JD',
-                                  style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 16),
-                                ),
-                              ],
-                            ),
-                          ],
+
+                        Text(
+                          "${goals.length} active ${goals.length == 1 ? "goal" : "goals"}",
+                          style: GoogleFonts
+                              .ibmPlexSansArabic(
+                            color: themeProvider.isDark
+                                ? AppColors.darkSubText
+                                : AppColors.lightSubText,
+                            fontSize: screenW * 0.035,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    // Recommended Saving Section
-                    Container(
-                      padding: const EdgeInsets.all(16),
+                  ),
+
+                  InkWell(
+                    onTap: () =>
+                        _openNewGoalScreen(context),
+                    borderRadius:
+                        BorderRadius.circular(13),
+                    child: Container(
+                      width: screenW * 0.12,
+                      height: screenW * 0.12,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F1818),
-                        borderRadius: BorderRadius.circular(16),
+                        color: themeProvider.isDark
+                            ? const Color(0xFF203330)
+                            : AppColors.lightSecondary
+                                .withOpacity(0.12),
+                        borderRadius:
+                            BorderRadius.circular(13),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.shield_moon, color: Color(0xFFFBC02D), size: 22),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Recommended Monthly Saving',
-                            style: TextStyle(color: Color(0xFF00D296), fontSize: 14, fontWeight: FontWeight.w500),
-                          ),
-                          const Spacer(),
-                          const Text(
-                            '80 JD',
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const Text(
-                            ' / month',
-                            style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
-                          ),
-                        ],
+                      child: Icon(
+                        Icons.add,
+                        color: themeProvider.isDark
+                            ? AppColors.darkSubText
+                            : AppColors.lightPrimary,
+                        size: screenW * 0.075,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
 
-              // 2. Small Goal Card (Clickable)
-              _buildClickableCard(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Clicked: Trip to Aqaba Goal')),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(height: screenH * 0.025),
+
+              // ================= LIST =================
+
+              Expanded(
+                child: ListView(
+                  physics:
+                      const BouncingScrollPhysics(),
+                  padding: EdgeInsets.only(
+                    bottom: screenH * 0.14,
+                  ),
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.flight, color: Color(0xFF9CA3AF), size: 28),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Trip to Aqaba',
-                              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                        // "90 days left" tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFCCFBF1).withOpacity(0.15), // Teal-ish
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            '90 days left',
-                            style: TextStyle(color: Color(0xFF00D296), fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Linear Progress Indicator
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: const LinearProgressIndicator(
-                        value: 0.4, // Placeholder for 40%
-                        minHeight: 8,
-                        backgroundColor: Color(0xFF263238),
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00D296)),
+                    if (goals.isEmpty)
+                      _DeletedAllGoalsMessage(
+                        isDark:
+                            themeProvider.isDark,
+                        screenW: screenW,
+                      ),
+
+                    ...goals.map(
+                      (goal) => GoalCard(
+                        goal: goal,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('200 JD', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14)),
-                        const Text('Goal 500', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14)),
-                      ],
+
+                    _AddGoalButton(
+                      isDark: themeProvider.isDark,
+                      onTap: () =>
+                          _openNewGoalScreen(context),
                     ),
+
+                    SizedBox(height: screenH * 0.02),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // 3. Add New Goal Card (Dashed Border - Clickable)
-              GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Add New Goal Button Tapped')),
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: const Color(0xFF263238), width: 2, style: BorderStyle.solid),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      '+ Add a new goal',
-                      style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 80), // Space for navigation bar
             ],
           ),
         ),
       ),
-      // Bottom Navigation Bar
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF161B1C),
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, spreadRadius: 2)],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(Icons.home_outlined, 'Home', 0),
-                _buildNavItem(Icons.menu, 'Expenses', 1),
-                _buildCenterNavItem(Icons.lightbulb_outline, 2),
-                _buildNavItem(Icons.access_time, 'Goals', 3), // Changed icon slightly to match design intent
-                _buildNavItem(Icons.person_outline, 'Profile', 4),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
-  // Helper to build standard Nav Items
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = index == _selectedIndex;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Navigating to $label')),
-        );
-      },
+  void _openNewGoalScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const NewGoalScreen(),
+      ),
+    );
+  }
+}
+
+// =====================================================
+// EMPTY AFTER DELETE
+// =====================================================
+
+class _DeletedAllGoalsMessage extends StatelessWidget {
+  final bool isDark;
+  final double screenW;
+
+  const _DeletedAllGoalsMessage({
+    required this.isDark,
+    required this.screenW,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 30,
+        bottom: 24,
+      ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: isSelected ? const Color(0xFF00D296) : const Color(0xFF757575), size: 26),
-          const SizedBox(height: 4),
+          Icon(
+            Icons.flag_outlined,
+            size: screenW * 0.15,
+            color: isDark
+                ? AppColors.darkSubText
+                : AppColors.lightSubText,
+          ),
+
+          const SizedBox(height: 12),
+
           Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF00D296) : const Color(0xFF757575),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 12,
+            "You don't have any active goals",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.ibmPlexSansArabic(
+              color: isDark
+                  ? AppColors.darkText
+                  : AppColors.lightText,
+              fontSize: screenW * 0.045,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 5),
+
+          Text(
+            "Add a new goal to continue your saving journey.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.ibmPlexSansArabic(
+              color: isDark
+                  ? AppColors.darkSubText
+                  : AppColors.lightSubText,
+              fontSize: screenW * 0.034,
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  // Helper to build the central highlighted Nav Item
-  Widget _buildCenterNavItem(IconData icon, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Center Action Tapped')),
-        );
-      },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Glowing background
-          Container(
-            width: 55,
-            height: 55,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF00D296).withOpacity(0.5),
-                  blurRadius: 15,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-          ),
-          // Actual button
-          Container(
-            width: 50,
-            height: 50,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [Color(0xFFB9FBC0), Color(0xFF00D296)], // Light to dark green
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+// =====================================================
+// ADD GOAL BUTTON
+// =====================================================
+
+class _AddGoalButton extends StatelessWidget {
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _AddGoalButton({
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(22),
+      child: CustomPaint(
+        painter: _DashedBorderPainter(
+          color: isDark
+              ? const Color(0xFF29433E)
+              : AppColors.lightSecondary
+                  .withOpacity(0.40),
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          height: 58,
+          child: Center(
+            child: Text(
+              "+ Add a new goal",
+              style: GoogleFonts.ibmPlexSansArabic(
+                color: isDark
+                    ? AppColors.darkSubText
+                    : AppColors.lightSubText,
+                fontSize: 13,
               ),
             ),
-            child: const Icon(Icons.lightbulb_outline, color: Colors.black87, size: 28),
           ),
-        ],
-      ),
-    );
-  }
-
-  // Helper to build a clean, tappable Card
-  Widget _buildClickableCard({required Widget child, required VoidCallback onTap}) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(24),
-        splashColor: const Color(0xFF00D296).withOpacity(0.1),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF161B1C),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: child,
         ),
       ),
     );
+  }
+}
+
+// =====================================================
+// DASHED BORDER
+// =====================================================
+
+class _DashedBorderPainter extends CustomPainter {
+  final Color color;
+
+  const _DashedBorderPainter({
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    const dashWidth = 5.0;
+    const dashSpace = 4.0;
+
+    final borderPath = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          const Radius.circular(22),
+        ),
+      );
+
+    for (final metric
+        in borderPath.computeMetrics()) {
+      double distance = 0;
+
+      while (distance < metric.length) {
+        final nextDistance =
+            (distance + dashWidth)
+                .clamp(0.0, metric.length);
+
+        canvas.drawPath(
+          metric.extractPath(
+            distance,
+            nextDistance,
+          ),
+          paint,
+        );
+
+        distance += dashWidth + dashSpace;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(
+    covariant _DashedBorderPainter oldDelegate,
+  ) {
+    return oldDelegate.color != color;
   }
 }
