@@ -2,6 +2,7 @@ import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/chatbot_provider.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/goal_provider.dart';
+import 'package:alpha_app/providers/home_provider.dart';
 
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
@@ -56,6 +57,10 @@ void main() async {
 
 create: (_) => ChatbotProvider(),
 
+),
+
+ChangeNotifierProvider(
+  create: (_) => HomeProvider(),
 ),
 
       ],
