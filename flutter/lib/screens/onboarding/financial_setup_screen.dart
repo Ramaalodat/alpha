@@ -10,11 +10,64 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
+import 'package:alpha_app/services/api_exception.dart';
+import 'package:alpha_app/services/onboarding_service.dart';
 
-class FinancialSetupScreen extends StatelessWidget {
-  const FinancialSetupScreen({
-    super.key,
-  });
+class FinancialSetupScreen extends StatefulWidget {
+  const FinancialSetupScreen({super.key});
+
+  @override
+  State<FinancialSetupScreen> createState() => _FinancialSetupScreenState();
+}
+
+class _FinancialSetupScreenState extends State<FinancialSetupScreen> {
+  bool _isLoading = false;
+
+  String _mapIncomeSource(String name) {
+    switch (name) {
+      case "Regular Salary": return "REGULAR_SALARY";
+      case "Temporary Job": return "TEMPORARY_JOB";
+      case "Family Support": return "FAMILY_ALLOWANCE";
+      case "External Support": return "EXTERNAL_HELP";
+      case "Rent Income": return "RENTAL_INCOME";
+      default: return "OTHER_INCOME";
+    }
+  }
+
+  String _mapFixedExpense(String name) {
+    switch (name) {
+      case "Education": return "TUITION";
+      case "House Rent": return "RENT";
+      case "Loan": return "LOAN";
+      case "Bills": return "UTILITIES";
+      case "Treatment": return "TREATMENT";
+      case "Saving": return "SAVINGS";
+      default: return "OTHER_FIXED";
+    }
+  }
+
+  String _mapVariableExpense(String name) {
+    switch (name) {
+      case "Food": return "FOOD";
+      case "Transport": return "TRANSPORT";
+      case "Clothes": return "CLOTHING";
+      case "Entertainment": return "ENTERTAINMENT";
+      case "Personal Care": return "PERSONAL_CARE";
+      default: return "OTHER_VARIABLE";
+    }
+  }
+
+  String _mapRelationship(String? rel) {
+    if (rel == "Careful spending") return "SAVING_CAREFULLY";
+    if (rel == "Balanced spending") return "BALANCED_SPENDING";
+    if (rel == "Emotional spending") return "EMOTIONAL_SPENDING";
+    return "OTHER";
+  }
+
+  String _mapMainGoal(String? goal) {
+    // Backend supports: 'EDUCATION', 'TECHNOLOGY', 'TRAVEL', 'CAR', 'OTHER'
+    return "OTHER";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -484,15 +537,63 @@ class FinancialSetupScreen extends StatelessWidget {
                   bottom: screenH * 0.02,
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (financialProvider.isValid) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SetGoalScreen(),
-                          ));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          if (financialProvider.isValid) {
+                            setState(() => _isLoading = true);
+                            try {
+                              await OnboardingService.completeFinancialInfo(
+                                monthlyIncome: financialProvider.householdIncome ?? 0,
+                                basicExpenses: financialProvider.totalExpenses,
+                                financialGoal: financialProvider.mainGoal == 'Other' 
+                                    ? financialProvider.customMainGoalController.text 
+                                    : (financialProvider.mainGoal ?? 'N/A'),
+                                primarySpendingCategory: 'Unknown',
+                                relationshipWithMoney: _mapRelationship(financialProvider.moneyRelationship),
+                                monthlyExtraSavingsGoal: financialProvider.savingTarget,
+                                mainFinancialGoal12M: _mapMainGoal(financialProvider.mainGoal),
+                                incomeSources: financialProvider.incomeSources
+                                    .where((e) => e.selected)
+                                    .map((e) => {'sourceType': _mapIncomeSource(e.name), 'amount': e.amount})
+                                    .toList(),
+                                fixedExpenses: financialProvider.fixedExpenses
+                                    .where((e) => e.selected)
+                                    .map((e) => {'category': _mapFixedExpense(e.name), 'amount': e.amount})
+                                    .toList(),
+                                variableExpenses: financialProvider.flexibleExpenses
+                                    .where((e) => e.selected)
+                                    .map((e) => {'category': _mapVariableExpense(e.name), 'amount': e.amount})
+                                    .toList(),
+                              );
+
+                              if (!mounted) return;
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SetGoalScreen(),
+                                  ));
+                            } on ApiException catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.message),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Something went wrong. Please try again.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } finally {
+                              if (mounted) setState(() => _isLoading = false);
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: themeProvider.isDark
                               ? AppColors.darkError
@@ -527,14 +628,16 @@ class FinancialSetupScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Text(
-                    "Next",
-                    style: TextStyle(
-                      fontSize: screenW * 0.055,
-                      color: themeProvider.isDark ? AppColors.darkBorder : AppColors.darkBorder,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: _isLoading 
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          "Next",
+                          style: TextStyle(
+                            fontSize: screenW * 0.055,
+                            color: AppColors.darkBorder,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ],

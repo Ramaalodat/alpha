@@ -9,6 +9,49 @@ import { OtpPurpose } from '@prisma/client';
 
 export class AuthController {
   /**
+   * Request OTP for registration
+   * POST /api/auth/request-registration-otp
+   */
+  async requestRegistrationOtp(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const body = request.body as {
+        phoneNumber: string;
+        email?: string;
+        username?: string;
+      };
+
+      const metadata = extractRequestMetadata(request);
+
+      const result = await authService.requestRegistrationOtp({
+        ...body,
+        ipAddress: metadata.ipAddress,
+        userAgent: metadata.userAgent,
+      });
+
+      logger.info('Registration OTP requested successfully', {
+        phoneNumber: body.phoneNumber,
+      });
+
+      return reply
+        .status(HTTP_STATUS.OK)
+        .send(createSuccessResponse({
+          expiresAt: result.expiresAt,
+          otpCode: result.otpCode,
+        }, result.message));
+    } catch (error: any) {
+      logger.error('Registration OTP request failed', { error: error.message, code: error.code });
+      
+      const statusCode = error.code === ErrorCodes.PHONE_NUMBER_EXISTS || error.code === ErrorCodes.CONFLICT
+        ? HTTP_STATUS.CONFLICT
+        : HTTP_STATUS.BAD_REQUEST;
+
+      return reply
+        .status(statusCode)
+        .send(createErrorResponse(error.code, error.message, error.details));
+    }
+  }
+
+  /**
    * Register new user
    * POST /api/auth/register
    */
@@ -20,6 +63,7 @@ export class AuthController {
         fullName: string;
         birthDate: string;
         password: string;
+        otpCode: string;
       };
 
       const metadata = extractRequestMetadata(request);
@@ -39,7 +83,7 @@ export class AuthController {
         .status(HTTP_STATUS.CREATED)
         .send(createSuccessResponse({
           user: result.user,
-          otpCode: result.otpCode,
+          tokens: result.tokens,
         }, result.message));
     } catch (error: any) {
       logger.error('Registration failed', { error: error.message, code: error.code });

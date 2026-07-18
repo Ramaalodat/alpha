@@ -19,6 +19,7 @@ interface RegisterParams {
   fullName: string;
   birthDate: string; // ISO date string
   password: string;
+  otpCode: string;
   email?: string;
   username?: string;
   ipAddress?: string;
@@ -68,20 +69,125 @@ export class AuthService {
   }
 
   /**
+   * Request OTP for registration
+   */
+  async requestRegistrationOtp(params: {
+    phoneNumber: string;
+    email?: string;
+    username?: string;
+    ipAddress?: string;
+    userAgent?: string;
+  }): Promise<{
+    message: string;
+    otpCode?: string;
+    expiresAt: Date;
+  }> {
+    const { phoneNumber, email, username, ipAddress, userAgent } = params;
+    const normalizedPhone = phoneUtils.normalize(phoneNumber);
+
+    return this.useDevFallback(
+      async () => {
+        const existingUser = await prisma.user.findUnique({
+          where: { phoneNumber: normalizedPhone },
+        });
+
+        if (existingUser) {
+          logger.warn('Registration OTP request failed - phone number exists', { phoneNumber: normalizedPhone });
+          throw {
+            code: ErrorCodes.PHONE_NUMBER_EXISTS,
+            message: ERROR_MESSAGES.PHONE_EXISTS,
+          };
+        }
+
+        if (email) {
+          const existingEmail = await prisma.user.findFirst({ where: { email } });
+          if (existingEmail) {
+            logger.warn('Registration OTP request failed - email exists', { email });
+            throw {
+              code: ErrorCodes.CONFLICT,
+              message: ERROR_MESSAGES.EMAIL_ALREADY_EXISTS,
+            };
+          }
+        }
+
+        if (username) {
+          const existingUsername = await prisma.user.findFirst({ where: { username } });
+          if (existingUsername) {
+            logger.warn('Registration OTP request failed - username exists', { username });
+            throw {
+              code: ErrorCodes.CONFLICT,
+              message: ERROR_MESSAGES.USERNAME_ALREADY_EXISTS,
+            };
+          }
+        }
+
+        const otpResult = await otpService.generateAndSendOtp({
+          phoneNumber: normalizedPhone,
+          purpose: OtpPurpose.REGISTRATION,
+          ipAddress,
+          userAgent,
+        });
+
+        return {
+          message: SUCCESS_MESSAGES.OTP_SENT,
+          otpCode: otpResult.code,
+          expiresAt: otpResult.expiresAt,
+        };
+      },
+      async () => {
+        const existingUser = await devStore.findUserByPhone(normalizedPhone);
+        if (existingUser) {
+          logger.warn('Registration OTP request failed - phone number exists (dev fallback)', { phoneNumber: normalizedPhone });
+          throw {
+            code: ErrorCodes.PHONE_NUMBER_EXISTS,
+            message: ERROR_MESSAGES.PHONE_EXISTS,
+          };
+        }
+
+        const otpResult = await otpService.generateAndSendOtp({
+          phoneNumber: normalizedPhone,
+          purpose: OtpPurpose.REGISTRATION,
+          ipAddress,
+          userAgent,
+        });
+
+        return {
+          message: SUCCESS_MESSAGES.OTP_SENT,
+          otpCode: otpResult.code,
+          expiresAt: otpResult.expiresAt,
+        };
+      }
+    );
+  }
+
+  /**
    * Register new user
    */
   async register(params: RegisterParams): Promise<{
     user: Partial<User>;
     message: string;
-    otpCode?: string;
+    tokens: TokenPair;
   }> {
-    const { phoneNumber, fullName, birthDate, password, email, username, ipAddress, userAgent } = params;
+    const { phoneNumber, fullName, birthDate, password, otpCode, email, username, ipAddress, userAgent } = params;
 
     // Normalize phone number
     const normalizedPhone = phoneUtils.normalize(phoneNumber);
 
     return this.useDevFallback(
       async () => {
+        const { verified } = await otpService.verifyOtp({
+          phoneNumber: normalizedPhone,
+          code: otpCode,
+          purpose: OtpPurpose.REGISTRATION,
+        });
+
+        if (!verified) {
+          throw {
+            code: ErrorCodes.OTP_INVALID,
+            message: ERROR_MESSAGES.OTP_INVALID,
+          };
+        }
+
         // Check if phone number already exists
         const existingUser = await prisma.user.findUnique({
           where: { phoneNumber: normalizedPhone },
@@ -149,7 +255,8 @@ export class AuthService {
             fullName,
             birthDate: birthDateObj,
             passwordHash,
-            status: UserStatus.PENDING_VERIFICATION,
+            status: UserStatus.VERIFIED,
+            phoneVerifiedAt: new Date(),
             isOnboarded: false,
             ...(email && { email }),
             ...(emailVerifiedAt && { emailVerifiedAt }),
@@ -166,10 +273,8 @@ export class AuthService {
           },
         });
 
-        // Generate and send OTP for phone verification
-        const otpResult = await otpService.generateAndSendOtp({
-          phoneNumber: normalizedPhone,
-          purpose: OtpPurpose.REGISTRATION,
+        // Generate tokens
+        const tokens = await this.generateTokenPair(user, {
           ipAddress,
           userAgent,
         });
@@ -198,11 +303,24 @@ export class AuthService {
 
         return {
           user,
-          message: SUCCESS_MESSAGES.USER_REGISTERED + '. ' + SUCCESS_MESSAGES.OTP_SENT,
-          otpCode: otpResult.code,
+          message: SUCCESS_MESSAGES.USER_REGISTERED,
+          tokens,
         };
       },
       async () => {
+        const { verified } = await otpService.verifyOtp({
+          phoneNumber: normalizedPhone,
+          code: otpCode,
+          purpose: OtpPurpose.REGISTRATION,
+        });
+
+        if (!verified) {
+          throw {
+            code: ErrorCodes.OTP_INVALID,
+            message: ERROR_MESSAGES.OTP_INVALID,
+          };
+        }
+
         const existingUser = await devStore.findUserByPhone(normalizedPhone);
         if (existingUser) {
           logger.warn('Registration failed - phone number exists (dev fallback)', { phoneNumber: normalizedPhone });
@@ -220,13 +338,18 @@ export class AuthService {
           fullName,
           birthDate: birthDateObj,
           passwordHash,
-          status: UserStatus.PENDING_VERIFICATION,
+          status: UserStatus.VERIFIED,
+          phoneVerifiedAt: new Date(),
           isOnboarded: false,
         });
 
-        const otpResult = await otpService.generateAndSendOtp({
-          phoneNumber: normalizedPhone,
-          purpose: OtpPurpose.REGISTRATION,
+        const tokens = await this.generateTokenPair({
+          id: user.id,
+          phoneNumber: user.phoneNumber,
+          fullName: user.fullName,
+          status: user.status as UserStatus,
+          isOnboarded: user.isOnboarded,
+        }, {
           ipAddress,
           userAgent,
         });
@@ -246,8 +369,8 @@ export class AuthService {
             isOnboarded: user.isOnboarded,
             createdAt: user.createdAt,
           },
-          message: SUCCESS_MESSAGES.USER_REGISTERED + '. ' + SUCCESS_MESSAGES.OTP_SENT,
-          otpCode: otpResult.code,
+          message: SUCCESS_MESSAGES.USER_REGISTERED,
+          tokens,
         };
       }
     );

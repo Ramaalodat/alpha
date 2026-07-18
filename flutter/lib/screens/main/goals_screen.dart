@@ -1,6 +1,6 @@
 import 'package:alpha_app/core/utils/app_colors.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
-import 'package:alpha_app/screens/main/add_goal_screen.dart';
+import 'package:alpha_app/screens/goals/new_goal_screen.dart';
 import 'package:alpha_app/services/finance_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -71,7 +71,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const AddGoalScreen()));
+              MaterialPageRoute(builder: (_) => NewGoalScreen()));
           if (result == true) {
             setState(() {
               _future = FinanceService.loadGoals();

@@ -451,15 +451,10 @@ class _CreateAccountState extends State<CreateAccount> {
 
                               authProvider.setLoading(true);
                               try {
-                                final result = await AuthService.register(
+                                final result = await AuthService.requestRegistrationOtp(
                                   phoneNumber:
                                       '+962${authProvider.phoneController.text.trim()}',
                                   email: _emailController.text.trim(),
-                                  fullName:
-                                      authProvider.nameController.text.trim(),
-                                  birthDate: authProvider.birthDate!.toIso8601String(),
-                                  password: authProvider.passwordController.text
-                                      .trim(),
                                 );
                                 if (!mounted) return;
                                 final data =
@@ -472,6 +467,11 @@ class _CreateAccountState extends State<CreateAccount> {
                                               phoneNumber:
                                                   '+962${authProvider.phoneController.text.trim()}',
                                               devOtpCode: otpCode,
+                                              isRegistration: true,
+                                              fullName: authProvider.nameController.text.trim(),
+                                              birthDate: authProvider.birthDate!.toIso8601String(),
+                                              password: authProvider.passwordController.text.trim(),
+                                              email: _emailController.text.trim(),
                                             )));
                               } catch (e) {
                                 if (!mounted) return;

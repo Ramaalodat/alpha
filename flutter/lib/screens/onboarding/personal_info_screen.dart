@@ -9,8 +9,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-class PersonalInfoScreen extends StatelessWidget {
+import 'package:alpha_app/services/api_exception.dart';
+import 'package:alpha_app/services/user_service.dart';
+
+class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});
+
+  @override
+  State<PersonalInfoScreen> createState() => _PersonalInfoScreenState();
+}
+
+class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -258,15 +268,49 @@ class PersonalInfoScreen extends StatelessWidget {
                   bottom: screenH * 0.02,
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (personalProvider.isValid) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const FinancialSetupScreen(),
-                          ));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          if (personalProvider.isValid) {
+                            setState(() => _isLoading = true);
+                            try {
+                              await UserService.updateDemographics(
+                                gender: personalProvider.gender!.toUpperCase(),
+                                maritalStatus: personalProvider.maritalStatus?.toUpperCase(),
+                                isHeadOfHousehold: personalProvider.isHeadOfHousehold,
+                                isStudent: personalProvider.isStudent,
+                              );
+                              await UserService.updateFamilySize(
+                                familySize: personalProvider.familyMembers,
+                              );
+                              
+                              if (!mounted) return;
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const FinancialSetupScreen(),
+                                  ));
+                            } on ApiException catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.message),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Something went wrong. Please try again.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } finally {
+                              if (mounted) setState(() => _isLoading = false);
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: themeprovider.isDark
                               ? AppColors.darkError
@@ -301,14 +345,16 @@ class PersonalInfoScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Text(
-                    "Next",
-                    style: TextStyle(
-                      fontSize: screenW * 0.055,
-                      color: AppColors.darkBorder,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: _isLoading 
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          "Next",
+                          style: TextStyle(
+                            fontSize: screenW * 0.055,
+                            color: AppColors.darkBorder,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ],

@@ -15,10 +15,25 @@ import {
   resendOtpSchema,
   sendEmailVerificationSchema,
   verifyEmailSchema,
+  requestRegistrationOtpSchema,
 } from '../middleware/validation.middleware';
 
 export const authRoutes = async (fastify: FastifyInstance) => {
   // Public routes (no authentication required)
+
+  /**
+   * @route   POST /api/auth/request-registration-otp
+   * @desc    Request OTP for registration
+   * @access  Public
+   */
+  fastify.post(
+    '/request-registration-otp',
+    {
+      preHandler: [validate(requestRegistrationOtpSchema)],
+      config: { rateLimit: authRateLimit },
+    },
+    authController.requestRegistrationOtp
+  );
 
   /**
    * @route   POST /api/auth/register

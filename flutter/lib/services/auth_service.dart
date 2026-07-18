@@ -3,11 +3,34 @@ import 'package:alpha_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
+  static Future<Map<String, dynamic>> requestRegistrationOtp({
+    required String phoneNumber,
+    String? email,
+  }) async {
+    final response = await ApiService.post('/auth/request-registration-otp', body: {
+      'phoneNumber': phoneNumber,
+      if (email != null) 'email': email,
+    });
+
+    final body = await ApiService.parseJson(response);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return body;
+    }
+
+    final error = body['error'] as Map<String, dynamic>?;
+    throw ApiException(
+      message: error?['message'] ?? body['message'] ?? 'Request failed',
+      code: error?['code'] as String?,
+      details: error?['details'] as Map<String, dynamic>?,
+    );
+  }
+
   static Future<Map<String, dynamic>> register({
     required String phoneNumber,
     required String fullName,
     required String birthDate,
     required String password,
+    required String otpCode,
     String? email,
   }) async {
     final response = await ApiService.post('/auth/register', body: {
@@ -15,11 +38,19 @@ class AuthService {
       'fullName': fullName,
       'birthDate': birthDate,
       'password': password,
+      'otpCode': otpCode,
       if (email != null) 'email': email,
     });
 
     final body = await ApiService.parseJson(response);
     if (response.statusCode >= 200 && response.statusCode < 300) {
+      final prefs = await SharedPreferences.getInstance();
+      final data = body['data'] as Map<String, dynamic>?;
+      final tokens = data?['tokens'] as Map<String, dynamic>?;
+      if (tokens != null) {
+        await prefs.setString('access_token', tokens['accessToken'] ?? '');
+        await prefs.setString('refresh_token', tokens['refreshToken'] ?? '');
+      }
       return body;
     }
 

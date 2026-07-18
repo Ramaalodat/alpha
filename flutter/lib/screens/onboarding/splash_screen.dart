@@ -124,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
       final isOnboarded = user['isOnboarded'] == true;
       if (isOnboarded) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
         // User has account but hasn't completed onboarding → demographics
         Navigator.pushReplacementNamed(context, '/onboarding/demographics');
@@ -139,7 +139,7 @@ class _SplashScreenState extends State<SplashScreen> {
         if (!mounted) return;
         final isOnboarded = user['isOnboarded'] == true;
         if (isOnboarded) {
-          Navigator.pushReplacementNamed(context, '/dashboard');
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
           Navigator.pushReplacementNamed(context, '/onboarding/demographics');
         }

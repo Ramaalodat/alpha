@@ -10,11 +10,21 @@ import 'package:provider/provider.dart';
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final String? devOtpCode;
+  final bool isRegistration;
+  final String? fullName;
+  final String? birthDate;
+  final String? email;
+  final String? password;
 
   const OtpScreen({
     super.key,
     required this.phoneNumber,
     this.devOtpCode,
+    this.isRegistration = false,
+    this.fullName,
+    this.birthDate,
+    this.email,
+    this.password,
   });
 
   @override
@@ -77,10 +87,23 @@ class _OtpScreenState extends State<OtpScreen> {
     });
 
     try {
-      final result = await AuthService.verifyPhone(
-        phoneNumber: widget.phoneNumber,
-        otpCode: _pinController.text,
-      );
+      Map<String, dynamic> result;
+      
+      if (widget.isRegistration) {
+        result = await AuthService.register(
+          phoneNumber: widget.phoneNumber,
+          fullName: widget.fullName!,
+          birthDate: widget.birthDate!,
+          password: widget.password!,
+          otpCode: _pinController.text,
+          email: widget.email,
+        );
+      } else {
+        result = await AuthService.verifyPhone(
+          phoneNumber: widget.phoneNumber,
+          otpCode: _pinController.text,
+        );
+      }
 
       if (!mounted) return;
 
@@ -101,7 +124,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
       if (!mounted) return;
       if (isOnboarded) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
         Navigator.pushReplacementNamed(context, '/onboarding/demographics');
       }

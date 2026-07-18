@@ -4,7 +4,7 @@ import 'package:alpha_app/providers/goal_provider.dart';
 
 import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/screens/goals/goal_date.dart';
-import 'package:alpha_app/screens/main/dashboard_screen.dart';
+import 'package:alpha_app/screens/main/main_screen.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +12,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-class SetGoalScreen extends StatelessWidget {
+import 'package:alpha_app/services/api_exception.dart';
+import 'package:alpha_app/services/onboarding_service.dart';
+
+class SetGoalScreen extends StatefulWidget {
   const SetGoalScreen({super.key});
+
+  @override
+  State<SetGoalScreen> createState() => _SetGoalScreenState();
+}
+
+class _SetGoalScreenState extends State<SetGoalScreen> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -331,21 +341,52 @@ class SetGoalScreen extends StatelessWidget {
                   bottom: screenH * 0.02,
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (provider.isValid) {
-                      final saved = provider.saveCurrentGoal();
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          if (provider.isValid) {
+                            setState(() => _isLoading = true);
+                            try {
+                              await OnboardingService.createFirstGoal(
+                                icon: 'star', // Default icon since new UI doesn't select one
+                                name: provider.goalName,
+                                targetAmount: provider.monthlySaving,
+                                targetDate: provider.targetDate!.toIso8601String(),
+                              );
+                              
+                              final saved = provider.saveCurrentGoal();
+                              if (!mounted) return;
 
-                      if (saved) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DashboardScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                              if (saved) {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MainScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              }
+                            } on ApiException catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.message),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } catch (e) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Something went wrong. Please try again.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } finally {
+                              if (mounted) setState(() => _isLoading = false);
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: themeProvider.isDark
                               ? AppColors.darkError
@@ -380,14 +421,16 @@ class SetGoalScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Text(
-                    "Finish",
-                    style: TextStyle(
-                      fontSize: screenW * 0.055,
-                      color: AppColors.darkBorder,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: _isLoading 
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          "Finish",
+                          style: TextStyle(
+                            fontSize: screenW * 0.055,
+                            color: AppColors.darkBorder,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ],

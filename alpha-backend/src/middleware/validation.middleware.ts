@@ -213,6 +213,15 @@ export const registerSchema = Joi.object({
       'any.required': VALIDATION_MESSAGES.REQUIRED,
     }),
   password: passwordValidator,
+  otpCode: otpValidator,
+});
+
+export const requestRegistrationOtpSchema = Joi.object({
+  phoneNumber: jordanPhoneValidator,
+  email: Joi.string().email().optional().messages({
+    'string.email': VALIDATION_MESSAGES.INVALID_EMAIL,
+  }),
+  username: Joi.string().optional(),
 });
 
 export const verifyPhoneSchema = Joi.object({

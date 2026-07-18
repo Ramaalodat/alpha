@@ -4,6 +4,7 @@ import 'package:alpha_app/providers/goal_provider.dart';
 
 import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/screens/goals/goal_date.dart';
+import 'package:alpha_app/services/finance_service.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,17 @@ class NewGoalScreen extends StatelessWidget {
       backgroundColor: themeProvider.isDark
           ? AppColors.darkBackground
           : AppColors.lightBackground,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: themeProvider.isDark ? AppColors.darkText : AppColors.lightText,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
@@ -317,12 +329,23 @@ class NewGoalScreen extends StatelessWidget {
                   bottom: screenH * 0.02,
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (provider.isValid) {
-                      final saved = provider.saveCurrentGoal();
-
-                      if (saved) {
-                        Navigator.pop(context);
+                      // Save to backend
+                      try {
+                        await FinanceService.createGoal(
+                          icon: '🎯',
+                          name: provider.goalName,
+                          targetAmount: provider.monthlySaving,
+                          targetDate: provider.targetDate!.toIso8601String(),
+                          priority: provider.priority.toString(),
+                        );
+                        if (!context.mounted) return;
+                        Navigator.pop(context, true);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+                        );
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(

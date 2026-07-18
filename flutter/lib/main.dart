@@ -4,12 +4,17 @@ import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
 import 'package:alpha_app/providers/goal_provider.dart';
+import 'package:alpha_app/providers/home_provider.dart';
 import 'package:alpha_app/screens/auth/login.dart';
 import 'package:alpha_app/screens/main/dashboard_screen.dart';
 import 'package:alpha_app/screens/onboarding/personal_info_screen.dart';
 import 'package:alpha_app/screens/onboarding/financial_setup_screen.dart';
 import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
+import 'package:alpha_app/screens/home/home_screen.dart';
+import 'package:alpha_app/screens/main/main_screen.dart';
+import 'package:alpha_app/screens/profile/profile_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:alpha_app/screens/profile/profile_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -39,6 +44,7 @@ void main() async {
           ChangeNotifierProvider(create: (context) => FinancialProvider()),
           ChangeNotifierProvider(create: (context) => PersonalProvider()),
           ChangeNotifierProvider(create: (context) => GoalProvider()),
+          ChangeNotifierProvider(create: (context) => HomeProvider()),
         ], child: MyApp())),
   );
 }
@@ -79,6 +85,7 @@ class _MyAppState extends State<MyApp> {
           routes: {
             '/login': (context) => const Login(),
             '/dashboard': (context) => const DashboardScreen(),
+            '/home': (context) => const MainScreen(),
             '/profile': (context) => const ProfileScreen(),
             '/onboarding/demographics': (context) => const PersonalInfoScreen(),
             '/onboarding/financial-info': (context) =>
