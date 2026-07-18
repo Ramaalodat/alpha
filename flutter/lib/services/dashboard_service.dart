@@ -18,4 +18,36 @@ class DashboardService {
       return {};
     }
   }
+
+  static Future<Map<String, dynamic>> loadHealthScore() async {
+    try {
+      final response = await ApiService.get('/dashboard/health-score');
+      final body = await ApiService.parseJson(response);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = body['data'];
+        return data is Map
+            ? Map<String, dynamic>.from(data)
+            : <String, dynamic>{};
+      }
+      return {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  static Future<List<dynamic>> loadInsights() async {
+    try {
+      final response = await ApiService.get('/insights?limit=1');
+      final body = await ApiService.parseJson(response);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = body['data']['data'] ?? body['data'] ?? []; // In case of pagination wrapper
+        return data is List
+            ? List<dynamic>.from(data)
+            : <dynamic>[];
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
 }

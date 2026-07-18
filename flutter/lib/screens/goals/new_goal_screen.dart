@@ -333,12 +333,23 @@ class NewGoalScreen extends StatelessWidget {
                     if (provider.isValid) {
                       // Save to backend
                       try {
+                        String priorityStr;
+                        if (provider.priority <= 3) {
+                          priorityStr = 'LOW';
+                        } else if (provider.priority <= 6) {
+                          priorityStr = 'MEDIUM';
+                        } else if (provider.priority <= 8) {
+                          priorityStr = 'HIGH';
+                        } else {
+                          priorityStr = 'URGENT';
+                        }
+
                         await FinanceService.createGoal(
                           icon: '🎯',
                           name: provider.goalName,
                           targetAmount: provider.monthlySaving,
                           targetDate: provider.targetDate!.toIso8601String(),
-                          priority: provider.priority.toString(),
+                          priority: priorityStr,
                         );
                         if (!context.mounted) return;
                         Navigator.pop(context, true);

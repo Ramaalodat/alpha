@@ -69,6 +69,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
       backgroundColor:
           theme.isDark ? AppColors.darkBackground : AppColors.lightBackground,
       floatingActionButton: FloatingActionButton(
+        heroTag: 'goals_fab',
         onPressed: () async {
           final result = await Navigator.push(context,
               MaterialPageRoute(builder: (_) => NewGoalScreen()));

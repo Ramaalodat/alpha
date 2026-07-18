@@ -69,6 +69,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       backgroundColor:
           theme.isDark ? AppColors.darkBackground : AppColors.lightBackground,
       floatingActionButton: FloatingActionButton(
+        heroTag: 'expenses_fab',
         onPressed: () async {
           final result = await Navigator.push(context,
               MaterialPageRoute(builder: (_) => const AddExpenseScreen()));

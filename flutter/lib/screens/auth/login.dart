@@ -6,7 +6,6 @@ import 'package:alpha_app/core/utils/device.dart';
 import 'package:alpha_app/screens/auth/create_account.dart';
 import 'package:alpha_app/screens/auth/forgot_password_screen.dart';
 import 'package:alpha_app/screens/auth/otp_screen.dart';
-import 'package:alpha_app/screens/home/home_screen.dart';
 import 'package:alpha_app/screens/main/main_screen.dart';
 import 'package:alpha_app/services/api_exception.dart';
 import 'package:alpha_app/services/auth_service.dart';
@@ -193,7 +192,7 @@ class _LoginState extends State<Login> {
                                   Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (_) => const HomeScreen()));
+                                          builder: (_) => const MainScreen()));
                                 } else {
                                   Navigator.pushReplacementNamed(
                                       context, '/onboarding/demographics');

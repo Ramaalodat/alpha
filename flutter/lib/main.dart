@@ -11,10 +11,7 @@ import 'package:alpha_app/screens/onboarding/personal_info_screen.dart';
 import 'package:alpha_app/screens/onboarding/financial_setup_screen.dart';
 import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
-import 'package:alpha_app/screens/home/home_screen.dart';
 import 'package:alpha_app/screens/main/main_screen.dart';
-import 'package:alpha_app/screens/profile/profile_screen.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:alpha_app/screens/profile/profile_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 

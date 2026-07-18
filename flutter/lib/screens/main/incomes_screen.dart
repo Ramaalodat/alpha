@@ -69,6 +69,7 @@ class _IncomesScreenState extends State<IncomesScreen> {
       backgroundColor:
           theme.isDark ? AppColors.darkBackground : AppColors.lightBackground,
       floatingActionButton: FloatingActionButton(
+        heroTag: 'incomes_fab',
         onPressed: () async {
           final result = await Navigator.push(context,
               MaterialPageRoute(builder: (_) => const AddIncomeScreen()));
