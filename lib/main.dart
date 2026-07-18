@@ -8,6 +8,7 @@ import 'package:alpha_app/providers/home_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/leaderbord_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
+import 'package:alpha_app/providers/receipt_provider.dart';
 import 'package:alpha_app/providers/reward_provider.dart' show RewardProvider;
 
 import 'package:alpha_app/providers/themeprovider.dart';
@@ -22,6 +23,7 @@ import 'package:alpha_app/screens/onboarding/splash_screen.dart';
 import 'package:alpha_app/screens/profile/financial_setup_screen.dart';
 
 import 'package:alpha_app/screens/profile/personal_info_screen.dart';
+import 'package:alpha_app/screens/receipts/receipt_input_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:flutter/material.dart';
@@ -75,7 +77,9 @@ create: (_) => ChatbotProvider(),
 ChangeNotifierProvider(
   create: (_) => HomeProvider(),
 ),
-
+ChangeNotifierProvider(
+  create: (_) => ReceiptProvider(),
+),
       ],
         child: MyApp())
     ),
@@ -126,7 +130,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home: ChallengesScreen()
+            home:  ReceiptInputScreen()
           );
         },
          
