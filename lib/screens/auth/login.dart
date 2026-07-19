@@ -148,9 +148,8 @@ class _LoginState extends State<Login> {
   if (!_formkey.currentState!.validate()) return;
 
 
- final success = await context.read<AuthProvider>().login(
-  phone: "+962${authprovider.phoneController.text.trim()}",
-  password: authprovider.passwordController.text.trim(),
+ final success = await context.read<AuthProvider>().loginUser( 
+ 
 );
 
 

@@ -10,6 +10,7 @@ import 'package:alpha_app/providers/home_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/leaderbord_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
+import 'package:alpha_app/providers/profile_provider.dart';
 import 'package:alpha_app/providers/receipt_provider.dart';
 import 'package:alpha_app/providers/reward_provider.dart' show RewardProvider;
 
@@ -17,6 +18,7 @@ import 'package:alpha_app/providers/themeprovider.dart';
 import 'package:alpha_app/screens/analysis/financial_analysis_screen.dart';
 
 import 'package:alpha_app/screens/main_screen.dart';
+import 'package:alpha_app/screens/onboarding/splash_screen.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 
@@ -83,6 +85,10 @@ ChangeNotifierProvider(
   create: (_) =>
       FinancialAnalysisProvider(),
 ),
+
+ChangeNotifierProvider(
+  create: (_) => ProfileProvider(),
+),
       ],
         child: MyApp())
     ),
@@ -133,7 +139,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home: MainNavigationScreen()
+            home: SplashScreen()
           );
         },
          

@@ -60,7 +60,7 @@ class _BoardingOneState extends State<BoardingOne> {
                SizedBox(height: screenH*0.03),
             Expanded(
               child: Text( textAlign: TextAlign.center,
-                "Basira automatically tracks your spending patterns and uncovers the habits shaping your finances — with zero extra effort from you",
+                "Alpha automatically tracks your spending patterns and uncovers the habits shaping your finances — with zero extra effort from you",
                 style: GoogleFonts.ibmPlexSansArabic(
                   fontSize: screenW*0.042,
                  
