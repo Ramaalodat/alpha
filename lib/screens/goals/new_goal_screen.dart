@@ -1,332 +1,921 @@
 import 'package:alpha_app/core/utils/app_colors.dart';
 import 'package:alpha_app/core/utils/device.dart';
 import 'package:alpha_app/providers/goal_provider.dart';
-
 import 'package:alpha_app/providers/themeprovider.dart';
-import 'package:alpha_app/screens/auth/login.dart';
 import 'package:alpha_app/screens/goals/goal_date.dart';
-import 'package:alpha_app/screens/goals/goal_history.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-class NewGoalScreen extends StatelessWidget {
-  const NewGoalScreen({super.key});
+class NewGoalScreen extends StatefulWidget {
+  const NewGoalScreen({
+    super.key,
+  });
+
+  @override
+  State<NewGoalScreen> createState() =>
+      _NewGoalScreenState();
+}
+
+class _NewGoalScreenState extends State<NewGoalScreen> {
+  bool _formPrepared = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _formPrepared) {
+        return;
+      }
+
+      _formPrepared = true;
+
+      context.read<GoalProvider>().clearForm();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<GoalProvider>();
+    final provider =
+        context.watch<GoalProvider>();
 
-    final themeProvider = context.watch<Themeprovider>();
+    final themeProvider =
+        context.watch<Themeprovider>();
 
-    final screenW = Device.width(context);
-    final screenH = Device.height(context);
+    final bool isDark =
+        themeProvider.isDark;
 
-    return Scaffold(
-      backgroundColor: themeProvider.isDark
-          ? AppColors.darkBackground
-          : AppColors.lightBackground,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenW * 0.05,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    final double screenW =
+        Device.width(context);
+
+    final double screenH =
+        Device.height(context);
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (
+        didPop,
+        result,
+      ) {
+        if (!didPop) {
+          _closeScreen();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: isDark
+            ? AppColors.darkBackground
+            : AppColors.lightBackground,
+        body: SafeArea(
+          child: Stack(
             children: [
-              SizedBox(height: screenW * 0.03),
-
-              Text(
-                "New goal",
-                style: GoogleFonts.ibmPlexSansArabic(
-                  color: themeProvider.isDark
-                      ? AppColors.darkText
-                      : AppColors.lightText,
-                 fontSize: screenW*0.075,
-                  fontWeight: FontWeight.bold,
+              SingleChildScrollView(
+                physics:
+                    const BouncingScrollPhysics(),
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenW * 0.05,
                 ),
-              ),
-
-            SizedBox(height: screenH*0.01,),
-
-              Text(
-                "You can add more anytime later",
-               style: GoogleFonts.ibmPlexSansArabic(
-                               fontSize: screenW*0.035,
-                              fontWeight: FontWeight.w500,
-                               color: themeProvider.isDark
-                  ? AppColors.darkSubText
-                  : AppColors.lightSubText,
-                             ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // ================= PROGRESS =================
-
-              LinearPercentIndicator( 
-                           lineHeight: screenH*0.02, // سماكة الشريط
-                           percent: provider.pageProgress, // النسبة المئوية للتقدم
-                           backgroundColor: themeProvider.isDark ? AppColors.darkBorder : AppColors.lightBorder, 
-                           progressColor:  themeProvider.isDark ? AppColors.darkSecondary : AppColors.lightSecondary,
-                           barRadius: Radius.circular(10), 
-                           animation: false, 
-                           animationDuration: 1000, 
-                         ),
-
-              SizedBox(height: screenH*0.03,),
-
-              Text(
-                "Choose your goal",
-                style: TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),
-              ),
-
-              SizedBox(height: screenH*0.01,),
-
-              MultiSelectChip(
-                items: provider.goalCategories,
-                selectedItems: provider.selectedCategory == null
-                    ? []
-                    : [provider.selectedCategory!],
-                onTap: provider.setCategory,
-              ),
-
-              SizedBox(height: screenH*0.02,),
-
-              // ================= OTHER NAME =================
-
-              if (provider.selectedCategory == "Other")
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: screenH*0.02,),
-                    Text(
-                      "Goal name",
-                     style: TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),
+                    SizedBox(
+                      height: screenH * 0.022,
                     ),
-                    const SizedBox(height: 10),
+
+                    _buildHeader(
+                      isDark: isDark,
+                      screenW: screenW,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.012,
+                    ),
+
+                    Text(
+                      "Set a realistic financial goal and Alpha will help you track your progress.",
+                      style: GoogleFonts
+                          .ibmPlexSansArabic(
+                        color: isDark
+                            ? AppColors.darkSubText
+                            : AppColors.lightSubText,
+                        fontSize: screenW * 0.034,
+                        fontWeight:
+                            FontWeight.w500,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.03,
+                    ),
+
+                    // ================= GOAL CATEGORY =================
+
+                    _SectionTitle(
+                      title: "Choose your goal",
+                      screenW: screenW,
+                      isDark: isDark,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.012,
+                    ),
+
+                    MultiSelectChip(
+                      items:
+                          provider.goalCategories,
+                      selectedItems:
+                          provider.selectedCategory ==
+                                  null
+                              ? []
+                              : [
+                                  provider
+                                      .selectedCategory!,
+                                ],
+                      onTap:
+                          provider.setCategory,
+                    ),
+
+                    // ================= CUSTOM GOAL NAME =================
+
+                    if (provider.selectedCategory ==
+                        "Other") ...[
+                      SizedBox(
+                        height: screenH * 0.022,
+                      ),
+
+                      _SectionTitle(
+                        title: "Goal name",
+                        screenW: screenW,
+                        isDark: isDark,
+                      ),
+
+                      SizedBox(
+                        height: screenH * 0.01,
+                      ),
+
+                      CustomTextfield(
+                        controller: provider
+                            .customNameController,
+                        hint:
+                            "Enter goal name",
+                        type: TextFieldType.name,
+                        icon:
+                            Icons.flag_outlined,
+                        onChanged: (_) {
+                          provider.refresh();
+                        },
+                      ),
+                    ],
+
+                    SizedBox(
+                      height: screenH * 0.025,
+                    ),
+
+                    // ================= MONTHLY SAVING =================
+
+                    _SectionTitle(
+                      title:
+                          "Monthly saving amount",
+                      screenW: screenW,
+                      isDark: isDark,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.01,
+                    ),
+
                     CustomTextfield(
-                      controller: provider.customNameController,
-                      hint: "Enter goal name",
-                      type: TextFieldType.name,
+                      controller:
+                          provider.amountController,
+                      hint: "Amount per month",
+                      type: TextFieldType.number,
+                      icon:
+                          Icons.payments_outlined,
+                      suffix: Padding(
+                        padding:
+                            const EdgeInsets.all(
+                          12,
+                        ),
+                        child: Text(
+                          "JOD",
+                          style: TextStyle(
+                            color: isDark
+                                ? AppColors
+                                    .darkSubText
+                                : AppColors
+                                    .lightSubText,
+                            fontWeight:
+                                FontWeight.w600,
+                          ),
+                        ),
+                      ),
                       onChanged: (_) {
                         provider.refresh();
                       },
                     ),
-                  ],
-                ),
 
-              SizedBox(height: screenH*0.02,),
-
-              Text(
-                "Monthly saving amount",
-               style: TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),
-              ),
-
-              SizedBox(height: screenH*0.01,),
-
-              CustomTextfield(  suffix: const Padding(
-                        padding:
-                            EdgeInsets.all(12),
-                        child: Text("JOD"),
-                      ),
-                controller: provider.amountController,
-                hint: "Amount per month",
-                type: TextFieldType.number,
-                icon: Icons.payments_outlined,
-                onChanged: (_) {
-                  provider.refresh();
-                },
-              ),
-
-              SizedBox(height: screenH*0.02,),
-
-              Text(
-                "Priority",
-                style: TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),
-              ),
-
-              Slider(
-                value: provider.priority.toDouble(),
-                min: 1,
-                max: 10,
-                divisions: 9,
-                activeColor: themeProvider.isDark
-                    ? AppColors.darkSecondary
-                    : AppColors.lightSecondary,
-                label: provider.priority.toString(),
-                onChanged: (value) {
-                  provider.setPriority(
-                    value.toInt(),
-                  );
-                },
-              ),
-
-                RichText(
-                text: TextSpan(
-                  text: "Priority:",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: screenW * 0.045,
-                    color: themeProvider.isDark
-                        ? AppColors.darkText
-                        : AppColors.lightText,
-                  ),
-                  children: [
-                    TextSpan(
-                      text:
-                          " ${provider.priority} / 10",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: screenW * 0.045,
-                        color: themeProvider.isDark
-                            ? AppColors.darkAccent
-                            : AppColors.lightAccent,
-                      ),
+                    SizedBox(
+                      height: screenH * 0.025,
                     ),
-                  ],
-                ),
-              ),
 
-              SizedBox(height: screenH*0.02,),
+                    // ================= PRIORITY =================
 
-              Text(
-                "Target date",
-                style: TextStyle(fontSize: screenW*0.04 ,  color: themeProvider.isDark ? AppColors.darkSubText:AppColors.lightSubText , fontWeight: FontWeight.bold),
-              ),
-
-              SizedBox(height: screenH * 0.01,),
-
-               CustomTextfield(
- controller: provider.targetDateController,
- hint: "Select your target date",
- icon: Icons.calendar_month,
- type: TextFieldType.date,
- readOnly: true,
-
- onTap: () async {
-
-   final date = await Navigator.push(
-     context,
-     MaterialPageRoute(
-       builder: (_) => GoalDateScreen(
-         initialDate: provider.targetDate,
-       ),
-     ),
-   );
-
-
-   if(date != null){
-
-     provider.setDate(date);
-
-   }
-
- },
-),
-
-             SizedBox(height: screenH*0.02,),
-
-              // ============== BASIRA SUGGESTION ==============
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: themeProvider.isDark
-                      ? AppColors.darkSecondary.withOpacity(.1)
-                      : AppColors.lightSecondary.withOpacity(.1),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      color: themeProvider.isDark
-                          ? AppColors.darkPrimary
-                          : AppColors.lightPrimary,
+                    _SectionTitle(
+                      title: "Priority",
+                      screenW: screenW,
+                      isDark: isDark,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        "Alpha suggests\nChoose a realistic monthly amount to reach your goal comfortably.",
-                        style: TextStyle(
-                          color: themeProvider.isDark
-                              ? AppColors.darkText
-                              : AppColors.lightText,
-                        ),
+
+                    SizedBox(
+                      height: screenH * 0.012,
+                    ),
+
+                    _PriorityCard(
+                      priority:
+                          provider.priority,
+                      isDark: isDark,
+                      screenW: screenW,
+                      onChanged: (value) {
+                        provider.setPriority(
+                          value.toInt(),
+                        );
+                      },
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.025,
+                    ),
+
+                    // ================= TARGET DATE =================
+
+                    _SectionTitle(
+                      title: "Target date",
+                      screenW: screenW,
+                      isDark: isDark,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.01,
+                    ),
+
+                    CustomTextfield(
+                      controller: provider
+                          .targetDateController,
+                      hint:
+                          "Select your target date",
+                      icon: Icons
+                          .calendar_month_outlined,
+                      type: TextFieldType.date,
+                      readOnly: true,
+                      onTap: () {
+                        _selectGoalDate(
+                          provider,
+                        );
+                      },
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.025,
+                    ),
+
+                    // ================= ALPHA PREVIEW =================
+
+                    _AlphaGoalPreviewCard(
+                      provider: provider,
+                      isDark: isDark,
+                      screenW: screenW,
+                    ),
+
+                    if (provider.errorMessage !=
+                        null) ...[
+                      SizedBox(
+                        height: screenH * 0.018,
                       ),
+
+                      _ErrorCard(
+                        message:
+                            provider.errorMessage!,
+                        onClose:
+                            provider.clearError,
+                      ),
+                    ],
+
+                    SizedBox(
+                      height: screenH * 0.03,
                     ),
-                  ],
-                ),
-              ),
 
-              SizedBox(height: screenH * 0.03),
+                    // ================= SAVE BUTTON =================
 
-                 Padding(
-                padding: EdgeInsets.only(
-                  bottom: screenH * 0.02,
-                ),
-                child: ElevatedButton(
-                  onPressed: () async{
-                  if (provider.isValid) {
-    final saved = await provider.saveCurrentGoal();
-
-if (saved) {
-  Navigator.pop(context);
-}
-  } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: themeProvider.isDark
-                              ? AppColors.darkError
-                              : AppColors.lightError,
-                          content: Text(
-                            "Please complete all required fields",
-                            style: TextStyle(
-                              fontSize: screenW * 0.04,
-                              fontWeight: FontWeight.w500,
+                    SizedBox(
+                      width: double.infinity,
+                      height: screenH * 0.065,
+                      child: ElevatedButton(
+                        onPressed:
+                            provider.isSaving
+                                ? null
+                                : _saveGoal,
+                        style: ElevatedButton
+                            .styleFrom(
+                          backgroundColor: isDark
+                              ? AppColors.darkPrimary
+                              : AppColors.lightPrimary,
+                          foregroundColor:
+                              AppColors.darkBorder,
+                          disabledBackgroundColor:
+                              (isDark
+                                      ? AppColors
+                                          .darkPrimary
+                                      : AppColors
+                                          .lightPrimary)
+                                  .withOpacity(
+                            0.45,
+                          ),
+                          elevation: 0,
+                          shape:
+                              RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(
+                              10,
                             ),
                           ),
-                          duration: Duration(seconds: 2),
                         ),
-                      );
-                    }
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      themeProvider.isDark
-                          ? AppColors.darkPrimary
-                          : AppColors.lightPrimary,
-                    ),
-                    fixedSize: WidgetStatePropertyAll(
-                      Size(
-                        screenW,
-                        screenH * 0.065,
+                        child: provider.isSaving
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child:
+                                    CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(
+                                "Add Goal",
+                                style: TextStyle(
+                                  fontSize:
+                                      screenW * 0.05,
+                                  fontWeight:
+                                      FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+
+                    SizedBox(
+                      height: screenH * 0.03,
+                    ),
+                  ],
+                ),
+              ),
+
+              if (provider.isSaving)
+                Positioned.fill(
+                  child: AbsorbPointer(
+                    child: Container(
+                      color: Colors.black
+                          .withOpacity(0.15),
                     ),
                   ),
-                  child: Text(
-                    "Finish",
-                    style: TextStyle(
-                      fontSize: screenW * 0.055,
-                      color: AppColors.darkBorder,
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // HEADER
+  // =====================================================
+
+  Widget _buildHeader({
+    required bool isDark,
+    required double screenW,
+  }) {
+    return Row(
+      children: [
+        InkWell(
+          onTap: _closeScreen,
+          borderRadius:
+              BorderRadius.circular(12),
+          child: Container(
+            width: screenW * 0.11,
+            height: screenW * 0.11,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkBorder
+                  : Colors.white,
+              borderRadius:
+                  BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark
+                    ? AppColors.darkBorder
+                    : AppColors.lightBorder,
+              ),
+            ),
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: isDark
+                  ? AppColors.darkText
+                  : AppColors.lightText,
+              size: screenW * 0.05,
+            ),
+          ),
+        ),
+
+        SizedBox(
+          width: screenW * 0.035,
+        ),
+
+        Expanded(
+          child: Text(
+            "Add Goal",
+            style:
+                GoogleFonts.ibmPlexSansArabic(
+              color: isDark
+                  ? AppColors.darkText
+                  : AppColors.lightText,
+              fontSize: screenW * 0.065,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // =====================================================
+  // DATE
+  // =====================================================
+
+  Future<void> _selectGoalDate(
+    GoalProvider provider,
+  ) async {
+    final dynamic selectedDate =
+        await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => GoalDateScreen(
+          initialDate:
+              provider.targetDate,
+        ),
+      ),
+    );
+
+    if (!mounted ||
+        selectedDate == null ||
+        selectedDate is! DateTime) {
+      return;
+    }
+
+    provider.setDate(selectedDate);
+  }
+
+  // =====================================================
+  // SAVE
+  // =====================================================
+
+  Future<void> _saveGoal() async {
+    FocusScope.of(context).unfocus();
+
+    final provider =
+        context.read<GoalProvider>();
+
+    if (!provider.isValid) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              provider.validationMessage ??
+                  "Please complete all required fields",
+              style: GoogleFonts
+                  .ibmPlexSansArabic(),
+            ),
+            backgroundColor:
+                context
+                        .read<Themeprovider>()
+                        .isDark
+                    ? AppColors.darkError
+                    : AppColors.lightError,
+            behavior:
+                SnackBarBehavior.floating,
+          ),
+        );
+
+      return;
+    }
+
+    final bool saved =
+        await provider.saveCurrentGoal();
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!saved) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              provider.errorMessage ??
+                  "Could not save goal",
+              style: GoogleFonts
+                  .ibmPlexSansArabic(),
+            ),
+            backgroundColor:
+                context
+                        .read<Themeprovider>()
+                        .isDark
+                    ? AppColors.darkError
+                    : AppColors.lightError,
+            behavior:
+                SnackBarBehavior.floating,
+          ),
+        );
+
+      return;
+    }
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            "Goal added successfully",
+            style:
+                GoogleFonts.ibmPlexSansArabic(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          backgroundColor:
+              context
+                      .read<Themeprovider>()
+                      .isDark
+                  ? AppColors.darkSecondary
+                  : AppColors.lightSecondary,
+          behavior:
+              SnackBarBehavior.floating,
+        ),
+      );
+
+    Navigator.pop(
+      context,
+      true,
+    );
+  }
+
+  // =====================================================
+  // CLOSE
+  // =====================================================
+
+  void _closeScreen() {
+    context
+        .read<GoalProvider>()
+        .clearForm();
+
+    Navigator.pop(context);
+  }
+}
+
+// =====================================================
+// SECTION TITLE
+// =====================================================
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final double screenW;
+  final bool isDark;
+
+  const _SectionTitle({
+    required this.title,
+    required this.screenW,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style:
+          GoogleFonts.ibmPlexSansArabic(
+        fontSize: screenW * 0.04,
+        color: isDark
+            ? AppColors.darkSubText
+            : AppColors.lightSubText,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+}
+
+// =====================================================
+// PRIORITY CARD
+// =====================================================
+
+class _PriorityCard extends StatelessWidget {
+  final int priority;
+  final bool isDark;
+  final double screenW;
+  final ValueChanged<double> onChanged;
+
+  const _PriorityCard({
+    required this.priority,
+    required this.isDark,
+    required this.screenW,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 15,
+        vertical: 14,
+      ),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkBorder
+            : Colors.white,
+        borderRadius:
+            BorderRadius.circular(15),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkBorder
+              : AppColors.lightBorder,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.priority_high_rounded,
+                color: isDark
+                    ? AppColors.darkSecondary
+                    : AppColors.lightSecondary,
+              ),
+
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: Text(
+                  "How important is this goal?",
+                  style: GoogleFonts
+                      .ibmPlexSansArabic(
+                    color: isDark
+                        ? AppColors.darkText
+                        : AppColors.lightText,
+                    fontSize:
+                        screenW * 0.035,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
+                ),
+              ),
+
+              Text(
+                "$priority / 10",
+                style: GoogleFonts
+                    .ibmPlexSansArabic(
+                  color: isDark
+                      ? AppColors.darkAccent
+                      : AppColors.lightAccent,
+                  fontSize:
+                      screenW * 0.038,
+                  fontWeight:
+                      FontWeight.bold,
                 ),
               ),
             ],
           ),
+
+          Slider(
+            value: priority.toDouble(),
+            min: 1,
+            max: 10,
+            divisions: 9,
+            label: priority.toString(),
+            activeColor: isDark
+                ? AppColors.darkSecondary
+                : AppColors.lightSecondary,
+            inactiveColor: isDark
+                ? AppColors.darkSubText
+                    .withOpacity(0.25)
+                : AppColors.lightSubText
+                    .withOpacity(0.25),
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// =====================================================
+// ALPHA GOAL PREVIEW
+// =====================================================
+
+class _AlphaGoalPreviewCard
+    extends StatelessWidget {
+  final GoalProvider provider;
+  final bool isDark;
+  final double screenW;
+
+  const _AlphaGoalPreviewCard({
+    required this.provider,
+    required this.isDark,
+    required this.screenW,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding:
+          const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkSecondary
+                .withOpacity(0.10)
+            : AppColors.lightSecondary
+                .withOpacity(0.10),
+        borderRadius:
+            BorderRadius.circular(15),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkSecondary
+                  .withOpacity(0.18)
+              : AppColors.lightSecondary
+                  .withOpacity(0.18),
         ),
+      ),
+      child: Row(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkPrimary
+                      .withOpacity(0.12)
+                  : AppColors.lightPrimary
+                      .withOpacity(0.12),
+              borderRadius:
+                  BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.auto_awesome_rounded,
+              color: isDark
+                  ? AppColors.darkPrimary
+                  : AppColors.lightPrimary,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Alpha Preview",
+                  style: GoogleFonts
+                      .ibmPlexSansArabic(
+                    color: isDark
+                        ? AppColors.darkPrimary
+                        : AppColors.lightPrimary,
+                    fontSize:
+                        screenW * 0.036,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  _buildMessage(),
+                  style: GoogleFonts
+                      .ibmPlexSansArabic(
+                    color: isDark
+                        ? AppColors.darkText
+                        : AppColors.lightText,
+                    fontSize:
+                        screenW * 0.032,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _buildMessage() {
+    if (provider.selectedCategory == null) {
+      return "Choose a goal to receive a personalized saving suggestion.";
+    }
+
+    if (provider.monthlySaving <= 0) {
+      return "Enter a realistic monthly saving amount so Alpha can evaluate your plan.";
+    }
+
+    if (provider.targetDate == null) {
+      return "Select a target date to complete your goal plan.";
+    }
+
+    if (provider.priority >= 8) {
+      return "This is a high-priority goal. Alpha will give it more importance when analyzing your spending.";
+    }
+
+    if (provider.monthlySaving < 20) {
+      return "Your monthly saving amount is relatively low. Reaching the goal may take more time.";
+    }
+
+    return "Your goal setup looks realistic. Alpha will track your progress and help you stay consistent.";
+  }
+}
+
+// =====================================================
+// ERROR CARD
+// =====================================================
+
+class _ErrorCard extends StatelessWidget {
+  final String message;
+  final VoidCallback onClose;
+
+  const _ErrorCard({
+    required this.message,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDark =
+        context.watch<Themeprovider>().isDark;
+
+    final Color errorColor = isDark
+        ? AppColors.darkError
+        : AppColors.lightError;
+
+    return Container(
+      width: double.infinity,
+      padding:
+          const EdgeInsets.only(
+        left: 13,
+        top: 8,
+        bottom: 8,
+      ),
+      decoration: BoxDecoration(
+        color:
+            errorColor.withOpacity(0.10),
+        borderRadius:
+            BorderRadius.circular(14),
+        border: Border.all(
+          color:
+              errorColor.withOpacity(0.18),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            color: errorColor,
+          ),
+
+          const SizedBox(width: 9),
+
+          Expanded(
+            child: Text(
+              message,
+              style: GoogleFonts
+                  .ibmPlexSansArabic(
+                color: errorColor,
+              ),
+            ),
+          ),
+
+          IconButton(
+            onPressed: onClose,
+            icon: Icon(
+              Icons.close_rounded,
+              color: errorColor,
+              size: 18,
+            ),
+          ),
+        ],
       ),
     );
   }

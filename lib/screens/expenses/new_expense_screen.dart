@@ -3,6 +3,7 @@ import 'package:alpha_app/core/utils/device.dart';
 import 'package:alpha_app/models/expense_model.dart';
 import 'package:alpha_app/providers/expense_provider.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
+import 'package:alpha_app/screens/expenses/expense_date_screen.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
 import 'package:alpha_app/widgets/option_chip.dart';
@@ -379,12 +380,28 @@ class _NewExpenseScreenState
                       icon: Icons
                           .calendar_month_outlined,
                       readOnly: true,
-                      onTap: () {
-                        _selectDate(
-                          provider: provider,
-                          isDark: isDark,
-                        );
-                      },
+                    onTap: () async {
+  final selectedDate =
+      await Navigator.push<DateTime>(
+    context,
+    MaterialPageRoute(
+      builder: (_) =>
+          ExpenseDateScreen(
+        initialDate:
+            provider.selectedDate,
+      ),
+    ),
+  );
+
+  if (selectedDate == null ||
+      !context.mounted) {
+    return;
+  }
+
+  provider.setDate(
+    selectedDate,
+  );
+},
                     ),
 
                     SizedBox(
