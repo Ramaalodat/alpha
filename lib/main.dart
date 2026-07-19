@@ -1,6 +1,8 @@
 import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/challenge_provider.dart';
 import 'package:alpha_app/providers/chatbot_provider.dart';
+import 'package:alpha_app/providers/expense_provider.dart';
+import 'package:alpha_app/providers/financial_analysis_provider.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/goal_provider.dart';
 import 'package:alpha_app/providers/home_provider.dart';
@@ -8,22 +10,16 @@ import 'package:alpha_app/providers/home_provider.dart';
 import 'package:alpha_app/providers/language_provider.dart';
 import 'package:alpha_app/providers/leaderbord_provider.dart';
 import 'package:alpha_app/providers/personal_provider.dart';
+import 'package:alpha_app/providers/profile_provider.dart';
 import 'package:alpha_app/providers/receipt_provider.dart';
 import 'package:alpha_app/providers/reward_provider.dart' show RewardProvider;
 
 import 'package:alpha_app/providers/themeprovider.dart';
-import 'package:alpha_app/screens/ai_assistant/chat_screen.dart';
-import 'package:alpha_app/screens/auth/otp_screen.dart';
-import 'package:alpha_app/screens/auth/terms_screen.dart';
-import 'package:alpha_app/screens/challenges/chanllenges_screen.dart';
-import 'package:alpha_app/screens/goals/goal_history.dart';
-import 'package:alpha_app/screens/goals/set_goal_screen.dart';
+import 'package:alpha_app/screens/analysis/financial_analysis_screen.dart';
+
 import 'package:alpha_app/screens/main_screen.dart';
 import 'package:alpha_app/screens/onboarding/splash_screen.dart';
-import 'package:alpha_app/screens/profile/financial_setup_screen.dart';
 
-import 'package:alpha_app/screens/profile/personal_info_screen.dart';
-import 'package:alpha_app/screens/receipts/receipt_input_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:flutter/material.dart';
@@ -80,6 +76,19 @@ ChangeNotifierProvider(
 ChangeNotifierProvider(
   create: (_) => ReceiptProvider(),
 ),
+
+ChangeNotifierProvider(
+  create: (_) => ExpenseProvider(),
+),
+
+ChangeNotifierProvider(
+  create: (_) =>
+      FinancialAnalysisProvider(),
+),
+
+ChangeNotifierProvider(
+  create: (_) => ProfileProvider(),
+),
       ],
         child: MyApp())
     ),
@@ -130,7 +139,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home:  ReceiptInputScreen()
+            home: SplashScreen()
           );
         },
          

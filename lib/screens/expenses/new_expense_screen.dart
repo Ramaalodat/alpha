@@ -1,26 +1,35 @@
 import 'package:alpha_app/core/utils/app_colors.dart';
 import 'package:alpha_app/core/utils/device.dart';
-import 'package:alpha_app/providers/goal_provider.dart';
+import 'package:alpha_app/models/expense_model.dart';
+import 'package:alpha_app/providers/expense_provider.dart';
 import 'package:alpha_app/providers/themeprovider.dart';
-import 'package:alpha_app/screens/goals/goal_date.dart';
+import 'package:alpha_app/screens/expenses/expense_date_screen.dart';
 import 'package:alpha_app/widgets/custom_textfield.dart';
 import 'package:alpha_app/widgets/multi_select_chip.dart';
+import 'package:alpha_app/widgets/option_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-class NewGoalScreen extends StatefulWidget {
-  const NewGoalScreen({
+class NewExpenseScreen extends StatefulWidget {
+  final ExpenseModel? expenseToEdit;
+
+  const NewExpenseScreen({
     super.key,
+    this.expenseToEdit,
   });
 
   @override
-  State<NewGoalScreen> createState() =>
-      _NewGoalScreenState();
+  State<NewExpenseScreen> createState() =>
+      _NewExpenseScreenState();
 }
 
-class _NewGoalScreenState extends State<NewGoalScreen> {
+class _NewExpenseScreenState
+    extends State<NewExpenseScreen> {
   bool _formPrepared = false;
+
+  bool get _isEditing =>
+      widget.expenseToEdit != null;
 
   @override
   void initState() {
@@ -33,14 +42,23 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
 
       _formPrepared = true;
 
-      context.read<GoalProvider>().clearForm();
+      final provider =
+          context.read<ExpenseProvider>();
+
+      if (widget.expenseToEdit != null) {
+        provider.prepareExpenseForEditing(
+          widget.expenseToEdit!,
+        );
+      } else {
+        provider.clearForm();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final provider =
-        context.watch<GoalProvider>();
+        context.watch<ExpenseProvider>();
 
     final themeProvider =
         context.watch<Themeprovider>();
@@ -95,7 +113,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                     ),
 
                     Text(
-                      "Set a realistic financial goal and Alpha will help you track your progress.",
+                      _isEditing
+                          ? "Update the expense details below."
+                          : "Record the expense accurately so Alpha can analyze its effect on your budget.",
                       style: GoogleFonts
                           .ibmPlexSansArabic(
                         color: isDark
@@ -112,10 +132,10 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                       height: screenH * 0.03,
                     ),
 
-                    // ================= GOAL CATEGORY =================
+                    // ================= CATEGORY =================
 
                     _SectionTitle(
-                      title: "Choose your goal",
+                      title: "Category",
                       screenW: screenW,
                       isDark: isDark,
                     ),
@@ -125,8 +145,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                     ),
 
                     MultiSelectChip(
-                      items:
-                          provider.goalCategories,
+                      items: provider.categories,
                       selectedItems:
                           provider.selectedCategory ==
                                   null
@@ -139,34 +158,23 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                           provider.setCategory,
                     ),
 
-                    // ================= CUSTOM GOAL NAME =================
-
                     if (provider.selectedCategory ==
                         "Other") ...[
                       SizedBox(
-                        height: screenH * 0.022,
-                      ),
-
-                      _SectionTitle(
-                        title: "Goal name",
-                        screenW: screenW,
-                        isDark: isDark,
-                      ),
-
-                      SizedBox(
-                        height: screenH * 0.01,
+                        height: screenH * 0.018,
                       ),
 
                       CustomTextfield(
                         controller: provider
-                            .customNameController,
+                            .customCategoryController,
                         hint:
-                            "Enter goal name",
+                            "Enter category name",
                         type: TextFieldType.name,
                         icon:
-                            Icons.flag_outlined,
+                            Icons.category_outlined,
                         onChanged: (_) {
-                          provider.refresh();
+                          provider
+                              .notifyExpenseFormChanged();
                         },
                       ),
                     ],
@@ -175,11 +183,40 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                       height: screenH * 0.025,
                     ),
 
-                    // ================= MONTHLY SAVING =================
+                    // ================= EXPENSE NAME =================
 
                     _SectionTitle(
-                      title:
-                          "Monthly saving amount",
+                      title: "Expense name",
+                      screenW: screenW,
+                      isDark: isDark,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.01,
+                    ),
+
+                    CustomTextfield(
+                      controller:
+                          provider.titleController,
+                      hint:
+                          "Enter expense name",
+                      type: TextFieldType.name,
+                      icon: Icons
+                          .receipt_long_outlined,
+                      onChanged: (_) {
+                        provider
+                            .notifyExpenseFormChanged();
+                      },
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.022,
+                    ),
+
+                    // ================= AMOUNT =================
+
+                    _SectionTitle(
+                      title: "Amount",
                       screenW: screenW,
                       isDark: isDark,
                     ),
@@ -191,41 +228,29 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                     CustomTextfield(
                       controller:
                           provider.amountController,
-                      hint: "Amount per month",
+                      hint: "Enter amount",
                       type: TextFieldType.number,
                       icon:
                           Icons.payments_outlined,
-                      suffix: Padding(
+                      suffix: const Padding(
                         padding:
-                            const EdgeInsets.all(
-                          12,
-                        ),
-                        child: Text(
-                          "JOD",
-                          style: TextStyle(
-                            color: isDark
-                                ? AppColors
-                                    .darkSubText
-                                : AppColors
-                                    .lightSubText,
-                            fontWeight:
-                                FontWeight.w600,
-                          ),
-                        ),
+                            EdgeInsets.all(12),
+                        child: Text("JOD"),
                       ),
                       onChanged: (_) {
-                        provider.refresh();
+                        provider
+                            .notifyExpenseFormChanged();
                       },
                     ),
 
                     SizedBox(
-                      height: screenH * 0.025,
+                      height: screenH * 0.022,
                     ),
 
-                    // ================= PRIORITY =================
+                    // ================= NEED / WANT =================
 
                     _SectionTitle(
-                      title: "Priority",
+                      title: "Expense type",
                       screenW: screenW,
                       isDark: isDark,
                     ),
@@ -234,26 +259,110 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                       height: screenH * 0.012,
                     ),
 
-                    _PriorityCard(
-                      priority:
-                          provider.priority,
-                      isDark: isDark,
-                      screenW: screenW,
-                      onChanged: (value) {
-                        provider.setPriority(
-                          value.toInt(),
+                    OptionChip(
+                      items: const [
+                        "Need",
+                        "Want",
+                      ],
+                      selected:
+                          provider.expenseType ==
+                                  ExpenseType.need
+                              ? "Need"
+                              : "Want",
+                      onTap: (value) {
+                        provider.setExpenseType(
+                          value == "Need"
+                              ? ExpenseType.need
+                              : ExpenseType.want,
                         );
                       },
                     ),
 
                     SizedBox(
-                      height: screenH * 0.025,
+                      height: screenH * 0.022,
                     ),
 
-                    // ================= TARGET DATE =================
+                    // ================= MOVEMENT TYPE =================
 
                     _SectionTitle(
-                      title: "Target date",
+                      title: "Movement type",
+                      screenW: screenW,
+                      isDark: isDark,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.012,
+                    ),
+
+                    OptionChip(
+                      items:
+                          provider.movementTypes,
+                      selected:
+                          provider.movementTypeLabel,
+                      onTap: provider
+                          .setMovementTypeByLabel,
+                    ),
+
+                    if (provider.isRecurring) ...[
+                      SizedBox(
+                        height: screenH * 0.022,
+                      ),
+
+                      _SectionTitle(
+                        title: "Coverage period",
+                        screenW: screenW,
+                        isDark: isDark,
+                      ),
+
+                      SizedBox(
+                        height: screenH * 0.012,
+                      ),
+
+                      MultiSelectChip(
+                        items:
+                            provider.coveragePeriods,
+                        selectedItems: [
+                          provider
+                              .coveragePeriodLabel,
+                        ],
+                        onTap: provider
+                            .setCoveragePeriodByLabel,
+                      ),
+                    ],
+
+                    SizedBox(
+                      height: screenH * 0.022,
+                    ),
+
+                    // ================= PAYMENT METHOD =================
+
+                    _SectionTitle(
+                      title: "Payment method",
+                      screenW: screenW,
+                      isDark: isDark,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.012,
+                    ),
+
+                    OptionChip(
+                      items:
+                          provider.paymentMethods,
+                      selected:
+                          provider.paymentMethod,
+                      onTap: provider
+                          .setPaymentMethod,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.022,
+                    ),
+
+                    // ================= DATE =================
+
+                    _SectionTitle(
+                      title: "Date",
                       screenW: screenW,
                       isDark: isDark,
                     ),
@@ -263,37 +372,70 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                     ),
 
                     CustomTextfield(
-                      controller: provider
-                          .targetDateController,
+                      controller:
+                          provider.dateController,
                       hint:
-                          "Select your target date",
+                          "Select expense date",
+                      type: TextFieldType.date,
                       icon: Icons
                           .calendar_month_outlined,
-                      type: TextFieldType.date,
                       readOnly: true,
-                      onTap: () {
-                        _selectGoalDate(
-                          provider,
-                        );
-                      },
+                    onTap: () async {
+  final selectedDate =
+      await Navigator.push<DateTime>(
+    context,
+    MaterialPageRoute(
+      builder: (_) =>
+          ExpenseDateScreen(
+        initialDate:
+            provider.selectedDate,
+      ),
+    ),
+  );
+
+  if (selectedDate == null ||
+      !context.mounted) {
+    return;
+  }
+
+  provider.setDate(
+    selectedDate,
+  );
+},
                     ),
 
                     SizedBox(
-                      height: screenH * 0.025,
+                      height: screenH * 0.022,
                     ),
 
-                    // ================= ALPHA PREVIEW =================
+                    // ================= NOTE =================
 
-                    _AlphaGoalPreviewCard(
-                      provider: provider,
-                      isDark: isDark,
+                    _SectionTitle(
+                      title: "Note (optional)",
                       screenW: screenW,
+                      isDark: isDark,
+                    ),
+
+                    SizedBox(
+                      height: screenH * 0.01,
+                    ),
+
+                    CustomTextfield(
+                      controller:
+                          provider.noteController,
+                      hint: "Add a note",
+                      type: TextFieldType.name,
+                      icon: Icons.notes_rounded,
+                      onChanged: (_) {
+                        provider
+                            .notifyExpenseFormChanged();
+                      },
                     ),
 
                     if (provider.errorMessage !=
                         null) ...[
                       SizedBox(
-                        height: screenH * 0.018,
+                        height: screenH * 0.016,
                       ),
 
                       _ErrorCard(
@@ -303,6 +445,18 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                             provider.clearError,
                       ),
                     ],
+
+                    SizedBox(
+                      height: screenH * 0.025,
+                    ),
+
+                    // ================= ALPHA PREVIEW =================
+
+                    _AlphaPreviewCard(
+                      provider: provider,
+                      isDark: isDark,
+                      screenW: screenW,
+                    ),
 
                     SizedBox(
                       height: screenH * 0.03,
@@ -317,7 +471,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                         onPressed:
                             provider.isSaving
                                 ? null
-                                : _saveGoal,
+                                : _saveExpense,
                         style: ElevatedButton
                             .styleFrom(
                           backgroundColor: isDark
@@ -331,9 +485,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                                           .darkPrimary
                                       : AppColors
                                           .lightPrimary)
-                                  .withOpacity(
-                            0.45,
-                          ),
+                                  .withOpacity(0.45),
                           elevation: 0,
                           shape:
                               RoundedRectangleBorder(
@@ -354,7 +506,12 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                                 ),
                               )
                             : Text(
-                                "Add Goal",
+                                _isEditing
+                                    ? "Save Changes"
+                                    : provider
+                                            .isShoppingSessionActive
+                                        ? "Add to Session"
+                                        : "Add Expense",
                                 style: TextStyle(
                                   fontSize:
                                       screenW * 0.05,
@@ -388,10 +545,6 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     );
   }
 
-  // =====================================================
-  // HEADER
-  // =====================================================
-
   Widget _buildHeader({
     required bool isDark,
     required double screenW,
@@ -407,14 +560,16 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
             height: screenW * 0.11,
             decoration: BoxDecoration(
               color: isDark
-                  ? AppColors.darkBorder
+                  ? const Color(0xFF203330)
                   : Colors.white,
               borderRadius:
                   BorderRadius.circular(12),
               border: Border.all(
                 color: isDark
-                    ? AppColors.darkBorder
-                    : AppColors.lightBorder,
+                    ? Colors.white
+                        .withOpacity(0.04)
+                    : Colors.black
+                        .withOpacity(0.05),
               ),
             ),
             child: Icon(
@@ -433,9 +588,11 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
 
         Expanded(
           child: Text(
-            "Add Goal",
-            style:
-                GoogleFonts.ibmPlexSansArabic(
+            _isEditing
+                ? "Edit Expense"
+                : "Add Expense",
+            style: GoogleFonts
+                .ibmPlexSansArabic(
               color: isDark
                   ? AppColors.darkText
                   : AppColors.lightText,
@@ -448,70 +605,60 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     );
   }
 
-  // =====================================================
-  // DATE
-  // =====================================================
-
-  Future<void> _selectGoalDate(
-    GoalProvider provider,
-  ) async {
-    final dynamic selectedDate =
-        await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => GoalDateScreen(
-          initialDate:
-              provider.targetDate,
-        ),
-      ),
+  Future<void> _selectDate({
+    required ExpenseProvider provider,
+    required bool isDark,
+  }) async {
+    final selectedDate =
+        await showDatePicker(
+      context: context,
+      initialDate: provider.selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      builder: (
+        context,
+        child,
+      ) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme:
+                ColorScheme.fromSeed(
+              seedColor: isDark
+                  ? AppColors.darkPrimary
+                  : AppColors.lightPrimary,
+              brightness: isDark
+                  ? Brightness.dark
+                  : Brightness.light,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
-    if (!mounted ||
-        selectedDate == null ||
-        selectedDate is! DateTime) {
+    if (selectedDate == null ||
+        !mounted) {
       return;
     }
 
     provider.setDate(selectedDate);
   }
 
-  // =====================================================
-  // SAVE
-  // =====================================================
-
-  Future<void> _saveGoal() async {
+  Future<void> _saveExpense() async {
     FocusScope.of(context).unfocus();
 
     final provider =
-        context.read<GoalProvider>();
+        context.read<ExpenseProvider>();
 
-    if (!provider.isValid) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              provider.validationMessage ??
-                  "Please complete all required fields",
-              style: GoogleFonts
-                  .ibmPlexSansArabic(),
-            ),
-            backgroundColor:
-                context
-                        .read<Themeprovider>()
-                        .isDark
-                    ? AppColors.darkError
-                    : AppColors.lightError,
-            behavior:
-                SnackBarBehavior.floating,
-          ),
-        );
+    final bool wasEditing =
+        _isEditing;
 
-      return;
-    }
+    final bool addedToSession =
+        provider.isShoppingSessionActive &&
+            !wasEditing;
 
     final bool saved =
-        await provider.saveCurrentGoal();
+        await provider.saveCurrentExpense();
 
     if (!mounted) {
       return;
@@ -524,16 +671,13 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           SnackBar(
             content: Text(
               provider.errorMessage ??
-                  "Could not save goal",
+                  provider.validationMessage ??
+                  "Could not save expense",
               style: GoogleFonts
                   .ibmPlexSansArabic(),
             ),
             backgroundColor:
-                context
-                        .read<Themeprovider>()
-                        .isDark
-                    ? AppColors.darkError
-                    : AppColors.lightError,
+                const Color(0xFFFF6B6B),
             behavior:
                 SnackBarBehavior.floating,
           ),
@@ -547,18 +691,18 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
       ..showSnackBar(
         SnackBar(
           content: Text(
-            "Goal added successfully",
-            style:
-                GoogleFonts.ibmPlexSansArabic(
+            wasEditing
+                ? "Expense updated successfully"
+                : addedToSession
+                    ? "Expense added to shopping session"
+                    : "Expense added successfully",
+            style: GoogleFonts
+                .ibmPlexSansArabic(
               fontWeight: FontWeight.w600,
             ),
           ),
           backgroundColor:
-              context
-                      .read<Themeprovider>()
-                      .isDark
-                  ? AppColors.darkSecondary
-                  : AppColors.lightSecondary,
+              const Color(0xFF0F766E),
           behavior:
               SnackBarBehavior.floating,
         ),
@@ -570,13 +714,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     );
   }
 
-  // =====================================================
-  // CLOSE
-  // =====================================================
-
   void _closeScreen() {
     context
-        .read<GoalProvider>()
+        .read<ExpenseProvider>()
         .clearForm();
 
     Navigator.pop(context);
@@ -615,102 +755,67 @@ class _SectionTitle extends StatelessWidget {
 }
 
 // =====================================================
-// PRIORITY CARD
+// ERROR CARD
 // =====================================================
 
-class _PriorityCard extends StatelessWidget {
-  final int priority;
-  final bool isDark;
-  final double screenW;
-  final ValueChanged<double> onChanged;
+class _ErrorCard extends StatelessWidget {
+  final String message;
+  final VoidCallback onClose;
 
-  const _PriorityCard({
-    required this.priority,
-    required this.isDark,
-    required this.screenW,
-    required this.onChanged,
+  const _ErrorCard({
+    required this.message,
+    required this.onClose,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 14,
+      padding:
+          const EdgeInsets.only(
+        left: 13,
+        top: 8,
+        bottom: 8,
       ),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkBorder
-            : Colors.white,
+        color: const Color(
+          0xFFFF6B6B,
+        ).withOpacity(0.10),
         borderRadius:
-            BorderRadius.circular(15),
+            BorderRadius.circular(14),
         border: Border.all(
-          color: isDark
-              ? AppColors.darkBorder
-              : AppColors.lightBorder,
+          color: const Color(
+            0xFFFF6B6B,
+          ).withOpacity(0.18),
         ),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.priority_high_rounded,
-                color: isDark
-                    ? AppColors.darkSecondary
-                    : AppColors.lightSecondary,
-              ),
-
-              const SizedBox(width: 10),
-
-              Expanded(
-                child: Text(
-                  "How important is this goal?",
-                  style: GoogleFonts
-                      .ibmPlexSansArabic(
-                    color: isDark
-                        ? AppColors.darkText
-                        : AppColors.lightText,
-                    fontSize:
-                        screenW * 0.035,
-                    fontWeight:
-                        FontWeight.w600,
-                  ),
-                ),
-              ),
-
-              Text(
-                "$priority / 10",
-                style: GoogleFonts
-                    .ibmPlexSansArabic(
-                  color: isDark
-                      ? AppColors.darkAccent
-                      : AppColors.lightAccent,
-                  fontSize:
-                      screenW * 0.038,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-            ],
+          const Icon(
+            Icons.error_outline_rounded,
+            color: Color(0xFFFF6B6B),
           ),
 
-          Slider(
-            value: priority.toDouble(),
-            min: 1,
-            max: 10,
-            divisions: 9,
-            label: priority.toString(),
-            activeColor: isDark
-                ? AppColors.darkSecondary
-                : AppColors.lightSecondary,
-            inactiveColor: isDark
-                ? AppColors.darkSubText
-                    .withOpacity(0.25)
-                : AppColors.lightSubText
-                    .withOpacity(0.25),
-            onChanged: onChanged,
+          const SizedBox(width: 9),
+
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color:
+                    Color(0xFFFF6B6B),
+              ),
+            ),
+          ),
+
+          IconButton(
+            onPressed: onClose,
+            icon: const Icon(
+              Icons.close_rounded,
+              color:
+                  Color(0xFFFF6B6B),
+              size: 18,
+            ),
           ),
         ],
       ),
@@ -719,16 +824,16 @@ class _PriorityCard extends StatelessWidget {
 }
 
 // =====================================================
-// ALPHA GOAL PREVIEW
+// ALPHA PREVIEW
 // =====================================================
 
-class _AlphaGoalPreviewCard
+class _AlphaPreviewCard
     extends StatelessWidget {
-  final GoalProvider provider;
+  final ExpenseProvider provider;
   final bool isDark;
   final double screenW;
 
-  const _AlphaGoalPreviewCard({
+  const _AlphaPreviewCard({
     required this.provider,
     required this.isDark,
     required this.screenW,
@@ -736,6 +841,9 @@ class _AlphaGoalPreviewCard
 
   @override
   Widget build(BuildContext context) {
+    final String message =
+        _buildMessage();
+
     return Container(
       width: double.infinity,
       padding:
@@ -749,11 +857,9 @@ class _AlphaGoalPreviewCard
         borderRadius:
             BorderRadius.circular(15),
         border: Border.all(
-          color: isDark
-              ? AppColors.darkSecondary
-                  .withOpacity(0.18)
-              : AppColors.lightSecondary
-                  .withOpacity(0.18),
+          color: const Color(
+            0xFF34D399,
+          ).withOpacity(0.14),
         ),
       ),
       child: Row(
@@ -764,19 +870,16 @@ class _AlphaGoalPreviewCard
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.darkPrimary
-                      .withOpacity(0.12)
-                  : AppColors.lightPrimary
-                      .withOpacity(0.12),
+              color: const Color(
+                0xFF34D399,
+              ).withOpacity(0.13),
               borderRadius:
                   BorderRadius.circular(12),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.auto_awesome_rounded,
-              color: isDark
-                  ? AppColors.darkPrimary
-                  : AppColors.lightPrimary,
+              color:
+                  Color(0xFF34D399),
             ),
           ),
 
@@ -791,9 +894,9 @@ class _AlphaGoalPreviewCard
                   "Alpha Preview",
                   style: GoogleFonts
                       .ibmPlexSansArabic(
-                    color: isDark
-                        ? AppColors.darkPrimary
-                        : AppColors.lightPrimary,
+                    color: const Color(
+                      0xFF34D399,
+                    ),
                     fontSize:
                         screenW * 0.036,
                     fontWeight:
@@ -804,7 +907,7 @@ class _AlphaGoalPreviewCard
                 const SizedBox(height: 4),
 
                 Text(
-                  _buildMessage(),
+                  message,
                   style: GoogleFonts
                       .ibmPlexSansArabic(
                     color: isDark
@@ -824,99 +927,23 @@ class _AlphaGoalPreviewCard
   }
 
   String _buildMessage() {
-    if (provider.selectedCategory == null) {
-      return "Choose a goal to receive a personalized saving suggestion.";
+    if (provider.amount <= 0) {
+      return "Enter the expense details to preview its financial effect.";
     }
 
-    if (provider.monthlySaving <= 0) {
-      return "Enter a realistic monthly saving amount so Alpha can evaluate your plan.";
+    if (provider.expenseType ==
+        ExpenseType.want) {
+      return "This is a secondary want. Alpha will compare it with your remaining budget and current goals.";
     }
 
-    if (provider.targetDate == null) {
-      return "Select a target date to complete your goal plan.";
+    if (provider.isRecurring) {
+      return "This recurring movement covers ${provider.coveragePeriodLabel} and its financial effect will be distributed across that period.";
     }
 
-    if (provider.priority >= 8) {
-      return "This is a high-priority goal. Alpha will give it more importance when analyzing your spending.";
+    if (provider.amount >= 100) {
+      return "This is a relatively high expense. Review its impact on the remaining days of the month.";
     }
 
-    if (provider.monthlySaving < 20) {
-      return "Your monthly saving amount is relatively low. Reaching the goal may take more time.";
-    }
-
-    return "Your goal setup looks realistic. Alpha will track your progress and help you stay consistent.";
-  }
-}
-
-// =====================================================
-// ERROR CARD
-// =====================================================
-
-class _ErrorCard extends StatelessWidget {
-  final String message;
-  final VoidCallback onClose;
-
-  const _ErrorCard({
-    required this.message,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark =
-        context.watch<Themeprovider>().isDark;
-
-    final Color errorColor = isDark
-        ? AppColors.darkError
-        : AppColors.lightError;
-
-    return Container(
-      width: double.infinity,
-      padding:
-          const EdgeInsets.only(
-        left: 13,
-        top: 8,
-        bottom: 8,
-      ),
-      decoration: BoxDecoration(
-        color:
-            errorColor.withOpacity(0.10),
-        borderRadius:
-            BorderRadius.circular(14),
-        border: Border.all(
-          color:
-              errorColor.withOpacity(0.18),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.error_outline_rounded,
-            color: errorColor,
-          ),
-
-          const SizedBox(width: 9),
-
-          Expanded(
-            child: Text(
-              message,
-              style: GoogleFonts
-                  .ibmPlexSansArabic(
-                color: errorColor,
-              ),
-            ),
-          ),
-
-          IconButton(
-            onPressed: onClose,
-            icon: Icon(
-              Icons.close_rounded,
-              color: errorColor,
-              size: 18,
-            ),
-          ),
-        ],
-      ),
-    );
+    return "This expense will be included in your actual spending and daily safe allowance analysis.";
   }
 }
