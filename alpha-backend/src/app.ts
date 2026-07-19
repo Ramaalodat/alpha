@@ -26,6 +26,11 @@ import { insightRoutes } from './routes/insight.routes';
 import { achievementRoutes } from './routes/achievement.routes';
 import prisma from './lib/prisma';
 import { expenseService } from './services/expense.service';
+import { allocationRoutes } from './routes/allocation.routes';
+import { cycleRoutes } from './routes/cycle.routes';
+import { transactionRoutes } from './routes/transaction.routes';
+import { commitmentRoutes } from './routes/commitment.routes';
+import { CronManager } from './jobs/cron.manager';
 
 const fastify = Fastify({
   logger: false, // Using custom Winston logger
@@ -97,6 +102,16 @@ const registerRoutes = async () => {
       
       // Notification routes
       await instance.register(notificationRoutes, { prefix: '/notifications' });
+
+      // Allocation and Cycle routes
+      await instance.register(allocationRoutes, { prefix: '/allocations' });
+      await instance.register(cycleRoutes, { prefix: '/cycles' });
+
+      // Transaction routes
+      await instance.register(transactionRoutes, { prefix: '/transactions' });
+
+      // Commitment routes
+      await instance.register(commitmentRoutes, { prefix: '/commitments' });
 
       // Budget routes
       await instance.register(budgetRoutes, { prefix: '/budgets' });
@@ -191,6 +206,9 @@ const start = async () => {
       port: config.app.port,
       host: config.app.host,
     });
+
+    // Start Cron Jobs
+    CronManager.startAll();
 
     logger.info(`🚀 Server listening on ${config.app.host}:${config.app.port}`);
     logger.info(`📚 Environment: ${config.app.nodeEnv}`);

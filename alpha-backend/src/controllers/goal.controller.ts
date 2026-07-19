@@ -5,6 +5,7 @@ import { HTTP_STATUS } from '../utils/constants';
 import { CreateGoalRequest, UpdateGoalRequest, GoalTransactionRequest, GoalFilters } from '../types/user.types';
 import logger from '../utils/logger';
 import { normalizeFilterQuery } from '../utils/query.utils';
+import prisma from '../lib/prisma';
 
 export class GoalController {
   /**
@@ -200,8 +201,98 @@ export class GoalController {
       logger.error('Get goal stats failed', { error: error.message });
       
       return reply
-        .status(HTTP_STATUS.BAD_REQUEST)
-        .send(createErrorResponse(error.code, error.message));
+        .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+        .send(createErrorResponse(ErrorCodes.INTERNAL_ERROR, 'حدث خطأ أثناء جلب إحصائيات الهدف'));
+    }
+  }
+
+  /**
+   * Execute a completed goal
+   */
+  async executeGoal(request: FastifyRequest, reply: FastifyReply) {
+    const userId = request.user!.userId;
+    const { goalId } = request.params as { goalId: string };
+
+    try {
+      const updated = await prisma.financialGoal.update({
+        where: { id: goalId, userId },
+        data: {
+          status: 'COMPLETED',
+          stage: 'EXECUTED',
+          completedAt: new Date()
+        }
+      });
+      return reply.send(createSuccessResponse(updated, 'تم تنفيذ الهدف بنجاح'));
+    } catch (error: any) {
+      return reply.status(400).send(createErrorResponse(ErrorCodes.VALIDATION_ERROR, error.message));
+    }
+  }
+
+  /**
+   * Reallocate goal funds
+   */
+  async reallocateGoal(request: FastifyRequest, reply: FastifyReply) {
+    const userId = request.user!.userId;
+    const { goalId } = request.params as { goalId: string };
+    const { targetGoalId, amount } = request.body as any;
+
+    try {
+      const result = await prisma.$transaction(async (tx: any) => {
+        const source = await tx.financialGoal.findUnique({ where: { id: goalId, userId } });
+        const target = await tx.financialGoal.findUnique({ where: { id: targetGoalId, userId } });
+        
+        if (!source || !target || Number(source.currentAmount) < amount) throw new Error('Invalid reallocation');
+
+        await tx.financialGoal.update({
+          where: { id: source.id },
+          data: { currentAmount: { decrement: amount } }
+        });
+        await tx.financialGoal.update({
+          where: { id: target.id },
+          data: { currentAmount: { increment: amount } }
+        });
+
+        return { success: true };
+      });
+      return reply.send(createSuccessResponse(result, 'تم إعادة توجيه الأموال بنجاح'));
+    } catch (error: any) {
+      return reply.status(400).send(createErrorResponse(ErrorCodes.VALIDATION_ERROR, error.message));
+    }
+  }
+
+  /**
+   * Pause a goal
+   */
+  async pauseGoal(request: FastifyRequest, reply: FastifyReply) {
+    const userId = request.user!.userId;
+    const { goalId } = request.params as { goalId: string };
+
+    try {
+      const updated = await prisma.financialGoal.update({
+        where: { id: goalId, userId },
+        data: { status: 'PAUSED', stage: 'PAUSED' }
+      });
+      return reply.send(createSuccessResponse(updated, 'تم إيقاف الهدف مؤقتاً'));
+    } catch (error: any) {
+      return reply.status(400).send(createErrorResponse(ErrorCodes.VALIDATION_ERROR, error.message));
+    }
+  }
+
+  /**
+   * Resume a goal
+   */
+  async resumeGoal(request: FastifyRequest, reply: FastifyReply) {
+    const userId = request.user!.userId;
+    const { goalId } = request.params as { goalId: string };
+
+    try {
+      const updated = await prisma.financialGoal.update({
+        where: { id: goalId, userId },
+        data: { status: 'ACTIVE', stage: 'ACTIVE' }
+      });
+      return reply.send(createSuccessResponse(updated, 'تم استئناف الهدف بنجاح'));
+    } catch (error: any) {
+      return reply.status(400).send(createErrorResponse(ErrorCodes.VALIDATION_ERROR, error.message));
     }
   }
 }

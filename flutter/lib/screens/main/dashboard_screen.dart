@@ -21,10 +21,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late Future<Map<String, dynamic>> _dashboardFuture;
   bool _hasLoadedOnce = false;
 
+  Future<Map<String, dynamic>> _loadAllData() async {
+    final dashboard = await DashboardService.loadDashboard();
+    final buckets = await DashboardService.loadBucketBalances();
+    return {
+      'dashboard': dashboard,
+      'buckets': buckets,
+    };
+  }
+
   @override
   void initState() {
     super.initState();
-    _dashboardFuture = DashboardService.loadDashboard();
+    _dashboardFuture = _loadAllData();
   }
 
   /// Re-fetch dashboard data every time the screen becomes visible again
@@ -39,7 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _refreshDashboard() {
     setState(() {
-      _dashboardFuture = DashboardService.loadDashboard();
+      _dashboardFuture = _loadAllData();
     });
   }
 
@@ -100,7 +109,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           }
 
-          final data = snapshot.data ?? {};
+          final result = snapshot.data ?? {};
+          final data = result['dashboard'] ?? {};
+          final buckets = result['buckets'] as List<dynamic>? ?? [];
+
           _hasLoadedOnce = true;
           final user = Map<String, dynamic>.from(data['user'] ?? {});
           final goals = Map<String, dynamic>.from(data['goals'] ?? {});
@@ -131,7 +143,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if ((data['currentProfile'] as Map?)?['primarySpendingCategory'] == 'غير محدد')
+                  if ((data['currentProfile']
+                          as Map?)?['primarySpendingCategory'] ==
+                      'غير محدد')
                     _buildCompleteProfileBanner(theme, screenW),
                   _buildHeroCard(theme, screenW, screenH, fullName,
                       monthlyBalance, monthlyIncome),
@@ -162,6 +176,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildBudgetCard(theme, screenW, monthlyIncome, basicExpenses,
                       monthlyExpensesTotal, remainingBudget),
                   SizedBox(height: screenH * 0.02),
+                  // Bucket Balances
+                  if (buckets.isNotEmpty)
+                    _buildBucketsCard(theme, screenW, buckets),
+                  if (buckets.isNotEmpty) SizedBox(height: screenH * 0.02),
                   Text('Quick actions',
                       style: TextStyle(
                           fontSize: 18,
@@ -196,13 +214,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.isDark ? AppColors.darkPrimary.withOpacity(0.2) : AppColors.lightPrimary.withOpacity(0.1),
+        color: theme.isDark
+            ? AppColors.darkPrimary.withOpacity(0.2)
+            : AppColors.lightPrimary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.isDark ? AppColors.darkPrimary : AppColors.lightPrimary),
+        border: Border.all(
+            color:
+                theme.isDark ? AppColors.darkPrimary : AppColors.lightPrimary),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: theme.isDark ? AppColors.darkPrimary : AppColors.lightPrimary),
+          Icon(Icons.info_outline,
+              color: theme.isDark
+                  ? AppColors.darkPrimary
+                  : AppColors.lightPrimary),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -212,7 +237,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   'أكمل بيانات ملفك الشخصي',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: theme.isDark ? AppColors.darkText : AppColors.lightText,
+                    color:
+                        theme.isDark ? AppColors.darkText : AppColors.lightText,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -220,7 +246,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   'احصل على تجربة أفضل بإكمال بياناتك',
                   style: TextStyle(
                     fontSize: 12,
-                    color: theme.isDark ? AppColors.darkSubText : AppColors.lightSubText,
+                    color: theme.isDark
+                        ? AppColors.darkSubText
+                        : AppColors.lightSubText,
                   ),
                 ),
               ],
@@ -228,13 +256,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/onboarding/demographics').then((_) => _refreshDashboard());
+              Navigator.pushNamed(context, '/onboarding/demographics')
+                  .then((_) => _refreshDashboard());
             },
             child: Text(
               'إكمال',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: theme.isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
+                color: theme.isDark
+                    ? AppColors.darkPrimary
+                    : AppColors.lightPrimary,
               ),
             ),
           ),
@@ -478,5 +509,91 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _fmt(double v) {
     if (v == v.roundToDouble()) return v.toInt().toString();
     return v.toStringAsFixed(2);
+  }
+
+  Widget _buildBucketsCard(
+      Themeprovider theme, double screenW, List<dynamic> buckets) {
+    final text = theme.isDark ? AppColors.darkText : AppColors.lightText;
+    final sub = theme.isDark ? AppColors.darkSubText : AppColors.lightSubText;
+    final card = theme.isDark ? AppColors.darkCard : AppColors.lightCard;
+    final border = theme.isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final secondary =
+        theme.isDark ? AppColors.darkSecondary : AppColors.lightSecondary;
+
+    return Container(
+      padding: EdgeInsets.all(screenW * 0.04),
+      decoration: BoxDecoration(
+        color: card,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.pie_chart_outline, color: secondary, size: 22),
+              const SizedBox(width: 8),
+              Text('Bucket Balances',
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold, color: text)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...buckets.map((b) {
+            final bucketName = b['bucket'] ?? '';
+            final balance = _num(b['balance']);
+            final cap = _num(b['cap']);
+            final spent = _num(b['spent']);
+            final percentage = cap > 0 ? (spent / cap).clamp(0.0, 1.0) : 0.0;
+
+            Color barColor = secondary;
+            if (percentage > 0.9) {
+              barColor = Colors.redAccent;
+            } else if (percentage > 0.75) barColor = Colors.orangeAccent;
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(bucketName,
+                          style: TextStyle(
+                              color: text, fontWeight: FontWeight.w600)),
+                      Text('${_fmt(balance)} left',
+                          style: TextStyle(
+                              color: text, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: percentage,
+                      minHeight: 8,
+                      backgroundColor: sub.withValues(alpha: 0.1),
+                      valueColor: AlwaysStoppedAnimation(barColor),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('${_fmt(spent)} spent',
+                          style: TextStyle(color: sub, fontSize: 12)),
+                      Text('${_fmt(cap)} cap',
+                          style: TextStyle(color: sub, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
   }
 }

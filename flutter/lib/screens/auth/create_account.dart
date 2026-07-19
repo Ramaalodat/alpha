@@ -408,15 +408,24 @@ class _CreateAccountState extends State<CreateAccount> {
                   SizedBox(height: screenH * 0.01),
                   CustomTextfield(
                     controller: authProvider.passwordController,
-                    hint: 'Minimum 6 characters',
+                    hint: '8+ chars, upper, lower, number',
                     icon: Icons.lock_outline_rounded,
                     type: TextFieldType.password,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'validation.password_required'.tr();
                       }
-                      if (value.length < 6) {
-                        return 'validation.password_short'.tr();
+                      if (value.length < 8) {
+                        return 'Password must be at least 8 characters';
+                      }
+                      if (!RegExp(r'(?=.*[a-z])').hasMatch(value)) {
+                        return 'Password must contain a lowercase letter';
+                      }
+                      if (!RegExp(r'(?=.*[A-Z])').hasMatch(value)) {
+                        return 'Password must contain an uppercase letter';
+                      }
+                      if (!RegExp(r'(?=.*\d)').hasMatch(value)) {
+                        return 'Password must contain a number';
                       }
                       return null;
                     },

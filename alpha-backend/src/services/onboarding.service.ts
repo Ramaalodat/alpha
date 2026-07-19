@@ -5,6 +5,10 @@ import { OnboardingFinancialInfo, OnboardingStatus } from '../types/user.types';
 import logger from '../utils/logger';
 import prisma from '../lib/prisma';
 import { createDevStore } from '../utils/devStore';
+import { AllocationService } from './allocation.service';
+import { CommitmentService } from './commitment.service';
+import { CycleService } from './cycle.service';
+import { AllocationSource, ExpenseFrequency, BudgetBucket } from '@prisma/client';
 
 const devStore = createDevStore();
 
@@ -272,43 +276,31 @@ export class OnboardingService {
       }
     }
 
-    // Create Expense records for fixed expenses
-    if (fixedExpenses && fixedExpenses.length > 0 && fixedCategory) {
+    // Create Commitment records for fixed expenses
+    if (fixedExpenses && fixedExpenses.length > 0) {
+      const startOfNextMonth = new Date();
+      startOfNextMonth.setMonth(startOfNextMonth.getMonth() + 1);
+      startOfNextMonth.setDate(1);
+      startOfNextMonth.setHours(0, 0, 0, 0);
+
       for (const exp of fixedExpenses) {
-        const pinMonths = (exp as any).pinnedMonths || pinnedMonths;
-        await prisma.expense.create({
-          data: {
-            user: { connect: { id: userId } },
-            category: { connect: { id: fixedCategory.id } },
-            amount: exp.amount,
-            description: exp.category,
-            expenseDate: new Date(),
-            expenseType: 'FIXED' as any,
-            isRecurring: true,
-            ...(pinMonths && { pinnedMonths: pinMonths, pinnedUntil: calcPinnedUntil(pinMonths) }),
-          } as any,
+        await CommitmentService.createCommitment({
+          userId,
+          name: exp.category,
+          amount: exp.amount,
+          frequency: ExpenseFrequency.MONTHLY,
+          nextDueDate: startOfNextMonth,
+          budgetBucket: BudgetBucket.NEEDS,
         });
       }
     }
 
-    // Create Expense records for variable expenses
-    if (variableExpenses && variableExpenses.length > 0 && variableCategory) {
-      for (const exp of variableExpenses) {
-        const pinMonths = (exp as any).pinnedMonths || pinnedMonths;
-        await prisma.expense.create({
-          data: {
-            user: { connect: { id: userId } },
-            category: { connect: { id: variableCategory.id } },
-            amount: exp.amount,
-            description: exp.category,
-            expenseDate: new Date(),
-            expenseType: 'VARIABLE' as any,
-            isRecurring: false,
-            ...(pinMonths && { pinnedMonths: pinMonths, pinnedUntil: calcPinnedUntil(pinMonths) }),
-          } as any,
-        });
-      }
-    }
+    // Set Allocation Plan based on income
+    const tier = await AllocationService.getSystemTierForIncome(monthlyIncome);
+    await AllocationService.saveUserAllocationPlan(userId, tier, AllocationSource.SYSTEM_TIER, monthlyIncome);
+
+    // Start First Financial Cycle
+    await CycleService.startCycle(userId, monthlyIncome);
 
     // Create default settings if not exists
     const existingSettings = await prisma.userSettings.findUnique({

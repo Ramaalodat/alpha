@@ -86,4 +86,32 @@ export const goalRoutes = async (fastify: FastifyInstance) => {
    * @access  Private
    */
   fastify.get('/:goalId/stats', goalController.getGoalStats);
+
+  /**
+   * @route   POST /api/goals/:goalId/execute
+   * @desc    Execute goal
+   * @access  Private
+   */
+  fastify.post('/:goalId/execute', goalController.executeGoal);
+
+  /**
+   * @route   POST /api/goals/:goalId/reallocate
+   * @desc    Reallocate goal funds
+   * @access  Private
+   */
+  fastify.post('/:goalId/reallocate', goalController.reallocateGoal);
+
+  /**
+   * @route   POST /api/goals/:goalId/pause
+   * @desc    Pause goal
+   * @access  Private
+   */
+  fastify.post('/:goalId/pause', goalController.pauseGoal);
+
+  /**
+   * @route   POST /api/goals/:goalId/resume
+   * @desc    Resume goal
+   * @access  Private
+   */
+  fastify.post('/:goalId/resume', goalController.resumeGoal);
 };

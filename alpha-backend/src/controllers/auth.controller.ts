@@ -205,7 +205,7 @@ export class AuthController {
    */
   async logout(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const userId = request.user!.userId;
+      const userId = (request.user as any).userId;
       const body = request.body as {
         refreshToken?: string;
       };
@@ -407,15 +407,15 @@ export class AuthController {
    */
   async getCurrentUser(request: FastifyRequest, reply: FastifyReply) {
     try {
-      const userId = request.user!.userId;
+      const userId = (request.user as any).userId;
 
       // User info is already in request.user from JWT
       const userInfo = {
-        userId: request.user!.userId,
-        phoneNumber: request.user!.phoneNumber,
-        fullName: request.user!.fullName,
-        status: request.user!.status,
-        isOnboarded: request.user!.isOnboarded,
+        userId: (request.user as any).userId,
+        phoneNumber: (request.user as any).phoneNumber,
+        fullName: (request.user as any).fullName,
+        status: (request.user as any).status,
+        isOnboarded: (request.user as any).isOnboarded,
       };
 
       return reply

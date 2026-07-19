@@ -1,6 +1,33 @@
 import 'package:alpha_app/services/api_service.dart';
 
 class DashboardService {
+  static Future<Map<String, dynamic>> loadCurrentCycle() async {
+    try {
+      final response = await ApiService.get('/cycles/current');
+      final body = await ApiService.parseJson(response);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return body['data'] ?? {};
+      }
+      return {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  static Future<List<dynamic>> loadBucketBalances() async {
+    try {
+      final response = await ApiService.get('/cycles/current/buckets');
+      final body = await ApiService.parseJson(response);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final data = body['data'];
+        return data is List ? data : [];
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
   static Future<Map<String, dynamic>> loadDashboard() async {
     try {
       final response = await ApiService.get('/dashboard');

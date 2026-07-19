@@ -14,7 +14,11 @@ import 'package:alpha_app/screens/onboarding/splash_screen.dart';
 import 'package:alpha_app/screens/main/main_screen.dart';
 import 'package:alpha_app/screens/profile/profile_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
-
+import 'package:alpha_app/providers/reward_provider.dart';
+import 'package:alpha_app/providers/challenge_provider.dart';
+import 'package:alpha_app/providers/leaderbord_provider.dart';
+import 'package:alpha_app/providers/chatbot_provider.dart';
+import 'package:alpha_app/providers/receipt_provider.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -42,6 +46,19 @@ void main() async {
           ChangeNotifierProvider(create: (context) => PersonalProvider()),
           ChangeNotifierProvider(create: (context) => GoalProvider()),
           ChangeNotifierProvider(create: (context) => HomeProvider()),
+          ChangeNotifierProvider(create: (context) => RewardProvider()),
+          ChangeNotifierProvider(
+            create: (_) => ChallengeProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ReceiptProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => LeaderboardProvider(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ChatbotProvider(),
+          ),
         ], child: MyApp())),
   );
 }
