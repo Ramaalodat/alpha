@@ -1,6 +1,7 @@
 import 'package:alpha_app/providers/auth_provider.dart';
 import 'package:alpha_app/providers/challenge_provider.dart';
 import 'package:alpha_app/providers/chatbot_provider.dart';
+import 'package:alpha_app/providers/expense_provider.dart';
 import 'package:alpha_app/providers/financial_setup_provider.dart';
 import 'package:alpha_app/providers/goal_provider.dart';
 import 'package:alpha_app/providers/home_provider.dart';
@@ -16,6 +17,7 @@ import 'package:alpha_app/screens/ai_assistant/chat_screen.dart';
 import 'package:alpha_app/screens/auth/otp_screen.dart';
 import 'package:alpha_app/screens/auth/terms_screen.dart';
 import 'package:alpha_app/screens/challenges/chanllenges_screen.dart';
+import 'package:alpha_app/screens/expenses/expenses_screen.dart';
 import 'package:alpha_app/screens/goals/goal_history.dart';
 import 'package:alpha_app/screens/goals/set_goal_screen.dart';
 import 'package:alpha_app/screens/main_screen.dart';
@@ -80,6 +82,10 @@ ChangeNotifierProvider(
 ChangeNotifierProvider(
   create: (_) => ReceiptProvider(),
 ),
+
+ChangeNotifierProvider(
+  create: (_) => ExpenseProvider(),
+),
       ],
         child: MyApp())
     ),
@@ -130,7 +136,7 @@ void initState() {
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
                   navigatorKey: navigatorKey,
-            home:  ReceiptInputScreen()
+            home: MainNavigationScreen()
           );
         },
          

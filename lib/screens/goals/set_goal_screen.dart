@@ -140,6 +140,11 @@ Text(
               SizedBox(height: screenH*0.01,),
 
               CustomTextfield(
+               suffix: const Padding(
+                        padding:
+                            EdgeInsets.all(12),
+                        child: Text("JOD"),
+                      ),
                 controller: provider.amountController,
                 hint: "Amount per month",
                 type: TextFieldType.number,
@@ -278,10 +283,10 @@ Text(
                   bottom: screenH * 0.02,
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                  if (provider.isValid) {
+                  onPressed: () async {
+                  if (provider.isValid)  {
     // يحفظ الهدف في قائمة السجل داخل نفس البروفايدر
-  final saved = provider.saveCurrentGoal();
+  final saved = await provider.saveCurrentGoal();
 
 if (saved) {
   Navigator.pushAndRemoveUntil(

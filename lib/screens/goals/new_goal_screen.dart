@@ -128,7 +128,11 @@ class NewGoalScreen extends StatelessWidget {
 
               SizedBox(height: screenH*0.01,),
 
-              CustomTextfield(
+              CustomTextfield(  suffix: const Padding(
+                        padding:
+                            EdgeInsets.all(12),
+                        child: Text("JOD"),
+                      ),
                 controller: provider.amountController,
                 hint: "Amount per month",
                 type: TextFieldType.number,
@@ -267,9 +271,9 @@ class NewGoalScreen extends StatelessWidget {
                   bottom: screenH * 0.02,
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async{
                   if (provider.isValid) {
-    final saved = provider.saveCurrentGoal();
+    final saved = await provider.saveCurrentGoal();
 
 if (saved) {
   Navigator.pop(context);

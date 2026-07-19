@@ -1,7 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/goal_model.dart';
 
 class GoalProvider extends ChangeNotifier {
+  GoalProvider() {
+    Future.microtask(_initialize);
+  }
+
+  static const String _storageKey =
+      'alpha_saved_goals';
+
   // ================= CONTROLLERS =================
 
   final TextEditingController customNameController =
@@ -21,25 +32,69 @@ class GoalProvider extends ChangeNotifier {
   int priority = 5;
   double emergencyPercentage = 10;
 
+  // ================= STATE =================
+
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  bool _isSaving = false;
+
+  bool get isSaving => _isSaving;
+
+  bool _isInitialized = false;
+
+  bool get isInitialized => _isInitialized;
+
+  String? _errorMessage;
+
+  String? get errorMessage => _errorMessage;
+
   // ================= GOALS =================
 
   final List<Goal> _goals = [];
 
-  List<Goal> get goals => List.unmodifiable(_goals);
+  List<Goal> get goals {
+    final sortedGoals =
+        List<Goal>.from(_goals);
+
+    sortedGoals.sort(
+      (a, b) {
+        final aDate =
+            a.targetDate ?? DateTime(9999);
+
+        final bDate =
+            b.targetDate ?? DateTime(9999);
+
+        return aDate.compareTo(bDate);
+      },
+    );
+
+    return List.unmodifiable(sortedGoals);
+  }
 
   List<Goal> get activeGoals {
-    return _goals
-        .where((goal) => goal.isActive && !goal.isCompleted)
+    return goals
+        .where(
+          (goal) =>
+              goal.isActive &&
+              !goal.isCompleted,
+        )
         .toList();
   }
 
   List<Goal> get completedGoals {
-    return _goals
-        .where((goal) => !goal.isActive || goal.isCompleted)
+    return goals
+        .where(
+          (goal) =>
+              !goal.isActive ||
+              goal.isCompleted,
+        )
         .toList();
   }
 
-  int get activeGoalsCount => activeGoals.length;
+  int get activeGoalsCount =>
+      activeGoals.length;
 
   // ================= CATEGORIES =================
 
@@ -54,6 +109,116 @@ class GoalProvider extends ChangeNotifier {
     "Furniture",
     "Other",
   ];
+
+  // ================= INITIALIZE =================
+
+  Future<void> _initialize() async {
+    _isLoading = true;
+    _errorMessage = null;
+
+    notifyListeners();
+
+    try {
+      await loadGoals();
+      _isInitialized = true;
+    } catch (error) {
+      _errorMessage =
+          _cleanError(error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // ================= LOCAL STORAGE =================
+
+  Future<void> loadGoals() async {
+    final preferences =
+        await SharedPreferences.getInstance();
+
+    final storedValue =
+        preferences.getString(_storageKey);
+
+    if (storedValue == null ||
+        storedValue.trim().isEmpty) {
+      _goals.clear();
+      return;
+    }
+
+    final decoded =
+        jsonDecode(storedValue);
+
+    if (decoded is! List) {
+      throw const FormatException(
+        'Invalid saved goals format',
+      );
+    }
+
+    final loadedGoals =
+        decoded
+            .whereType<Map>()
+            .map(
+              (item) =>
+                  Goal.fromJson(
+                Map<String, dynamic>.from(
+                  item,
+                ),
+              ),
+            )
+            .where(
+              (goal) =>
+                  goal.id != null &&
+                  goal.id!.trim().isNotEmpty,
+            )
+            .toList();
+
+    _goals
+      ..clear()
+      ..addAll(loadedGoals);
+  }
+
+  Future<bool> _saveGoals() async {
+    _isSaving = true;
+    _errorMessage = null;
+
+    notifyListeners();
+
+    try {
+      final preferences =
+          await SharedPreferences.getInstance();
+
+      final encoded = jsonEncode(
+        _goals
+            .map(
+              (goal) =>
+                  goal.toJson(),
+            )
+            .toList(),
+      );
+
+      final saved =
+          await preferences.setString(
+        _storageKey,
+        encoded,
+      );
+
+      if (!saved) {
+        throw Exception(
+          'Could not save goals locally',
+        );
+      }
+
+      return true;
+    } catch (error) {
+      _errorMessage =
+          _cleanError(error);
+
+      return false;
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
 
   // ================= VALUES =================
 
@@ -82,49 +247,92 @@ class GoalProvider extends ChangeNotifier {
       customNameController.clear();
     }
 
+    _errorMessage = null;
+
     notifyListeners();
   }
 
   void setPriority(int value) {
     priority = value;
+    _errorMessage = null;
+
     notifyListeners();
   }
 
-  void setEmergencyPercentage(double value) {
+  void setEmergencyPercentage(
+    double value,
+  ) {
     emergencyPercentage = value;
+    _errorMessage = null;
+
     notifyListeners();
   }
 
   void setDate(DateTime date) {
-    targetDate = date;
+    targetDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+    );
 
     targetDateController.text =
         "${date.day}/${date.month}/${date.year}";
+
+    _errorMessage = null;
 
     notifyListeners();
   }
 
   void refresh() {
+    _errorMessage = null;
     notifyListeners();
   }
 
   // ================= VALIDATION =================
 
   bool get isValid {
-    final categoryValid = selectedCategory != null;
+    final categoryValid =
+        selectedCategory != null;
 
     final customNameValid =
         selectedCategory != "Other" ||
-        customNameController.text.trim().isNotEmpty;
+            customNameController.text
+                .trim()
+                .isNotEmpty;
 
-    final amountValid = monthlySaving > 0;
+    final amountValid =
+        monthlySaving > 0;
 
-    final targetDateValid = targetDate != null;
+    final targetDateValid =
+        targetDate != null;
 
     return categoryValid &&
         customNameValid &&
         amountValid &&
         targetDateValid;
+  }
+
+  String? get validationMessage {
+    if (selectedCategory == null) {
+      return "Please select a goal category";
+    }
+
+    if (selectedCategory == "Other" &&
+        customNameController.text
+            .trim()
+            .isEmpty) {
+      return "Please enter the goal name";
+    }
+
+    if (monthlySaving <= 0) {
+      return "Please enter a valid monthly saving amount";
+    }
+
+    if (targetDate == null) {
+      return "Please select a target date";
+    }
+
+    return null;
   }
 
   // ================= PAGE PROGRESS =================
@@ -139,7 +347,9 @@ class GoalProvider extends ChangeNotifier {
 
     if (selectedCategory != null &&
         (selectedCategory != "Other" ||
-            customNameController.text.trim().isNotEmpty)) {
+            customNameController.text
+                .trim()
+                .isNotEmpty)) {
       completedSteps++;
     }
 
@@ -153,9 +363,13 @@ class GoalProvider extends ChangeNotifier {
 
     final value =
         (2 / 3) +
-        ((completedSteps / totalSteps) * (1 / 3));
+            ((completedSteps / totalSteps) *
+                (1 / 3));
 
-    return value.clamp(0.0, 1.0);
+    return value.clamp(
+      0.0,
+      1.0,
+    );
   }
 
   // ================= CREATE MODEL =================
@@ -163,38 +377,75 @@ class GoalProvider extends ChangeNotifier {
   Goal get currentGoal {
     return Goal(
       id: DateTime.now()
-          .millisecondsSinceEpoch
+          .microsecondsSinceEpoch
           .toString(),
-      category: selectedCategory ?? "",
-      customName: selectedCategory == "Other"
-          ? customNameController.text.trim()
-          : null,
-      monthlySaving: monthlySaving,
-      priority: priority,
-      targetDate: targetDate,
 
-      /// ترجع لاحقًا من الباك إند.
-      savedAmount: null,
-      targetAmount: null,
-      recommendedMonthlySaving: null,
+      category:
+          selectedCategory ?? "",
 
-      isActive: true,
+      customName:
+          selectedCategory == "Other"
+              ? customNameController.text
+                  .trim()
+              : null,
+
+      monthlySaving:
+          monthlySaving,
+
+      priority:
+          priority,
+
+      targetDate:
+          targetDate,
+
+      savedAmount:
+          null,
+
+      targetAmount:
+          null,
+
+      recommendedMonthlySaving:
+          null,
+
+      isActive:
+          true,
     );
   }
 
-  /// لدعم الكود القديم عندك.
   Goal get goal => currentGoal;
 
-  // ================= SAVE =================
+  // ================= SAVE CURRENT GOAL =================
 
-  bool saveCurrentGoal() {
+  Future<bool> saveCurrentGoal() async {
     if (!isValid) {
+      _errorMessage =
+          validationMessage;
+
+      notifyListeners();
+
       return false;
     }
 
-    final newGoal = currentGoal;
+    final newGoal =
+        currentGoal;
 
     _goals.add(newGoal);
+
+    notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals.removeWhere(
+        (goal) =>
+            goal.id == newGoal.id,
+      );
+
+      notifyListeners();
+
+      return false;
+    }
 
     clearForm(
       notify: false,
@@ -205,119 +456,312 @@ class GoalProvider extends ChangeNotifier {
     return true;
   }
 
-  // ================= BACKEND DATA =================
+  // ================= SET / ADD DATA =================
 
-  void setGoals(List<Goal> goals) {
+  Future<bool> setGoals(
+    List<Goal> goals,
+  ) async {
+    final backup =
+        List<Goal>.from(_goals);
+
     _goals
       ..clear()
       ..addAll(goals);
 
     notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals
+        ..clear()
+        ..addAll(backup);
+
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
   }
 
-  void addGoal(Goal goal) {
+  Future<bool> addGoal(
+    Goal goal,
+  ) async {
     _goals.add(goal);
+
     notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals.removeWhere(
+        (item) =>
+            item.id == goal.id,
+      );
+
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
   }
 
-  void addGoals(List<Goal> goals) {
+  Future<bool> addGoals(
+    List<Goal> goals,
+  ) async {
+    final backup =
+        List<Goal>.from(_goals);
+
     _goals.addAll(goals);
+
     notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals
+        ..clear()
+        ..addAll(backup);
+
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
   }
 
   // ================= UPDATE =================
 
-  void updateGoal(Goal updatedGoal) {
-    final index = _goals.indexWhere(
-      (goal) => goal.id == updatedGoal.id,
+  Future<bool> updateGoal(
+    Goal updatedGoal,
+  ) async {
+    final index =
+        _goals.indexWhere(
+      (goal) =>
+          goal.id == updatedGoal.id,
     );
 
     if (index == -1) {
-      return;
+      _errorMessage =
+          "Goal not found";
+
+      notifyListeners();
+
+      return false;
     }
 
-    _goals[index] = updatedGoal;
+    final oldGoal =
+        _goals[index];
+
+    _goals[index] =
+        updatedGoal;
 
     notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals[index] = oldGoal;
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
   }
 
-  void updateGoalProgress({
+  Future<bool> updateGoalProgress({
     required String goalId,
     required double savedAmount,
     required double targetAmount,
     double? recommendedMonthlySaving,
-  }) {
-    final index = _goals.indexWhere(
-      (goal) => goal.id == goalId,
+  }) async {
+    final index =
+        _goals.indexWhere(
+      (goal) =>
+          goal.id == goalId,
     );
 
     if (index == -1) {
-      return;
+      return false;
     }
 
-    _goals[index] = _goals[index].copyWith(
-      savedAmount: savedAmount,
-      targetAmount: targetAmount,
+    final oldGoal =
+        _goals[index];
+
+    _goals[index] =
+        oldGoal.copyWith(
+      savedAmount:
+          savedAmount,
+      targetAmount:
+          targetAmount,
       recommendedMonthlySaving:
           recommendedMonthlySaving,
     );
 
     notifyListeners();
-  }
 
-  void addSavingToGoal({
-    required String goalId,
-    required double amount,
-  }) {
-    if (amount <= 0) {
-      return;
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals[index] = oldGoal;
+      notifyListeners();
+
+      return false;
     }
 
-    final index = _goals.indexWhere(
-      (goal) => goal.id == goalId,
+    return true;
+  }
+
+  Future<bool> addSavingToGoal({
+    required String goalId,
+    required double amount,
+  }) async {
+    if (amount <= 0) {
+      return false;
+    }
+
+    final index =
+        _goals.indexWhere(
+      (goal) =>
+          goal.id == goalId,
     );
 
     if (index == -1) {
-      return;
+      return false;
     }
 
-    final selectedGoal = _goals[index];
-    final currentSavedAmount =
-        selectedGoal.savedAmount ?? 0;
+    final oldGoal =
+        _goals[index];
 
-    _goals[index] = selectedGoal.copyWith(
-      savedAmount: currentSavedAmount + amount,
+    final currentSavedAmount =
+        oldGoal.savedAmount ?? 0;
+
+    _goals[index] =
+        oldGoal.copyWith(
+      savedAmount:
+          currentSavedAmount + amount,
     );
 
     notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals[index] = oldGoal;
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
   }
 
   // ================= COMPLETE =================
 
-  void markGoalCompleted(String goalId) {
-    final index = _goals.indexWhere(
-      (goal) => goal.id == goalId,
+  Future<bool> markGoalCompleted(
+    String goalId,
+  ) async {
+    final index =
+        _goals.indexWhere(
+      (goal) =>
+          goal.id == goalId,
     );
 
     if (index == -1) {
-      return;
+      return false;
     }
 
-    _goals[index] = _goals[index].copyWith(
+    final oldGoal =
+        _goals[index];
+
+    _goals[index] =
+        oldGoal.copyWith(
       isActive: false,
     );
 
     notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals[index] = oldGoal;
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
   }
 
   // ================= DELETE =================
 
-  void removeGoal(String goalId) {
-    _goals.removeWhere(
-      (goal) => goal.id == goalId,
+  Future<bool> removeGoal(
+    String goalId,
+  ) async {
+    final index =
+        _goals.indexWhere(
+      (goal) =>
+          goal.id == goalId,
     );
 
+    if (index == -1) {
+      return false;
+    }
+
+    final removedGoal =
+        _goals.removeAt(index);
+
     notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals.insert(
+        index,
+        removedGoal,
+      );
+
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
+  }
+
+  // ================= CLEAR ALL =================
+
+  Future<bool> clearAllGoals() async {
+    final backup =
+        List<Goal>.from(_goals);
+
+    _goals.clear();
+
+    notifyListeners();
+
+    final saved =
+        await _saveGoals();
+
+    if (!saved) {
+      _goals.addAll(backup);
+      notifyListeners();
+
+      return false;
+    }
+
+    return true;
   }
 
   // ================= CLEAR FORM =================
@@ -333,6 +777,7 @@ class GoalProvider extends ChangeNotifier {
     targetDate = null;
     priority = 5;
     emergencyPercentage = 10;
+    _errorMessage = null;
 
     if (notify) {
       notifyListeners();
@@ -343,6 +788,24 @@ class GoalProvider extends ChangeNotifier {
 
   Map<String, dynamic> get data {
     return currentGoal.toJson();
+  }
+
+  // ================= ERROR =================
+
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  String _cleanError(
+    Object error,
+  ) {
+    return error
+        .toString()
+        .replaceFirst(
+          'Exception: ',
+          '',
+        );
   }
 
   // ================= DISPOSE =================
