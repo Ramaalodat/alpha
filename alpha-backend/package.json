@@ -4,7 +4,7 @@
   "description": "BASIRA - Your Resilient Partner in Financial Growth - Backend API",
   "main": "dist/app.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npx prisma generate && npx prisma db push && tsc",
     "dev": "tsx watch src/app.ts",
     "start": "node dist/app.js",
     "test": "jest",
