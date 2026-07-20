@@ -210,7 +210,7 @@ const buildConfig = (): Config => ({
   jwt: {
     accessTokenSecret: getEnvVar('JWT_ACCESS_SECRET'),
     refreshTokenSecret: getEnvVar('JWT_REFRESH_SECRET'),
-    accessTokenExpiry: getEnvVar('JWT_ACCESS_EXPIRES_IN', '15m'),
+    accessTokenExpiry: getEnvVar('JWT_ACCESS_EXPIRES_IN', '7d'),
     refreshTokenExpiry: getEnvVar('JWT_REFRESH_EXPIRES_IN', '7d'),
     issuer: getEnvVar('JWT_ISSUER', 'basira-api'),
     audience: getEnvVar('JWT_AUDIENCE', 'basira-app'),
