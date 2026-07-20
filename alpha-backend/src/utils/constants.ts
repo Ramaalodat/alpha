@@ -38,8 +38,8 @@ export const OTP_CONFIG = {
 
 // JWT configuration
 export const JWT_CONFIG = {
-  ACCESS_TOKEN_EXPIRY: '15m',
-  REFRESH_TOKEN_EXPIRY: '7d',
+  ACCESS_TOKEN_EXPIRY: '30d',
+  REFRESH_TOKEN_EXPIRY: '60d',
   ISSUER: 'basira-api',
   AUDIENCE: 'basira-app',
 } as const;
