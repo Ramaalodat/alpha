@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
@@ -7,7 +8,30 @@ async function main() {
   console.log('🌱 Starting database seeding...');
 
   // =============================================
-  // 1. Seed Default Expense Categories
+  // 1. Seed Allocation Tiers
+  // =============================================
+  console.log('📊 Seeding Allocation Tiers...');
+  const tiers = [
+    { code: 'VERY_LOW', labelAr: 'منخفض جداً', labelEn: 'Very Low', minimumIncome: 0, maximumIncome: 300, needsBps: 8000, wantsBps: 1500, savingsBps: 500 },
+    { code: 'LOW', labelAr: 'منخفض', labelEn: 'Low', minimumIncome: 300, maximumIncome: 600, needsBps: 7000, wantsBps: 2000, savingsBps: 1000 },
+    { code: 'LOWER_MIDDLE', labelAr: 'متوسط أدنى', labelEn: 'Lower Middle', minimumIncome: 600, maximumIncome: 1000, needsBps: 6000, wantsBps: 2500, savingsBps: 1500 },
+    { code: 'MIDDLE', labelAr: 'متوسط', labelEn: 'Middle', minimumIncome: 1000, maximumIncome: 2000, needsBps: 5000, wantsBps: 3000, savingsBps: 2000 },
+    { code: 'UPPER_MIDDLE', labelAr: 'متوسط أعلى', labelEn: 'Upper Middle', minimumIncome: 2000, maximumIncome: 4000, needsBps: 4000, wantsBps: 3500, savingsBps: 2500 },
+    { code: 'HIGH', labelAr: 'مرتفع', labelEn: 'High', minimumIncome: 4000, maximumIncome: 8000, needsBps: 3000, wantsBps: 4000, savingsBps: 3000 },
+    { code: 'VERY_HIGH', labelAr: 'مرتفع جداً', labelEn: 'Very High', minimumIncome: 8000, maximumIncome: null, needsBps: 2000, wantsBps: 4500, savingsBps: 3500 },
+  ];
+
+  for (const tier of tiers) {
+    await prisma.allocationTier.upsert({
+      where: { code: tier.code },
+      update: tier,
+      create: tier,
+    });
+  }
+  console.log(`✅ Created ${tiers.length} allocation tiers`);
+
+  // =============================================
+  // 2. Seed Default Expense Categories
   // =============================================
   console.log('📁 Seeding expense categories...');
 
@@ -37,20 +61,27 @@ async function main() {
   const categories = [...fixedCategories, ...variableCategories];
 
   for (const category of categories) {
-    await prisma.expenseCategory.upsert({
-      where: { 
-        name: category.name 
-      },
-      update: {
-        nameAr: category.nameAr,
-        icon: category.icon,
-        color: category.color,
-        isDefault: category.isDefault,
-        isEssential: category.isEssential,
-        displayOrder: category.displayOrder,
-      },
-      create: category,
+    const existing = await prisma.expenseCategory.findFirst({
+      where: { name: category.name }
     });
+
+    if (existing) {
+      await prisma.expenseCategory.update({
+        where: { id: existing.id },
+        data: {
+          nameAr: category.nameAr,
+          icon: category.icon,
+          color: category.color,
+          isDefault: category.isDefault,
+          isEssential: category.isEssential,
+          displayOrder: category.displayOrder,
+        }
+      });
+    } else {
+      await prisma.expenseCategory.create({
+        data: category
+      });
+    }
   }
 
   console.log(`✅ Created ${categories.length} expense categories`);

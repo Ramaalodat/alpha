@@ -247,6 +247,34 @@ export class UserService {
           },
         });
 
+        // Strict Architecture: Snapshot Immutability
+        // If income changes while a cycle is OPEN, schedule a transition plan instead of recalculating
+        if (currentProfile && profileData.monthlyIncome !== undefined && profileData.monthlyIncome !== Number(currentProfile.monthlyIncome)) {
+          const openCycle = await prisma.financialCycle.findFirst({
+            where: { userId, status: 'OPEN' },
+            include: { allocationSnapshot: true }
+          });
+          
+          if (openCycle && openCycle.allocationSnapshot) {
+            await prisma.allocationTransitionPlan.create({
+              data: {
+                userId,
+                status: 'PROPOSED',
+                stepBps: 1000,
+                startNeedsBps: openCycle.allocationSnapshot.needsBps,
+                startWantsBps: openCycle.allocationSnapshot.wantsBps,
+                startSavingsBps: openCycle.allocationSnapshot.savingsBps,
+                targetNeedsBps: openCycle.allocationSnapshot.needsBps, // Placeholder for actual new tier calculation
+                targetWantsBps: openCycle.allocationSnapshot.wantsBps,
+                targetSavingsBps: openCycle.allocationSnapshot.savingsBps,
+                fundingBucket: 'NEEDS',
+                startCycleId: openCycle.id
+              }
+            });
+            logger.info('AllocationTransitionPlan created to preserve Snapshot Immutability', { userId });
+          }
+        }
+
         await this.createAuditLog({
           userId,
           action: 'UPDATE',
@@ -742,7 +770,7 @@ export class UserService {
             where: { userId, status: 'ACTIVE', deletedAt: null },
           }),
           prisma.financialGoal.count({
-            where: { userId, status: 'COMPLETED', deletedAt: null },
+            where: { userId, status: 'EXECUTED', deletedAt: null },
           }),
           prisma.expense.aggregate({
             where: { userId, deletedAt: null },

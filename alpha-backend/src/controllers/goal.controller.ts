@@ -217,8 +217,8 @@ export class GoalController {
       const updated = await prisma.financialGoal.update({
         where: { id: goalId, userId },
         data: {
-          status: 'COMPLETED',
-          stage: 'EXECUTED',
+          status: 'EXECUTED',
+          executedAt: new Date(),
           completedAt: new Date()
         }
       });

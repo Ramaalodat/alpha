@@ -74,7 +74,7 @@ export interface FinancialGoal {
   targetAmount: number;
   currentAmount: number;
   targetDate: Date;
-  status: 'ACTIVE' | 'COMPLETED' | 'PAUSED' | 'DELETED';
+  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'READY' | 'EXECUTED' | 'CANCELLED';
   progressPercentage?: number;
   flexibility?: 'FIXED' | 'FLEXIBLE';
   goalCategory?: string;
@@ -112,7 +112,7 @@ export interface UpdateGoalRequest {
   name?: string;
   targetAmount?: number;
   targetDate?: string;
-  status?: 'ACTIVE' | 'COMPLETED' | 'PAUSED';
+  status?: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'READY' | 'EXECUTED' | 'CANCELLED';
 }
 
 export interface GoalTransactionRequest {
@@ -290,6 +290,8 @@ export interface DashboardSummary {
     monthlyExpenses: number;
     topCategory?: string;
     remainingBudget?: number;
+    safeDailySpend?: number;
+    spendingVelocity?: number;
   };
   recentActivity: {
     recentExpenses: Expense[];
@@ -366,7 +368,7 @@ export interface IncomeFilters {
 }
 
 export interface GoalFilters {
-  status?: 'ACTIVE' | 'COMPLETED' | 'PAUSED';
+  status?: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'READY' | 'EXECUTED' | 'CANCELLED';
   minAmount?: number;
   maxAmount?: number;
   dueBefore?: string;

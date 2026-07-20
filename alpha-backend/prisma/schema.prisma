@@ -28,11 +28,12 @@ enum UserStatus {
 }
 
 enum GoalStatus {
+  DRAFT
   ACTIVE
-  COMPLETED
   PAUSED
+  READY
+  EXECUTED
   CANCELLED
-  DELETED
 
   @@map("goal_status")
 }

@@ -160,7 +160,7 @@ export class GoalService {
     }
     if (data.status) {
       updateData.status = data.status;
-      if (data.status === GoalStatus.COMPLETED) {
+      if (data.status === GoalStatus.READY || data.status === GoalStatus.EXECUTED) {
         updateData.completedAt = new Date();
       }
     }
@@ -204,7 +204,7 @@ export class GoalService {
       where: { id: goalId },
       data: {
         deletedAt: new Date(),
-        status: GoalStatus.DELETED,
+        status: GoalStatus.CANCELLED,
       },
     });
 
@@ -308,7 +308,7 @@ export class GoalService {
       if (milestones.milestone75) updateData.milestone75 = true;
       if (milestones.milestone100) {
         updateData.milestone100 = true;
-        updateData.status = GoalStatus.COMPLETED;
+        updateData.status = GoalStatus.READY;
         updateData.completedAt = new Date();
       }
 

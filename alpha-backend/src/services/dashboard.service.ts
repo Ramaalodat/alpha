@@ -177,7 +177,7 @@ export class DashboardService {
     // Process goals data
     const totalGoals = goalsData.length;
     const activeGoals = goalsData.filter(g => g.status === 'ACTIVE').length;
-    const completedGoals = goalsData.filter(g => g.status === 'COMPLETED').length;
+    const completedGoals = goalsData.filter(g => g.status === 'EXECUTED').length;
     const totalSaved = goalsData.reduce((sum, g) => sum + Number(g.currentAmount), 0);
     const totalTarget = goalsData.reduce((sum, g) => sum + Number(g.targetAmount), 0);
     const overallProgress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
@@ -191,11 +191,66 @@ export class DashboardService {
       topCategory = category?.name;
     }
 
-    // Calculate remaining budget
+    // Calculate remaining budget based on legacy method
     const monthlyIncome = currentProfile ? Number(currentProfile.monthlyIncome) : 0;
     const basicExpenses = currentProfile ? Number(currentProfile.basicExpenses) : 0;
     const monthlyExpensesTotal = Number(monthlyExpenses._sum.amount || 0);
     const remainingBudget = monthlyIncome - basicExpenses - monthlyExpensesTotal;
+
+    // Strict Architecture: Safe Daily Spend & Spending Velocity
+    let safeDailySpend = 0;
+    let spendingVelocity = 0;
+
+    const openCycle = await prisma.financialCycle.findFirst({
+      where: { userId, status: 'OPEN' },
+    });
+
+    if (openCycle) {
+      // Elapsed Time Percentage
+      const startDate = openCycle.startDate.getTime();
+      const endDate = openCycle.endDate.getTime();
+      const nowTime = now.getTime();
+      
+      const totalDays = Math.max(1, (endDate - startDate) / (1000 * 60 * 60 * 24));
+      const daysElapsed = Math.max(0, (nowTime - startDate) / (1000 * 60 * 60 * 24));
+      const remainingDays = Math.max(1, totalDays - daysElapsed);
+      
+      const elapsedTimePercentage = Math.min(100, (daysElapsed / totalDays) * 100);
+
+      // Fetch components for Safe Daily Spend
+      const totalCycleIncome = Number(openCycle.recordedIncome) + Number(openCycle.unexpectedIncome);
+      
+      const cycleExpenses = await prisma.expense.aggregate({
+        where: { userId, expenseDate: { gte: openCycle.startDate, lte: openCycle.endDate }, deletedAt: null },
+        _sum: { amount: true }
+      });
+      const confirmedExpenses = Number(cycleExpenses._sum.amount || 0);
+
+      const unpaidCommitments = await prisma.commitmentOccurrence.aggregate({
+        where: { cycleId: openCycle.id, status: 'UPCOMING' },
+        _sum: { amount: true }
+      });
+      const unpaidCoreCommitments = Number(unpaidCommitments._sum.amount || 0);
+
+      const reservedSavingsData = await prisma.savingsAllocation.aggregate({
+        where: { cycleId: openCycle.id },
+        _sum: { emergencyFundAmount: true, unallocatedSavingsAmount: true }
+      });
+      const reservedSavings = Number(reservedSavingsData._sum.emergencyFundAmount || 0) + Number(reservedSavingsData._sum.unallocatedSavingsAmount || 0);
+
+      const reservedGoalsData = await prisma.goalCycleAllocation.aggregate({
+        where: { cycleId: openCycle.id },
+        _sum: { plannedAmount: true }
+      });
+      const reservedGoalAllocations = Number(reservedGoalsData._sum.plannedAmount || 0);
+
+      const availableBalance = Math.max(0, totalCycleIncome - confirmedExpenses - unpaidCoreCommitments - reservedSavings - reservedGoalAllocations);
+      safeDailySpend = Math.round((availableBalance / remainingDays) * 100) / 100;
+
+      const totalBudget = Number(openCycle.expectedIncome);
+      const usagePercentage = totalBudget > 0 ? (confirmedExpenses / totalBudget) * 100 : 0;
+      spendingVelocity = Math.round((usagePercentage - elapsedTimePercentage) * 100) / 100;
+    }
 
     const summary: DashboardSummary = {
       user: {
@@ -215,6 +270,8 @@ export class DashboardService {
         monthlyExpenses: monthlyExpensesTotal,
         topCategory,
         remainingBudget,
+        safeDailySpend,
+        spendingVelocity,
       },
       recentActivity: {
         recentExpenses: recentExpenses as any,
@@ -269,11 +326,11 @@ export class DashboardService {
       goals: {
         totalGoals: goals.length,
         activeGoals: activeGoals.length,
-        completedGoals: goals.filter((g) => g.status === 'COMPLETED').length,
+        completedGoals: goals.filter((g) => g.status === 'EXECUTED').length,
         totalSaved, totalTarget,
         overallProgress: Math.round(overallProgress * 100) / 100,
       },
-      expenses: { monthlyExpenses, topCategory: undefined, remainingBudget },
+      expenses: { monthlyExpenses, topCategory: undefined, remainingBudget, safeDailySpend: 0, spendingVelocity: 0 },
       recentActivity: { recentExpenses: [], recentGoalTransactions: [], unreadNotifications: 0, newInsights: 0, recentIncomes: [] },
       incomes: { monthlyIncomeTotal },
     } as any;
