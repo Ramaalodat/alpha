@@ -1,12 +1,10 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { chatController } from '../controllers/chat.controller';
 import { authenticate } from '../middleware/auth.middleware';
-import { requireOnboarded } from '../middleware/onboarding.middleware';
 
 export const chatRoutes = async (fastify: FastifyInstance, options: FastifyPluginOptions) => {
   // All chat routes require authentication
   fastify.addHook('onRequest', authenticate);
-  // fastify.addHook('onRequest', requireOnboarded); // Optional depending on if they can chat before onboarding
 
   fastify.post(
     '/message',
