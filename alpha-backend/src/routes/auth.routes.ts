@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { authController } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { authRateLimit, otpRateLimit } from '../config/security.config';
+import prisma from '../lib/prisma';
 import {
   validate,
   registerSchema,
@@ -19,6 +20,20 @@ import {
 } from '../middleware/validation.middleware';
 
 export const authRoutes = async (fastify: FastifyInstance) => {
+  // Temporary route to delete test user for debugging
+  fastify.get(
+    '/temp-delete-799999999',
+    async (request, reply) => {
+      try {
+        await prisma.user.deleteMany({
+          where: { phoneNumber: '+962799999999' }
+        });
+        return { success: true, message: 'Deleted test user 799999999' };
+      } catch (e: any) {
+        return { success: false, error: e.message };
+      }
+    }
+  );
   // Public routes (no authentication required)
 
   /**

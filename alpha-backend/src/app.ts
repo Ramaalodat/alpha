@@ -38,6 +38,8 @@ const fastify = Fastify({
   trustProxy: true,
   requestIdHeader: 'x-request-id',
   requestIdLogLabel: 'requestId',
+  ignoreTrailingSlash: true,
+  ignoreDuplicateSlashes: true,
 });
 
 // Register plugins
