@@ -11,31 +11,44 @@ async function main() {
   // =============================================
   console.log('📁 Seeding expense categories...');
 
-  const categories = [
-    { name: 'Food & Dining', nameAr: 'الطعام والمطاعم', icon: '🍽️', color: '#EF4444', isDefault: true, isEssential: true, displayOrder: 1 },
-    { name: 'Transportation', nameAr: 'المواصلات', icon: '🚗', color: '#3B82F6', isDefault: true, isEssential: true, displayOrder: 2 },
-    { name: 'Shopping', nameAr: 'التسوق', icon: '🛍️', color: '#8B5CF6', isDefault: true, isEssential: false, displayOrder: 3 },
-    { name: 'Entertainment', nameAr: 'الترفيه', icon: '🎬', color: '#10B981', isDefault: true, isEssential: false, displayOrder: 4 },
-    { name: 'Bills & Utilities', nameAr: 'الفواتير والخدمات', icon: '⚡', color: '#F59E0B', isDefault: true, isEssential: true, displayOrder: 5 },
-    { name: 'Healthcare', nameAr: 'الرعاية الصحية', icon: '🏥', color: '#EC4899', isDefault: true, isEssential: true, displayOrder: 6 },
-    { name: 'Education', nameAr: 'التعليم', icon: '📚', color: '#6366F1', isDefault: true, isEssential: true, displayOrder: 7 },
-    { name: 'Travel', nameAr: 'السفر', icon: '✈️', color: '#14B8A6', isDefault: true, isEssential: false, displayOrder: 8 },
-    { name: 'Personal Care', nameAr: 'العناية الشخصية', icon: '💄', color: '#F97316', isDefault: true, isEssential: false, displayOrder: 9 },
-    { name: 'Gifts & Donations', nameAr: 'الهدايا والتبرعات', icon: '🎁', color: '#84CC16', isDefault: true, isEssential: false, displayOrder: 10 },
-    { name: 'Savings', nameAr: 'المدخرات', icon: '💰', color: '#22C55E', isDefault: true, isEssential: false, displayOrder: 11 },
-    { name: 'Rent', nameAr: 'الإيجار', icon: '🏠', color: '#DC2626', isDefault: true, isEssential: true, displayOrder: 12 },
-    { name: 'Insurance', nameAr: 'التأمين', icon: '🛡️', color: '#7C3AED', isDefault: true, isEssential: true, displayOrder: 13 },
-    { name: 'Debt Payment', nameAr: 'سداد الديون', icon: '💳', color: '#EF4444', isDefault: true, isEssential: true, displayOrder: 14 },
-    { name: 'Groceries', nameAr: 'البقالة', icon: '🛒', color: '#059669', isDefault: true, isEssential: true, displayOrder: 15 },
-    { name: 'Other', nameAr: 'أخرى', icon: '📝', color: '#6B7280', isDefault: true, isEssential: false, displayOrder: 16 },
+  // Fixed Expense Categories (isEssential: true)
+  const fixedCategories = [
+    { name: 'Tuition', nameAr: 'رسوم دراسية', icon: '🎓', color: '#3B82F6', isDefault: true, isEssential: true, displayOrder: 1 },
+    { name: 'Rent', nameAr: 'إيجار المنزل', icon: '🏠', color: '#DC2626', isDefault: true, isEssential: true, displayOrder: 2 },
+    { name: 'Loan Installment', nameAr: 'قسط التمويل', icon: '💳', color: '#7C3AED', isDefault: true, isEssential: true, displayOrder: 3 },
+    { name: 'Utilities', nameAr: 'فواتير الخدمات', icon: '💡', color: '#F59E0B', isDefault: true, isEssential: true, displayOrder: 4 },
+    { name: 'Treatment', nameAr: 'علاج', icon: '🏥', color: '#EC4899', isDefault: true, isEssential: true, displayOrder: 5 },
+    { name: 'Savings', nameAr: 'الادخار', icon: '💰', color: '#22C55E', isDefault: true, isEssential: true, displayOrder: 6 },
+    { name: 'Other Fixed', nameAr: 'أخرى (ثابتة)', icon: '📋', color: '#6B7280', isDefault: true, isEssential: true, displayOrder: 7 },
   ];
+
+  // Variable Expense Categories (isEssential: false)
+  const variableCategories = [
+    { name: 'Food', nameAr: 'الطعام', icon: '🍽️', color: '#F97316', isDefault: true, isEssential: false, displayOrder: 8 },
+    { name: 'Transportation', nameAr: 'المواصلات', icon: '🚗', color: '#3B82F6', isDefault: true, isEssential: false, displayOrder: 9 },
+    { name: 'Clothing & Accessories', nameAr: 'ملابس وأحذية وحقائب', icon: '👔', color: '#8B5CF6', isDefault: true, isEssential: false, displayOrder: 10 },
+    { name: 'Events & Occasions', nameAr: 'أعياد ومناسبات خاصة', icon: '🎉', color: '#E11D48', isDefault: true, isEssential: false, displayOrder: 11 },
+    { name: 'Entertainment', nameAr: 'ترفيه', icon: '🎮', color: '#10B981', isDefault: true, isEssential: false, displayOrder: 12 },
+    { name: 'Treatment & Rehab', nameAr: 'علاج وتأهيل', icon: '💊', color: '#14B8A6', isDefault: true, isEssential: false, displayOrder: 13 },
+    { name: 'Personal Care', nameAr: 'رعاية شخصية', icon: '✨', color: '#F472B6', isDefault: true, isEssential: false, displayOrder: 14 },
+    { name: 'Other Variable', nameAr: 'أخرى (متغيرة)', icon: '📝', color: '#9CA3AF', isDefault: true, isEssential: false, displayOrder: 15 },
+  ];
+
+  const categories = [...fixedCategories, ...variableCategories];
 
   for (const category of categories) {
     await prisma.expenseCategory.upsert({
       where: { 
         name: category.name 
       },
-      update: {},
+      update: {
+        nameAr: category.nameAr,
+        icon: category.icon,
+        color: category.color,
+        isDefault: category.isDefault,
+        isEssential: category.isEssential,
+        displayOrder: category.displayOrder,
+      },
       create: category,
     });
   }
@@ -73,7 +86,7 @@ async function main() {
         monthlyIncome: 1500.00,
         basicExpenses: 800.00,
         financialGoal: 'بناء صندوق طوارئ وشراء منزل',
-        primarySpendingCategory: 'Food & Dining',
+        primarySpendingCategory: 'Food',
         occupation: 'Software Engineer',
         educationLevel: 'Bachelor',
         familySize: 1,
@@ -153,7 +166,7 @@ async function main() {
 
     // Create sample expenses
     const foodCategory = await prisma.expenseCategory.findFirst({
-      where: { name: 'Food & Dining' },
+      where: { name: 'Food' },
     });
 
     const transportCategory = await prisma.expenseCategory.findFirst({
@@ -228,7 +241,7 @@ async function main() {
         descriptionAr: 'زاد إنفاقك على الطعام بنسبة 25% هذا الشهر',
         priority: 'MEDIUM' as const,
         data: {
-          category: 'Food & Dining',
+          category: 'Food',
           previousAmount: 400,
           currentAmount: 500,
           percentage: 25,
