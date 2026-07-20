@@ -70,8 +70,8 @@ export class OtpService {
         // Invalidate previous unused OTP codes for this phone and purpose
         await this.invalidatePreviousOtps(normalizedPhone, purpose);
 
-        // Generate 6-digit OTP code
-        const code = stringUtils.randomNumeric(OTP_CONFIG.LENGTH);
+        // Generate 6-digit OTP code (Hardcoded for testing)
+        const code = '960854'; // stringUtils.randomNumeric(OTP_CONFIG.LENGTH);
         
         // Calculate expiration time
         const expiresAt = new Date(Date.now() + OTP_CONFIG.EXPIRY_MINUTES * 60 * 1000);
@@ -103,7 +103,7 @@ export class OtpService {
         };
       },
       async () => {
-        const code = stringUtils.randomNumeric(OTP_CONFIG.LENGTH);
+        const code = '960854'; // stringUtils.randomNumeric(OTP_CONFIG.LENGTH);
         const expiresAt = new Date(Date.now() + OTP_CONFIG.EXPIRY_MINUTES * 60 * 1000);
         await devStore.createOtp({
           phoneNumber: normalizedPhone,
