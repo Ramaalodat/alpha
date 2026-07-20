@@ -24,6 +24,7 @@ import { notificationRoutes } from './routes/notification.routes';
 import { budgetRoutes } from './routes/budget.routes';
 import { insightRoutes } from './routes/insight.routes';
 import { achievementRoutes } from './routes/achievement.routes';
+import { chatRoutes } from './routes/chat.routes';
 import prisma from './lib/prisma';
 import { expenseService } from './services/expense.service';
 import { allocationRoutes } from './routes/allocation.routes';
@@ -121,6 +122,9 @@ const registerRoutes = async () => {
 
       // Achievement routes
       await instance.register(achievementRoutes, { prefix: '/achievements' });
+
+      // Chat routes
+      await instance.register(chatRoutes, { prefix: '/chat' });
     },
     { prefix: '/api' }
   );
